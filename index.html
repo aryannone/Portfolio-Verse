@@ -1060,6 +1060,12 @@ function setSystem(system) { const id = TEMPLATES[S.project.design.template].sys
 /* ----- projects ----- */
 async function createProject(o) { const p = newProject(o); S._cache.set(p.id, p); S.project = p; S.past = []; S.future = []; S.variations = []; S.activeVar = null; S.codeDraft = { html: null, css: null, js: null, dirty: false }; S.saveState = 'unsaved'; LS.set('pv:last', p.id); await saveNow(); emit('project'); return p; }
 async function duplicateProject(id) { const src = S._cache.get(id); if (!src) return; const c = clone(src); c.id = uid('p'); c.name = src.name + ' copy'; c.createdAt = c.updatedAt = Date.now(); S._cache.set(c.id, c); await DB.put(c); S.baseStamp[c.id] = c.updatedAt; upsertIndex(c); return c; }
+/* Keep a Make It Yours design without applying it: copy the whole portfolio (content, assets, code) with that design as its own project. */
+async function saveVariationAsProject(vid) {
+  const v = S.variations.find(x => x.id === vid), src = S.project; if (!v || !src) return null;
+  const c = clone(src); c.id = uid('p'); c.name = (src.name + ' · ' + v.label).slice(0, 80); c.design = clone(v.design); c.versions = []; c.createdAt = c.updatedAt = Date.now();
+  S._cache.set(c.id, c); await DB.put(c); S.baseStamp[c.id] = c.updatedAt; upsertIndex(c); return c;
+}
 async function deleteProject(id) { await DB.del(id); S._cache.delete(id); S.index = S.index.filter(x => x.id !== id); if (S.project && S.project.id === id) { S.project = null; LS.del('pv:last'); } }
 function renameProject(id, name) { const p = S._cache.get(id); if (!p) return; p.name = name.trim().slice(0, 80) || p.name; p.updatedAt = Date.now(); DB.put(p).then(() => { S.baseStamp[id] = p.updatedAt; }).catch(e => toast('Could not save the new name: ' + e.message, 'err')); upsertIndex(p); if (S.project && S.project.id === id) emit('save'); }
 async function importProject(text) { const p = sanitizeProject(JSON.parse(text)); if (S._cache.has(p.id)) { p.id = uid('p'); p.name += ' (imported)'; } S._cache.set(p.id, p); await DB.put(p); S.baseStamp[p.id] = p.updatedAt; upsertIndex(p); return p; }
@@ -1548,7 +1554,7 @@ function miyPanelHTML() {
   ${S.interpreted && S.interpreted.length ? `<div class="chips"><span class="muted sm">Understood:</span>${S.interpreted.map(x => `<span class="chip2">${esc(x)}</span>`).join('')}</div>` : ''}
   <div class="vlist"><label class="vcard ${act ? '' : 'on'}"><input type="radio" name="var" data-act-change="varpick" value="" ${act ? '' : 'checked'}><div class="vt tf" data-own="${S.project.id}"><iframe sandbox title="Current design" tabindex="-1" aria-hidden="true"></iframe></div><div class="vb"><strong>Current design</strong><small>Always kept until you apply a variation</small></div></label>
   ${vs.map(v => `<label class="vcard ${act === v.id ? 'on' : ''}"><input type="radio" name="var" data-act-change="varpick" value="${v.id}" ${act === v.id ? 'checked' : ''}><div class="vt tf" data-vid="${v.id}"><iframe sandbox title="${esc(v.label)}" tabindex="-1" aria-hidden="true"></iframe></div><div class="vb"><strong>${esc(v.label)}</strong><small>${esc(v.changes.slice(0, 4).join(' · ') || 'Subtle changes')}</small></div></label>`).join('')}</div>
-  <div class="miy-actions"><button class="btn primary" data-act="miyapply" ${act ? '' : 'disabled'}>${ico('check', 16)} Apply this design</button><button class="btn" data-act="miycompare" ${act ? '' : 'disabled'} aria-pressed="${S.compare}">${S.compare ? 'Exit compare' : 'Compare side by side'}</button><button class="btn ghost" data-act="miyshuffle">${ico('refresh', 15)} More options</button><button class="btn ghost danger-t" data-act="miydiscard">Discard all</button></div>`;
+  <div class="miy-actions"><button class="btn primary" data-act="miyapply" ${act ? '' : 'disabled'}>${ico('check', 16)} Apply this design</button><button class="btn" data-act="miycompare" ${act ? '' : 'disabled'} aria-pressed="${S.compare}">${S.compare ? 'Exit compare' : 'Compare side by side'}</button><button class="btn" data-act="miysave" ${act ? '' : 'disabled'}>${ico('copy', 16)} Save as new portfolio</button><button class="btn ghost" data-act="miysaveall">Save all ${vs.length}</button><button class="btn ghost" data-act="miyshuffle">${ico('refresh', 15)} More options</button><button class="btn ghost danger-t" data-act="miydiscard">Discard all</button></div>`;
 }
 function hydrateVarThumbs(root) {
   $$('.tf[data-vid],.tf[data-own]', root).forEach(el => {
@@ -1894,6 +1900,8 @@ const ACT = {
   closesheet: () => { S.ui.sheet = null; S.ui.insp = false; if (Router.cur.q.p) Router.setQuery({ p: null }); const i = $('.ws'); i && i.classList.remove('insp-open'); updateChrome(); layoutPreview(); },
   editcontent: el => { S.ui.openSec[el.dataset.id] = true; ACT.openpanel({ dataset: { p: 'content' } }); },
   miypreset: el => runVariations({ preset: el.dataset.k }), miycustom: () => { const t = $('#miy-text').value; S.ui.miyText = t; runVariations({ text: t }); },
+  miysave: async () => { try { const c = await saveVariationAsProject(S.activeVar); if (c) toast('Saved “' + c.name + '”. Find it any time under ⋯ → All portfolios.'); } catch (e) { toast('Could not save this design: ' + e.message, 'err'); } },
+  miysaveall: async () => { try { const n = S.variations.length; for (const v of [...S.variations]) await saveVariationAsProject(v.id); toast('Saved ' + n + ' designs as new portfolios. Find them under ⋯ → All portfolios.'); } catch (e) { toast('Could not save these designs: ' + e.message, 'err'); } },
   miyback: () => discardVariations(), miydiscard: () => { discardVariations(); toast('Discarded — your design is unchanged'); },
   miyapply: async () => { if (!(await guardManualCode('this design'))) return; applyVariation(S.activeVar); toast('Design applied. Use Undo to go back.'); }, miyshuffle: () => runVariations(S.miyReq, (S.miySeed || 0) + 1),
   miycompare: () => { S.compare = !S.compare; emit('variations'); refreshPreview(true); },
@@ -1946,3 +1954,4 @@ boot();
 </script>
 </body>
 </html>
+
