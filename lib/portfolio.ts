@@ -28,7 +28,8 @@ export type SectionStyle = "" | "outline" | "filled" | "colour" | "sticker" | "g
 export type Section = {
   id: string;
   title: string;
-  layout: "cards" | "list";
+  // "skills" is the one special section: it shows the skill chips and has no entries.
+  layout: "cards" | "list" | "skills";
   style: SectionStyle;
   hidden: boolean;
   items: Item[];
@@ -141,6 +142,10 @@ export function newItem(): Item {
   return { id: uid(), title: "", sub: "", meta: "", text: "", tags: [], photos: [] };
 }
 
+export function skillsSection(): Section {
+  return { id: "skills", title: "Skills", layout: "skills", style: "", hidden: false, items: [] };
+}
+
 export function newSection(title: string, layout: Section["layout"]): Section {
   return { id: uid(), title, layout, style: "", hidden: false, items: [] };
 }
@@ -194,7 +199,11 @@ export function normalize(saved: Portfolio): Portfolio {
   return {
     ...LOOK_DEFAULTS,
     ...saved,
-    sections: saved.sections.map((section) => ({ ...section, style: section.style ?? "" })),
+    // Skills used to sit after every section, so that is where the section goes for older saves.
+    sections: [
+      ...saved.sections.map((section) => ({ ...section, style: section.style ?? "" })),
+      ...(saved.sections.some((section) => section.layout === "skills") ? [] : [skillsSection()]),
+    ],
   };
 }
 
@@ -249,6 +258,7 @@ export function fromSample(template: string): Portfolio {
     hidden: false,
     items: s.education.map((e, i) => ({ id: `e${i}`, title: e.title, sub: e.place, meta: e.years, text: "", tags: [], photos: i === 0 ? photos(3) : [] })),
   });
+  sections.push(skillsSection());
 
   return {
     template: id,
@@ -282,7 +292,7 @@ export function blankPortfolio(template: string): Portfolio {
     email: "",
     links: [],
     skills: [],
-    sections: [newSection("Projects", "cards"), newSection("Experience", "list"), newSection("Education", "list")],
+    sections: [newSection("Projects", "cards"), newSection("Experience", "list"), newSection("Education", "list"), skillsSection()],
     sample: false,
   };
 }

@@ -46,7 +46,8 @@
   gap: 56px;
 }
 .tp-side, .tp-main { display: contents; }
-.tp-skills { order: 2; }
+/* Skills are written twice: in the flow of sections, and in the side panel for the one template that uses it. */
+.tp-skills-side { display: none; }
 .tp-contact { order: 3; }
 
 .tp-hero { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
@@ -195,6 +196,8 @@
 .tp-professional-2 .tp-in { max-width: none; padding: 0; gap: 0; display: grid; grid-template-columns: 360px minmax(0, 1fr); }
 .tp-professional-2 .tp-side { display: flex; flex-direction: column; gap: 44px; padding: 56px 36px; background: var(--tp-accent); color: var(--tp-on-accent); }
 .tp-professional-2 .tp-main { display: flex; flex-direction: column; gap: 48px; padding: 56px; min-width: 0; }
+.tp-professional-2 .tp-skills-side { display: flex; }
+.tp-professional-2 .tp-skills-main { display: none; }
 .tp-professional-2 .tp-name { font-size: 44px; line-height: 1.05; }
 .tp-professional-2 .tp-avatar { background: var(--tp-on-accent); color: var(--tp-accent); }
 .tp-professional-2 .tp-side .tp-tags, .tp-professional-2 .tp-side .tp-h { color: inherit; opacity: 0.72; }
@@ -331,9 +334,9 @@
 .tp-creative-5 .tp-bio { font-family: var(--tp-display); font-style: italic; font-size: 24px; }
 .tp-creative-5 .tp-links .tp-cta { border-radius: 0; background: var(--tp-accent); color: var(--tp-on-accent); }
 .tp-creative-5 .tp-sec { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 20px 40px; align-items: start; }
-.tp-creative-5 .tp-about, .tp-creative-5 .tp-cards, .tp-creative-5 .tp-list { counter-increment: tp-sec; }
+.tp-creative-5 .tp-about, .tp-creative-5 .tp-cards, .tp-creative-5 .tp-list, .tp-creative-5 .tp-skills-main { counter-increment: tp-sec; }
 .tp-creative-5 .tp-h { color: var(--tp-ink); display: flex; flex-direction: column; gap: 6px; }
-.tp-creative-5 .tp-about .tp-h::before, .tp-creative-5 .tp-cards .tp-h::before, .tp-creative-5 .tp-list .tp-h::before { content: "0" counter(tp-sec); font-family: var(--tp-display); font-size: 44px; font-weight: 500; letter-spacing: -0.02em; line-height: 1; color: var(--tp-accent); }
+.tp-creative-5 .tp-about .tp-h::before, .tp-creative-5 .tp-cards .tp-h::before, .tp-creative-5 .tp-list .tp-h::before, .tp-creative-5 .tp-skills-main .tp-h::before { content: "0" counter(tp-sec); font-family: var(--tp-display); font-size: 44px; font-weight: 500; letter-spacing: -0.02em; line-height: 1; color: var(--tp-accent); }
 .tp-creative-5 .tp-about p { font-family: var(--tp-display); font-size: 24px; line-height: 1.4; }
 .tp-creative-5 .tp-sec:not(.tp-v) .tp-grid.tp-grid { --tp-cols: 1; --tp-tall: 1; gap: 0; }
 .tp-creative-5 .tp-sec:not(.tp-v) .tp-shot.tp-shot { aspect-ratio: 16 / 10; }

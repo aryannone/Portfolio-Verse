@@ -20,6 +20,7 @@ const HINTS: Record<string, string> = {
   Projects: "Things you built, wrote, designed or led. College projects count.",
   Experience: "Jobs, internships, freelance work and volunteering.",
   Education: "Degrees, school, courses and certificates.",
+  Skills: "Tools, languages and strengths. Type them with commas in between.",
 };
 
 // The details form: one small step at a time, then a template picker that already shows the user's details.

@@ -100,9 +100,6 @@ export function ProfileFields({ data, tools }: { data: Portfolio; tools: Tools }
       <Field label="Email">
         <input className="ed-input" type="email" value={data.email} placeholder="you@example.com" onChange={(e) => set({ email: e.target.value })} />
       </Field>
-      <Field label="Skills, separated by commas">
-        <ListInput value={data.skills} onChange={(skills) => set({ skills })} placeholder="Excel, Python, Public speaking" />
-      </Field>
       <div className="ed-field">
         <span>Links</span>
         {data.links.map((link) => (
@@ -127,6 +124,27 @@ export function ProfileFields({ data, tools }: { data: Portfolio; tools: Tools }
 export function SectionFields({ data, section, tools, design }: { data: Portfolio; section: Section; tools: Tools; design: boolean }) {
   const { set, setSection, setItem, addPhotos } = tools;
   const styles = section.layout === "cards" ? CARD_STYLES : LIST_STYLES;
+
+  // The skills section has no entries, only the list of skills.
+  if (section.layout === "skills") {
+    return (
+      <>
+        <Field label="Section title">
+          <input className="ed-input" value={section.title} onChange={(e) => setSection(section.id, { title: e.target.value })} />
+        </Field>
+        <Field label="Skills, separated by commas">
+          <ListInput value={data.skills} onChange={(skills) => set({ skills })} placeholder="Excel, Python, Public speaking" />
+        </Field>
+        {design ? (
+          <div className="ed-tools">
+            <button type="button" className="ed-link" onClick={() => setSection(section.id, { hidden: !section.hidden })}>
+              {section.hidden ? "Show" : "Hide"}
+            </button>
+          </div>
+        ) : null}
+      </>
+    );
+  }
 
   return (
     <>

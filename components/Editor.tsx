@@ -197,6 +197,9 @@ export default function Editor() {
                 Glowing background
               </label>
               <p className="ed-hint">Animations play in Preview and in the downloaded file.</p>
+              {data.template === "professional-2" ? (
+                <p className="ed-hint">In this template, Skills stay in the side panel wherever the Skills section is moved.</p>
+              ) : null}
             </div>
           </details>
 

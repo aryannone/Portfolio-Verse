@@ -32,7 +32,23 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   const store = useRef<RuntimeStore>({ items: {} });
 
   const moves = data.motion !== "none";
-  const sections = data.sections.filter((s) => !s.hidden && s.items.length > 0);
+  const Name = semantic ? "h1" : "div";
+  const Heading = semantic ? "h2" : "div";
+  const sections = data.sections.filter((s) => !s.hidden && (s.layout === "skills" ? data.skills.length > 0 : s.items.length > 0));
+
+  // Skills are a section like any other, placed wherever the user moved them.
+  // Professional 2 is the exception: its design keeps them in the side panel.
+  const skills = (section: Section, place: "side" | "main") => (
+    <div key={section.id} className={`tp-sec tp-skills tp-skills-${place}`}>
+      <Heading className="tp-h">{section.title}</Heading>
+      <div className="tp-chips">
+        {data.skills.map((skill, i) => (
+          <span key={i}>{skill}</span>
+        ))}
+      </div>
+    </div>
+  );
+  const skillsSection = sections.find((s) => s.layout === "skills");
 
   const items: RuntimeStore["items"] = {};
   for (const section of sections) {
@@ -64,8 +80,6 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
     ? ({ "--tp-accent": data.accent, "--tp-on-accent": onColor(data.accent) } as CSSProperties)
     : undefined;
 
-  const Name = semantic ? "h1" : "div";
-  const Heading = semantic ? "h2" : "div";
 
   const itemProps = (section: Section, item: Item, base: string) => {
     const has = item.photos.length > 0;
@@ -133,16 +147,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
             </div>
           </div>
 
-          {data.skills.length ? (
-            <div className="tp-sec tp-skills">
-              <Heading className="tp-h">Skills</Heading>
-              <div className="tp-chips">
-                {data.skills.map((skill, i) => (
-                  <span key={i}>{skill}</span>
-                ))}
-              </div>
-            </div>
-          ) : null}
+          {skillsSection ? skills(skillsSection, "side") : null}
         </div>
 
         <div className="tp-main">
@@ -154,7 +159,9 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
           ) : null}
 
           {sections.map((section) =>
-            section.layout === "cards" ? (
+            section.layout === "skills" ? (
+              skills(section, "main")
+            ) : section.layout === "cards" ? (
               <div key={section.id} className={`tp-sec tp-cards${section.style ? ` tp-v tp-v-${section.style}` : ""}`}>
                 <Heading className="tp-h">{section.title}</Heading>
                 <div className={`tp-grid tp-n-${Math.min(section.items.length, 9)}`}>
