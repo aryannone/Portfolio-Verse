@@ -2,6 +2,7 @@
 
 export type SampleProject = { title: string; text: string; tags: string[] };
 export type SampleEducation = { title: string; place: string; years: string };
+export type SampleExperience = { title: string; place: string; years: string; text: string };
 
 export type Sample = {
   slug: string;
@@ -15,6 +16,7 @@ export type Sample = {
   projects: SampleProject[];
   skills: string[];
   education: SampleEducation[];
+  experience?: SampleExperience[];
   email: string;
   links: string[];
 };
@@ -154,5 +156,84 @@ export const SAMPLES: Record<string, Sample> = {
     ],
     email: "zoya.khan@example.com",
     links: ["LinkedIn", "Dribbble"],
+  },
+  "professional-4": {
+    slug: "arjun-reddy",
+    name: "Arjun Reddy",
+    initials: "AR",
+    role: "Software Engineer",
+    city: "Hyderabad",
+    bio: "Backend developer who likes small services, clear logs and fast tests.",
+    about:
+      "Final-year computer science student. I have interned twice, shipped a payments feature used by 40,000 people and still enjoy explaining recursion to juniors.",
+    workLabel: "Projects",
+    projects: [
+      { title: "Hostel room allotment system", text: "Replaced a paper lottery for 1,200 students with a fair, auditable draw.", tags: ["Go", "PostgreSQL"] },
+      { title: "Bus tracker for campus shuttles", text: "Live locations on a map, built with drivers' own phones.", tags: ["React Native", "Firebase"] },
+      { title: "Open-source PDF splitter", text: "A command-line tool with 300 stars and a very patient maintainer.", tags: ["Rust", "CLI"] },
+    ],
+    skills: ["Go", "Java", "PostgreSQL", "Docker", "AWS", "System design"],
+    experience: [
+      { title: "Software Engineering Intern", place: "A fintech startup, Bengaluru", years: "May to Jul 2026", text: "Built the UPI refund flow and cut failed refunds by a third." },
+      { title: "Summer Intern", place: "A logistics company, Hyderabad", years: "May to Jun 2025", text: "Wrote a route report that the operations team still opens every Monday." },
+    ],
+    education: [
+      { title: "B.Tech. Computer Science", place: "JNTU Hyderabad", years: "2023 to 2027" },
+      { title: "Class XII, MPC", place: "Narayana Junior College", years: "2023" },
+    ],
+    email: "arjun.reddy@example.com",
+    links: ["LinkedIn", "GitHub"],
+  },
+  "creative-4": {
+    slug: "sneha-kulkarni",
+    name: "Sneha Kulkarni",
+    initials: "SK",
+    role: "Motion Designer",
+    city: "Pune",
+    bio: "I make logos move, explainers breathe and title cards worth pausing on.",
+    about:
+      "Animation graduate working with studios and indie musicians. I storyboard on paper, animate at night and render while I sleep.",
+    workLabel: "Reel",
+    projects: [
+      { title: "Monsoon, a music video", text: "Two minutes of hand-drawn rain for a Marathi indie band.", tags: ["After Effects", "Frame by frame"] },
+      { title: "Startup explainer series", text: "Six short films that made a billing product feel friendly.", tags: ["Motion", "Storyboard"] },
+      { title: "Festival title sequence", text: "Opening titles for a Pune short-film festival.", tags: ["Cinema 4D", "Type"] },
+    ],
+    skills: ["After Effects", "Cinema 4D", "Blender", "Illustrator", "Storyboarding", "Sound sync"],
+    experience: [
+      { title: "Junior Motion Designer", place: "An animation studio, Pune", years: "2025 to now", text: "Explainers and brand films for product companies." },
+      { title: "Freelance animator", place: "Indie musicians and cafes", years: "2023 to 2025", text: "Lyric videos, loops and looping menu boards." },
+    ],
+    education: [
+      { title: "B.Des., Animation", place: "MIT Institute of Design, Pune", years: "2021 to 2025" },
+    ],
+    email: "sneha.kulkarni@example.com",
+    links: ["Instagram", "Vimeo"],
+  },
+  "creative-5": {
+    slug: "farhan-ali",
+    name: "Farhan Ali",
+    initials: "FA",
+    role: "Architect",
+    city: "Lucknow",
+    bio: "Small buildings, old cities and the light between them.",
+    about:
+      "I trained in Lucknow and work on homes, courtyards and restorations. I draw by hand first, because a pencil argues less than software.",
+    workLabel: "Selected work",
+    projects: [
+      { title: "Courtyard house, Aliganj", text: "A family home planned around a neem tree and the afternoon breeze.", tags: ["Residential", "Brick"] },
+      { title: "Chowk haveli restoration", text: "Lime plaster, timber repairs and a roof that no longer leaks.", tags: ["Conservation"] },
+      { title: "Riverside reading room", text: "A competition entry for a small public library on the Gomti.", tags: ["Public", "Competition"] },
+    ],
+    skills: ["Hand drafting", "AutoCAD", "Rhino", "Model making", "Site supervision", "Conservation"],
+    experience: [
+      { title: "Junior Architect", place: "A conservation practice, Lucknow", years: "2025 to now", text: "Measured drawings and site work on two listed buildings." },
+      { title: "Intern", place: "A design studio, Ahmedabad", years: "2024", text: "Models and working drawings for a school campus." },
+    ],
+    education: [
+      { title: "B.Arch.", place: "Faculty of Architecture, AKTU Lucknow", years: "2020 to 2025" },
+    ],
+    email: "farhan.ali@example.com",
+    links: ["Instagram", "LinkedIn"],
   },
 };

@@ -3,21 +3,22 @@ import SiteFooter from "@/components/SiteFooter";
 import StartButton from "@/components/StartButton";
 import ScaledPreview from "@/components/ScaledPreview";
 import HeroShowcase from "@/components/HeroShowcase";
+import RevealOnScroll from "@/components/RevealOnScroll";
 
 const STEPS = [
-  { title: "Start free", text: "One click. No account or password needed." },
-  { title: "Fill in your details", text: "Education, projects, skills, photo and résumé PDF, in one guided form." },
-  { title: "Pick a template", text: "Click any text to edit it. Change colours, fonts and sections." },
-  { title: "Publish", text: "Get your own link to share, or download the HTML and host it anywhere." },
+  { title: "Start building", text: "One click. No account or password needed." },
+  { title: "Fill in your details", text: "Education, experience, projects, skills and photos, in one simple panel." },
+  { title: "Pick a template", text: "Switch between nine looks. Change colours, fonts and sections." },
+  { title: "Download", text: "Get your whole portfolio as one HTML file and host it anywhere." },
 ];
 
 const FEATURES = [
-  { title: "Your own link", text: "A short address with your name, ready for your résumé and LinkedIn." },
+  { title: "Photos that open up", text: "Add photos to any project, job or course. Visitors tap it and a photo panel slides in." },
   { title: "Looks right on every screen", text: "Recruiters open links on phones. Your site adapts on its own." },
-  { title: "Click to edit", text: "Change any text right on the page. Your work saves by itself." },
+  { title: "Motion built in", text: "Sections rise in as visitors scroll. No settings, no code." },
+  { title: "Make it yours", text: "Nine templates, any colour, three heading fonts, your own sections." },
+  { title: "Saves as you type", text: "Your work is kept in this browser, so you can come back to it." },
   { title: "Download the HTML", text: "The site is yours. Take the file and host it wherever you like." },
-  { title: "Résumé PDF", text: "Upload your résumé once and visitors can download it from your site." },
-  { title: "A neat share preview", text: "Your name, photo and headline show up when you share the link on WhatsApp." },
 ];
 
 const SLUGS = [
@@ -37,6 +38,7 @@ export default function LandingPage() {
   return (
     <>
       <SiteHeader />
+      <RevealOnScroll />
       <main>
         <div className="hero-zone">
         <section className="wrap hero">
@@ -49,11 +51,11 @@ export default function LandingPage() {
               Your portfolio, live in <span className="mark">ten minutes.</span>
             </h1>
             <p className="lead">
-              Fill in your details, pick a template and publish. No sign-up, no code, no
-              developer, no cost.
+              Fill in your details, add your photos, pick a template and download your site. No
+              sign-up, no code, no cost.
             </p>
             <StartButton />
-            <p className="small">Free during beta. Download your HTML any time.</p>
+            <p className="small">Free during beta. No sign-up. Download your HTML any time.</p>
           </div>
 
           <div className="hero-demo">
@@ -74,10 +76,10 @@ export default function LandingPage() {
 
         <section className="band-dark">
           <div className="wrap section">
-            <h2 className="display h-section">Four steps. That is all.</h2>
+            <h2 className="display h-section" data-reveal>Four steps. That is all.</h2>
             <ol className="steps">
               {STEPS.map((step, i) => (
-                <li key={step.title} className="step">
+                <li key={step.title} className="step" data-reveal style={{ "--i": i } as React.CSSProperties}>
                   <span className="step-num" aria-hidden="true">{i + 1}</span>
                   <div className="step-title">{step.title}</div>
                   <div className="step-text">{step.text}</div>
@@ -89,22 +91,22 @@ export default function LandingPage() {
 
         <section className="wrap section">
           <div className="section-head">
-            <h2 className="display h-section">Two styles, six templates.</h2>
+            <h2 className="display h-section" data-reveal>Two styles, nine templates.</h2>
             <p>
               Professional for placements and job applications. Creative for designers,
               photographers and makers.
             </p>
           </div>
           <div className="styles">
-            <div className="style-card">
+            <div className="style-card" data-reveal>
               <ScaledPreview id="professional-1" ratio="16 / 10" flat />
               <div className="style-foot">
                 <strong>Professional</strong>
                 <span>Clean, calm and recruiter-friendly.</span>
               </div>
             </div>
-            <div className="style-card">
-              <ScaledPreview id="creative-1" ratio="16 / 10" flat />
+            <div className="style-card" data-reveal>
+              <ScaledPreview id="creative-4" ratio="16 / 10" flat />
               <div className="style-foot">
                 <strong>Creative</strong>
                 <span>Bold colour, big type, more personality.</span>
@@ -114,10 +116,10 @@ export default function LandingPage() {
         </section>
 
         <section className="wrap section" style={{ paddingTop: 0 }}>
-          <h2 className="display h-section">What you get, free.</h2>
+          <h2 className="display h-section" data-reveal>What you get, free.</h2>
           <div className="features">
-            {FEATURES.map((f) => (
-              <div key={f.title} className="feature">
+            {FEATURES.map((f, i) => (
+              <div key={f.title} className="feature" data-reveal style={{ "--i": i % 3 } as React.CSSProperties}>
                 <strong>{f.title}</strong>
                 <span>{f.text}</span>
               </div>

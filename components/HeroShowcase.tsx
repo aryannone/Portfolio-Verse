@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import ScaledPreview from "@/components/ScaledPreview";
 import { SAMPLES } from "@/lib/samples";
 
-const ORDER = ["professional-1", "creative-1", "professional-2", "creative-3", "creative-2"];
+const ORDER = ["creative-4", "professional-4", "creative-1", "creative-5", "professional-2", "creative-3"];
 
-// The hero's browser frame. It moves through real templates every few seconds,
+// The hero's browser frame. It moves through real templates, scrolling down each one,
 // pauses while the pointer is over it, and stays still if the visitor prefers less motion.
 export default function HeroShowcase() {
   const [index, setIndex] = useState(0);
@@ -17,7 +17,7 @@ export default function HeroShowcase() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const timer = window.setInterval(() => {
       setIndex((i) => (i + 1) % ORDER.length);
-    }, 3800);
+    }, 6500);
     return () => window.clearInterval(timer);
   }, [paused]);
 
@@ -40,7 +40,9 @@ export default function HeroShowcase() {
           portfolio-verse.vercel.app/<strong>{sample.slug}</strong>
         </div>
       </div>
-      <ScaledPreview key={id} id={id} ratio="16 / 12" flat />
+      <div key={id} className="scaled-swap">
+        <ScaledPreview id={id} ratio="16 / 12" flat auto />
+      </div>
     </div>
   );
 }
