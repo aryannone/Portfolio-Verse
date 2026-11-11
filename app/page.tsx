@@ -1,11 +1,11 @@
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import GoogleButton from "@/components/GoogleButton";
+import StartButton from "@/components/StartButton";
 import ScaledPreview from "@/components/ScaledPreview";
 import HeroShowcase from "@/components/HeroShowcase";
 
 const STEPS = [
-  { title: "Sign in with Google", text: "One tap. No new password to remember." },
+  { title: "Start free", text: "One click. No account or password needed." },
   { title: "Fill in your details", text: "Education, projects, skills, photo and résumé PDF, in one guided form." },
   { title: "Pick a template", text: "Click any text to edit it. Change colours, fonts and sections." },
   { title: "Publish", text: "Get your own link to share, or download the HTML and host it anywhere." },
@@ -49,10 +49,10 @@ export default function LandingPage() {
               Your portfolio, live in <span className="mark">ten minutes.</span>
             </h1>
             <p className="lead">
-              Sign in with Google, fill in your details, pick a template and publish. No code, no
+              Fill in your details, pick a template and publish. No sign-up, no code, no
               developer, no cost.
             </p>
-            <GoogleButton />
+            <StartButton />
             <p className="small">Free during beta. Download your HTML any time.</p>
           </div>
 

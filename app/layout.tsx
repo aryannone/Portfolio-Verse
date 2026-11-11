@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s · PORTFOLIO-VERSE",
   },
   description:
-    "A free portfolio website builder for students and first-job seekers. Sign in with Google, fill in your details, pick a template and publish.",
+    "A free portfolio website builder for students and first-job seekers. Fill in your details, pick a template and publish.",
   openGraph: {
     title: "PORTFOLIO-VERSE",
     description:

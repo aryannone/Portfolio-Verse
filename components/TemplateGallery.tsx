@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { TEMPLATES, type TemplateCategory } from "@/lib/templates";
 import ScaledPreview from "@/components/ScaledPreview";
-import GoogleButton from "@/components/GoogleButton";
+import StartButton from "@/components/StartButton";
 
 type Filter = "all" | TemplateCategory;
 
@@ -53,7 +53,7 @@ export default function TemplateGallery() {
                   <Link href={`/templates/${t.id}`} className="btn btn-quiet">
                     Preview
                   </Link>
-                  <GoogleButton label="Use this template" variant="outline" template={t.id} />
+                  <StartButton label="Use this template" variant="outline" template={t.id} />
                 </div>
               </article>
             ))}

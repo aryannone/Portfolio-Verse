@@ -5,9 +5,10 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 
 ## What is built so far
 
-- Foundation: Next.js app, design system (`app/globals.css`), Supabase client, Google login flow
+- Foundation: Next.js app, design system (`app/globals.css`), Supabase client
 - Landing page (`/`) and template gallery (`/templates`)
 - Placeholder pages for `/dashboard`, `/privacy`, `/terms`, `/report`
+- Login is switched off for now: every page is open to everyone, and `/dashboard` links to the original builder at `/studio`
 
 ## Folders
 
@@ -19,8 +20,4 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 
 ## Environment variables
 
-See `.env.example`. Without them the site still runs; the Google button shows a "being set up" message.
-
-## Admin access
-
-Set `ADMIN_KEY` in Vercel, redeploy, then open `/admin` and enter the key. That browser can then open login-only pages (such as `/dashboard`) without Google sign-in for 30 days. Without `ADMIN_KEY`, admin access is off.
+See `.env.example`. They are not used while login is switched off.

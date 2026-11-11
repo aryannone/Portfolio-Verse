@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TEMPLATES, getTemplate } from "@/lib/templates";
 import TemplatePreview from "@/components/TemplatePreview";
-import GoogleButton from "@/components/GoogleButton";
+import StartButton from "@/components/StartButton";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -34,7 +34,7 @@ export default async function TemplatePreviewPage({ params }: Params) {
             {template.name}
             <span>Sample content</span>
           </div>
-          <GoogleButton label="Use this template" variant="outline" template={template.id} />
+          <StartButton label="Use this template" variant="outline" template={template.id} />
         </div>
       </div>
       <main>
