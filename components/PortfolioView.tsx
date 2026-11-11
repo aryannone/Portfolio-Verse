@@ -36,10 +36,29 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   const Heading = semantic ? "h2" : "div";
   const sections = data.sections.filter((s) => !s.hidden && (s.layout === "skills" ? data.skills.length > 0 : s.items.length > 0));
 
+  // A section's own colours and font, when the user has set any.
+  const look = (section: Section) => {
+    const style: Record<string, string> = {};
+    if (section.bg) style["--tp-bg"] = section.bg;
+    if (section.ink || section.bg) style["--tp-ink"] = section.ink || onColor(section.bg ?? "");
+    if (section.accent) {
+      style["--tp-accent"] = section.accent;
+      style["--tp-on-accent"] = onColor(section.accent);
+    }
+    const classes = [
+      section.bg ? "tp-sec-bg" : "",
+      section.bg || section.ink ? "tp-sec-ink" : "",
+      section.font ? `tp-sf-${section.font}` : "",
+      section.style ? `tp-v tp-v-${section.style}` : "",
+    ].filter(Boolean);
+    return { extra: classes.length ? ` ${classes.join(" ")}` : "", style: style as CSSProperties };
+  };
+
   // Skills are a section like any other, placed wherever the user moved them.
   // Professional 2 is the exception: its design keeps them in the side panel.
+  const inSide = data.template === "professional-2";
   const skills = (section: Section, place: "side" | "main") => (
-    <div key={section.id} className={`tp-sec tp-skills tp-skills-${place}`}>
+    <div key={section.id} className={`tp-sec tp-skills tp-skills-${place}${look(section).extra}`} style={look(section).style}>
       <Heading className="tp-h">{section.title}</Heading>
       <div className="tp-chips">
         {data.skills.map((skill, i) => (
@@ -54,9 +73,11 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   for (const section of sections) {
     for (const item of section.items) {
       items[`${section.id}:${item.id}`] = {
+        section: section.title,
         title: item.title,
         sub: subLine(item),
         text: item.text,
+        details: item.details ?? "",
         tags: item.tags,
         layout: item.gallery || data.gallery,
         photos: item.photos,
@@ -82,12 +103,13 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
 
 
   const itemProps = (section: Section, item: Item, base: string) => {
-    const has = item.photos.length > 0;
+    // An entry opens the details panel when it has photos or a full write-up to show.
+    const has = item.photos.length > 0 || Boolean(item.details?.trim());
     return {
-      className: `${base} tp-item${has ? " has-photos" : ""}`,
+      className: `${base} tp-item${has ? " has-more" : ""}`,
       "data-item": `${section.id}:${item.id}`,
       ...(has && interactive
-        ? { tabIndex: 0, role: "button", "aria-label": `${item.title}. View ${photoLabel(item.photos.length)}` }
+        ? { tabIndex: 0, role: "button", "aria-label": `${item.title}. See details` }
         : {}),
     };
   };
@@ -104,6 +126,8 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
         data.theme ? `tp-th-${data.theme}` : "",
         data.hero ? `tp-hero-${data.hero}` : "",
         data.photoSize !== "m" ? `tp-av-${data.photoSize}` : "",
+        data.frame ? `tp-fr-${data.frame}` : "",
+        data.bodyFont !== "clean" ? `tp-bf-${data.bodyFont}` : "",
         data.bigName ? "tp-name-xl" : "",
         data.glow ? "tp-fx-glow" : "",
         animate && moves ? "tp-enter" : "",
@@ -112,6 +136,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
         .join(" ")}
       style={style}
     >
+      {data.progress && interactive ? <div className="tp-progress" aria-hidden="true" /> : null}
       <div className="tp-bg" aria-hidden="true" />
       <div className="tp-in">
         <div className="tp-side">
@@ -147,7 +172,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
             </div>
           </div>
 
-          {skillsSection ? skills(skillsSection, "side") : null}
+          {skillsSection && inSide ? skills(skillsSection, "side") : null}
         </div>
 
         <div className="tp-main">
@@ -160,9 +185,9 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
 
           {sections.map((section) =>
             section.layout === "skills" ? (
-              skills(section, "main")
+              inSide ? null : skills(section, "main")
             ) : section.layout === "cards" ? (
-              <div key={section.id} className={`tp-sec tp-cards${section.style ? ` tp-v tp-v-${section.style}` : ""}`}>
+              <div key={section.id} className={`tp-sec tp-cards${look(section).extra}`} style={look(section).style}>
                 <Heading className="tp-h">{section.title}</Heading>
                 <div className={`tp-grid tp-n-${Math.min(section.items.length, 9)}`}>
                   {section.items.map((item) => (
@@ -183,13 +208,13 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                           ))}
                         </div>
                       ) : null}
-                      {item.photos.length ? <span className="tp-more">View photos</span> : null}
+                      {item.photos.length || item.details?.trim() ? <span className="tp-more">See details</span> : null}
                     </div>
                   ))}
                 </div>
               </div>
             ) : (
-              <div key={section.id} className={`tp-sec tp-list${section.style ? ` tp-v tp-v-${section.style}` : ""}`}>
+              <div key={section.id} className={`tp-sec tp-list${look(section).extra}`} style={look(section).style}>
                 <Heading className="tp-h">{section.title}</Heading>
                 <div className="tp-rows">
                   {section.items.map((item) => (
@@ -205,6 +230,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                             ))}
                           </div>
                         ) : null}
+                        {!item.photos.length && item.details?.trim() ? <span className="tp-more">See details</span> : null}
                       </div>
                       {item.meta ? <span className="tp-years">{item.meta}</span> : null}
                       {item.photos.length ? (
@@ -212,7 +238,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                           {item.photos.slice(0, 3).map((photo, i) => (
                             <img key={i} src={photo} alt="" />
                           ))}
-                          <span className="tp-more">View {photoLabel(item.photos.length)}</span>
+                          <span className="tp-more">See details</span>
                         </div>
                       ) : null}
                     </div>

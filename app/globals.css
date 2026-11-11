@@ -15,6 +15,8 @@
   --font-display-stack: var(--font-display), "Segoe UI", system-ui, sans-serif;
   --font-body-stack: var(--font-body), "Segoe UI", system-ui, sans-serif;
   --font-serif-stack: var(--font-serif), Georgia, "Times New Roman", serif;
+  --font-tech-stack: var(--font-tech), "Segoe UI", system-ui, sans-serif;
+  --font-elegant-stack: var(--font-elegant), Georgia, "Times New Roman", serif;
 }
 
 * { box-sizing: border-box; }
@@ -514,6 +516,18 @@ a.btn { display: inline-flex; align-items: center; }
 select.ed-input { appearance: auto; }
 a.ed-link { padding: 0; }
 
+.ed-colour { flex: 1 1 0; }
+.ed-colour-in { display: flex; align-items: center; gap: 8px; min-height: 40px; }
+.ed-colour-in em { font-style: normal; font-size: 13px; color: var(--muted); }
+.ed-colour-in .ed-link { padding: 4px 0; }
+.ed-sub { border: 1px solid var(--line); border-radius: 10px; }
+.ed-sub > summary { cursor: pointer; padding: 10px 12px; font-size: 14px; font-weight: 600; }
+.ed-sub > summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 10px; }
+.ed-sub-in { padding: 4px 12px 12px; display: flex; flex-direction: column; gap: 12px; }
+/* The progress bar is fixed to the top of the window, so it only shows in the full preview. */
+.ed:not(.is-preview) .tp-progress { display: none; }
+.ed.is-preview .tp-progress { top: 62px; }
+
 .ed-foot { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; padding: 4px 0 24px; }
 
 @media (max-width: 860px) {
@@ -603,3 +617,14 @@ a.ed-link { padding: 0; }
   .own-b, .own-pointer { animation: none; opacity: 1; }
   .own-b1, .own-b4 { background: var(--accent); }
 }
+
+/* My saved templates */
+
+.saved-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 32px 24px; padding-bottom: 72px; }
+.saved-meta { font-size: 14px; color: var(--muted); }
+.saved-empty { padding-bottom: 96px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+.saved-empty p { font-size: 17px; color: var(--muted); max-width: 34em; }
+.btn-danger { background: #ffffff; border-color: #b42318; color: #b42318; }
+.btn-danger:hover:not(:disabled) { background: #b42318; color: #ffffff; }
+/* Where a saved portfolio is drawn, out of sight, to build its download. */
+.offscreen { position: fixed; left: -200vw; top: 0; width: 1200px; height: 800px; overflow: hidden; visibility: hidden; pointer-events: none; }

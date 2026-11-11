@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Figtree, Fraunces } from "next/font/google";
+import { Bricolage_Grotesque, Figtree, Fraunces, Playfair_Display, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
@@ -14,7 +14,10 @@ const body = Figtree({
   display: "swap",
 });
 
-// Only used when someone picks the serif heading font, so it is not preloaded.
+// The fonts below are only used when someone picks them in the editor, so they are not preloaded.
+const tech = Space_Grotesk({ subsets: ["latin"], variable: "--font-tech", display: "swap", preload: false });
+const elegant = Playfair_Display({ subsets: ["latin"], variable: "--font-elegant", display: "swap", preload: false });
+
 const serif = Fraunces({
   subsets: ["latin"],
   variable: "--font-serif",
@@ -39,7 +42,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${serif.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${serif.variable} ${tech.variable} ${elegant.variable}`}>
       <head>
         {/* Template styles live in public/ so the editor can also copy them into downloaded portfolios. */}
         <link rel="stylesheet" href="/portfolio.css" precedence="default" />

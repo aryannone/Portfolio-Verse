@@ -43,6 +43,50 @@ export async function savePortfolio(portfolio: Portfolio): Promise<boolean> {
   }
 }
 
+// Named copies of a portfolio, kept on the "My saved templates" page.
+export type SavedItem = { id: string; name: string; savedAt: number; data: Portfolio };
+
+const SAVED_KEY = "saved";
+
+export async function loadSaved(): Promise<SavedItem[]> {
+  try {
+    const db = await open();
+    return await new Promise((resolve, reject) => {
+      const request = db.transaction(STORE).objectStore(STORE).get(SAVED_KEY);
+      request.onsuccess = () => resolve(Array.isArray(request.result) ? (request.result as SavedItem[]) : []);
+      request.onerror = () => reject(request.error);
+    });
+  } catch {
+    return [];
+  }
+}
+
+async function writeSaved(list: SavedItem[]): Promise<boolean> {
+  try {
+    const db = await open();
+    return await new Promise((resolve) => {
+      const tx = db.transaction(STORE, "readwrite");
+      tx.objectStore(STORE).put(list, SAVED_KEY);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+      tx.onabort = () => resolve(false);
+    });
+  } catch {
+    return false;
+  }
+}
+
+export async function addSaved(name: string, data: Portfolio): Promise<boolean> {
+  const list = await loadSaved();
+  const item: SavedItem = { id: Math.random().toString(36).slice(2, 10), name, savedAt: Date.now(), data: { ...data, sample: false } };
+  return writeSaved([item, ...list]);
+}
+
+export async function deleteSaved(id: string): Promise<boolean> {
+  const list = await loadSaved();
+  return writeSaved(list.filter((item) => item.id !== id));
+}
+
 // Shrinks a chosen photo so pages stay fast and downloads stay small.
 export function imageToDataUrl(file: File, maxSide: number): Promise<string> {
   return new Promise((resolve, reject) => {

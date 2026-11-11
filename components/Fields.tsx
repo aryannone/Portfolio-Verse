@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { CARD_STYLES, GALLERIES, LIST_STYLES, newItem, uid, type GalleryId, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
+import { CARD_STYLES, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type FontId, type GalleryId, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
 import type { PortfolioTools } from "@/lib/usePortfolio";
 
 // The form pieces shared by the details form (/start) and the editor.
@@ -42,6 +42,47 @@ export function Choice<T extends string>({ label, value, options, onChange }: { 
         ))}
       </select>
     </Field>
+  );
+}
+
+// A colour that can also be left unset, so the page's own colour applies.
+export function ColourField({ label, value, fallback, onChange }: { label: string; value: string; fallback: string; onChange: (v: string) => void }) {
+  return (
+    <div className="ed-field ed-colour">
+      <span>{label}</span>
+      <div className="ed-colour-in">
+        <input type="color" className="ed-color" value={value || fallback} aria-label={label} onChange={(e) => onChange(e.target.value)} />
+        {value ? (
+          <button type="button" className="ed-link" onClick={() => onChange("")}>
+            Reset
+          </button>
+        ) : (
+          <em>Not set</em>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Background, text colour, accent and font for one section.
+export function SectionLook({ section, setSection }: { section: Section; setSection: (id: string, patch: Partial<Section>) => void }) {
+  return (
+    <details className="ed-sub">
+      <summary>Colours and font for this section</summary>
+      <div className="ed-sub-in">
+        <div className="ed-row">
+          <ColourField label="Background" value={section.bg ?? ""} fallback="#ffffff" onChange={(bg) => setSection(section.id, { bg })} />
+          <ColourField label="Text" value={section.ink ?? ""} fallback="#12141a" onChange={(ink) => setSection(section.id, { ink })} />
+          <ColourField label="Accent" value={section.accent ?? ""} fallback="#f5a300" onChange={(accent) => setSection(section.id, { accent })} />
+        </div>
+        <Choice<FontId | "">
+          label="Font"
+          value={section.font ?? ""}
+          options={[{ id: "", name: "Same as the page" }, ...FONTS]}
+          onChange={(font) => setSection(section.id, { font })}
+        />
+      </div>
+    </details>
   );
 }
 
@@ -136,11 +177,14 @@ export function SectionFields({ data, section, tools, design }: { data: Portfoli
           <ListInput value={data.skills} onChange={(skills) => set({ skills })} placeholder="Excel, Python, Public speaking" />
         </Field>
         {design ? (
-          <div className="ed-tools">
-            <button type="button" className="ed-link" onClick={() => setSection(section.id, { hidden: !section.hidden })}>
-              {section.hidden ? "Show" : "Hide"}
-            </button>
-          </div>
+          <>
+            <SectionLook section={section} setSection={setSection} />
+            <div className="ed-tools">
+              <button type="button" className="ed-link" onClick={() => setSection(section.id, { hidden: !section.hidden })}>
+                {section.hidden ? "Show" : "Hide"}
+              </button>
+            </div>
+          </>
         ) : null}
       </>
     );
@@ -168,6 +212,7 @@ export function SectionFields({ data, section, tools, design }: { data: Portfoli
             </div>
             <Choice<SectionStyle> label="Style" value={section.style} options={styles} onChange={(style) => setSection(section.id, { style })} />
           </div>
+          <SectionLook section={section} setSection={setSection} />
           <div className="ed-tools">
             <button type="button" className="ed-link" onClick={() => setSection(section.id, { hidden: !section.hidden })}>
               {section.hidden ? "Show" : "Hide"}
@@ -212,14 +257,23 @@ export function SectionFields({ data, section, tools, design }: { data: Portfoli
               <input className="ed-input" value={item.meta} onChange={(e) => setItem(section.id, item.id, { meta: e.target.value })} />
             </Field>
           </div>
-          <Field label="Description">
+          <Field label="Short description (shown on the page)">
             <textarea className="ed-input" rows={2} value={item.text} onChange={(e) => setItem(section.id, item.id, { text: e.target.value })} />
+          </Field>
+          <Field label="Full details (shown when a visitor taps See details)">
+            <textarea
+              className="ed-input"
+              rows={4}
+              value={item.details ?? ""}
+              placeholder="What the work was, what you did, and what came of it."
+              onChange={(e) => setItem(section.id, item.id, { details: e.target.value })}
+            />
           </Field>
           <Field label="Tags, separated by commas">
             <ListInput value={item.tags} onChange={(tags) => setItem(section.id, item.id, { tags })} />
           </Field>
           <div className="ed-field">
-            <span>Photos (visitors tap this entry to see them)</span>
+            <span>Photos (shown with the full details)</span>
             <div className="ed-photos">
               {item.photos.map((photo, photoIndex) => (
                 <div key={photoIndex} className="ed-photo">

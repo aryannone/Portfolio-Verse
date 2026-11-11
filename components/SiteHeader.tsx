@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function SiteHeader({ current }: { current?: "templates" }) {
+export default function SiteHeader({ current }: { current?: "templates" | "saved" }) {
   return (
     <header className="wrap site-header">
       <Link href="/" className="brand">
@@ -14,6 +14,13 @@ export default function SiteHeader({ current }: { current?: "templates" }) {
           aria-current={current === "templates" ? "page" : undefined}
         >
           Templates
+        </Link>
+        <Link
+          href="/saved"
+          className={current === "saved" ? "nav-link is-current" : "nav-link"}
+          aria-current={current === "saved" ? "page" : undefined}
+        >
+          My saved
         </Link>
       </nav>
     </header>

@@ -15,6 +15,7 @@ export default function ScaledPreview({
   flat = false,
   auto = false,
   data,
+  exact = false,
 }: {
   id: string;
   ratio?: string;
@@ -22,6 +23,8 @@ export default function ScaledPreview({
   auto?: boolean;
   // The user's own details, shown in place of the sample person.
   data?: Portfolio | null;
+  // Show that portfolio exactly as saved, not restyled into the template "id".
+  exact?: boolean;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ scale: number; viewHeight: number } | null>(null);
@@ -48,7 +51,7 @@ export default function ScaledPreview({
         style={{ transform: `scale(${size?.scale ?? 0.3})`, opacity: size === null ? 0 : 1 }}
       >
         <div className="scaled-scroll" style={{ "--view-h": `${size?.viewHeight ?? 0}px` } as CSSProperties}>
-          <TemplatePreview id={id} animate={auto} data={data} />
+          <TemplatePreview id={id} animate={auto} data={data} exact={exact} />
         </div>
       </div>
     </div>

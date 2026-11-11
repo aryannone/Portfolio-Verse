@@ -16,6 +16,8 @@ export const RESERVED_USERNAMES = [
   "logout",
   "privacy",
   "report",
+  "saved",
+  "start",
   "templates",
   "terms",
   "www",

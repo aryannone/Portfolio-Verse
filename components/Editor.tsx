@@ -8,6 +8,7 @@ import { TEMPLATES, getTemplate } from "@/lib/templates";
 import {
   ACCENTS,
   FONTS,
+  FRAMES,
   GALLERIES,
   HEROES,
   MOTIONS,
@@ -15,6 +16,8 @@ import {
   blankPortfolio,
   fromSample,
   newSection,
+  type FontId,
+  type FrameId,
   type GalleryId,
   type HeroId,
   type MotionId,
@@ -23,6 +26,7 @@ import {
 } from "@/lib/portfolio";
 import { usePortfolio } from "@/lib/usePortfolio";
 import { buildHtml, downloadHtml } from "@/lib/exportHtml";
+import { addSaved } from "@/lib/store";
 
 const PHOTO_SIZES: { id: Portfolio["photoSize"]; name: string }[] = [
   { id: "s", name: "Small" },
@@ -67,6 +71,16 @@ export default function Editor() {
     setBusy(false);
   }
 
+  // Keeps a copy of the portfolio as it is now, under a name, on the "My saved templates" page.
+  async function saveCopy() {
+    if (!data) return;
+    const suggested = `${data.name || "My portfolio"}, ${(getTemplate(data.template) ?? TEMPLATES[0]).name}`;
+    const name = window.prompt("Name this saved template:", suggested);
+    if (name === null) return;
+    const ok = await addSaved(name.trim() || suggested, data);
+    setStatus(ok ? "Saved to My saved templates" : "Could not save. This browser may be out of space.");
+  }
+
   function startOver(next: Portfolio) {
     if (!window.confirm("This replaces everything in the editor. Continue?")) return;
     setData(next);
@@ -98,6 +112,12 @@ export default function Editor() {
           <button type="button" className="btn btn-outline" onClick={() => setPreview((v) => !v)}>
             {preview ? "Back to editing" : "Preview"}
           </button>
+          <button type="button" className="btn btn-outline" onClick={saveCopy}>
+            Save
+          </button>
+          <Link href="/saved" className="btn btn-quiet">
+            My saved
+          </Link>
           <button type="button" className="btn btn-primary" onClick={download} disabled={busy}>
             {busy ? "Building…" : "Download HTML"}
           </button>
@@ -162,6 +182,7 @@ export default function Editor() {
                 <Choice<ThemeId> label="Page background" value={data.theme} options={THEMES} onChange={(theme) => set({ theme })} />
                 <Choice<HeroId> label="Header layout" value={data.hero} options={HEROES} onChange={(hero) => set({ hero })} />
               </div>
+              <Choice<FrameId> label="Photo frame" value={data.frame} options={FRAMES} onChange={(frame) => set({ frame })} />
               <div className="ed-row">
                 <div className="ed-field">
                   <span>Photo size</span>
@@ -175,19 +196,11 @@ export default function Editor() {
                 </div>
               </div>
               <div className="ed-row">
-                <div className="ed-field">
-                  <span>Heading font</span>
-                  <div className="ed-seg" role="group" aria-label="Heading font">
-                    {FONTS.map((f) => (
-                      <button key={f.id} type="button" aria-pressed={data.font === f.id} onClick={() => set({ font: f.id })}>
-                        {f.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                <Choice<FontId> label="Heading font" value={data.font} options={FONTS} onChange={(font) => set({ font })} />
+                <Choice<FontId> label="Text font" value={data.bodyFont} options={FONTS} onChange={(bodyFont) => set({ bodyFont })} />
               </div>
-              <Choice<MotionId> label="Animation" value={data.motion} options={MOTIONS} onChange={(motion) => set({ motion })} />
-              <Choice<GalleryId> label="How photos open in the side panel" value={data.gallery} options={GALLERIES} onChange={(gallery) => set({ gallery })} />
+              <Choice<MotionId> label="Scroll animation" value={data.motion} options={MOTIONS} onChange={(motion) => set({ motion })} />
+              <Choice<GalleryId> label="Photo layout in the details panel" value={data.gallery} options={GALLERIES} onChange={(gallery) => set({ gallery })} />
               <label className="ed-check">
                 <input type="checkbox" checked={data.bigName} onChange={(e) => set({ bigName: e.target.checked })} />
                 Extra-large name
@@ -195,6 +208,10 @@ export default function Editor() {
               <label className="ed-check">
                 <input type="checkbox" checked={data.glow} onChange={(e) => set({ glow: e.target.checked })} />
                 Glowing background
+              </label>
+              <label className="ed-check">
+                <input type="checkbox" checked={data.progress} onChange={(e) => set({ progress: e.target.checked })} />
+                Reading progress bar at the top
               </label>
               <p className="ed-hint">Animations play in Preview and in the downloaded file.</p>
               {data.template === "professional-2" ? (

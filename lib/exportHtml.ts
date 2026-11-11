@@ -26,6 +26,7 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
 
   const clone = root.cloneNode(true) as HTMLElement;
   clone.classList.remove("tp-anim");
+  clone.classList.add("tp-live");
   if (data.motion !== "none") clone.classList.add("tp-enter");
   clone.querySelectorAll(".tp-reveal").forEach((el) => {
     el.classList.remove("tp-reveal", "is-in", "is-done");
@@ -38,7 +39,7 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
     img.setAttribute("data-ph", String(indexOf(src)));
     img.removeAttribute("src");
   });
-  clone.querySelectorAll(".tp-item.has-photos").forEach((el) => {
+  clone.querySelectorAll(".tp-item.has-more").forEach((el) => {
     el.setAttribute("tabindex", "0");
     el.setAttribute("role", "button");
   });
@@ -48,9 +49,11 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
     if (section.hidden) continue;
     for (const item of section.items) {
       store.items[`${section.id}:${item.id}`] = {
+        section: section.title,
         title: item.title,
         sub: [item.sub, item.meta].filter(Boolean).join(" · "),
         text: item.text,
+        details: item.details ?? "",
         tags: item.tags,
         layout: item.gallery || data.gallery,
         photos: item.photos.map(indexOf),
@@ -58,7 +61,12 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
     }
   }
 
-  const serif = data.font === "serif" ? "&family=Fraunces:opsz,wght@9..144,400..700" : "";
+  // Only the extra fonts this portfolio uses are loaded.
+  const used = new Set<string>([data.font, data.bodyFont, ...data.sections.map((s) => s.font || "")]);
+  const extra =
+    (used.has("serif") ? "&family=Fraunces:opsz,wght@9..144,400..700" : "") +
+    (used.has("tech") ? "&family=Space+Grotesk:wght@400..700" : "") +
+    (used.has("elegant") ? "&family=Playfair+Display:wght@400..700" : "");
   const title = [data.name, data.role].filter(Boolean).join(" · ");
   const json = JSON.stringify(store).replace(/</g, "\\u003c");
 
@@ -73,12 +81,14 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
 <meta property="og:description" content="${escapeHtml(data.bio)}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Figtree:wght@400..700${serif}&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Figtree:wght@400..700${extra}&display=swap">
 <style>
 :root {
   --font-display-stack: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --font-body-stack: "Figtree", "Segoe UI", system-ui, sans-serif;
   --font-serif-stack: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-tech-stack: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-elegant-stack: "Playfair Display", Georgia, "Times New Roman", serif;
 }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; }

@@ -12,13 +12,18 @@ type Props = {
   animate?: boolean;
   // The user's own details, to show in place of the sample person.
   data?: Portfolio | null;
+  // Show the given portfolio exactly as it was saved, with its own template and look.
+  exact?: boolean;
 };
 
 // One template, filled with the user's details when there are any, and a sample person when not.
-export default function TemplatePreview({ id, live = false, animate = false, data }: Props) {
+export default function TemplatePreview({ id, live = false, animate = false, data, exact = false }: Props) {
   // A full page looks the details up itself; small pictures are handed them by their page.
   const saved = useSavedDetails();
   const details = data ?? (live ? saved : null);
-  const shown = useMemo(() => (details ? inTemplate(details, id) : fromSample(id)), [details, id]);
+  const shown = useMemo(() => {
+    if (exact && data) return data;
+    return details ? inTemplate(details, id) : fromSample(id);
+  }, [exact, data, details, id]);
   return <PortfolioView key={details ? "mine" : "sample"} data={shown} interactive={live} reveal={live} semantic={live} animate={live || animate} />;
 }

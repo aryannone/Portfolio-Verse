@@ -3,9 +3,13 @@
 // into every downloaded portfolio. Keep it self-contained.
 
 export type PanelItem = {
+  // The name of the section the entry belongs to, shown above its title.
+  section: string;
   title: string;
   sub: string;
   text: string;
+  // The longer write-up, shown only in the panel.
+  details: string;
   tags: string[];
   // How the photos are arranged in the panel: "stack", "mosaic" or "slides".
   layout: string;
@@ -64,9 +68,10 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     '<div class="tpd-backdrop"></div>' +
     '<aside class="tpd-panel">' +
     '<div class="tpd-grab"></div>' +
-    '<div class="tpd-head"><div><div class="tpd-title"></div><div class="tpd-sub"></div></div>' +
-    '<button type="button" class="tpd-close" aria-label="Close photos">×</button></div>' +
-    '<div class="tpd-body"><p class="tpd-text"></p><div class="tpd-tags"></div><div class="tpd-photos"></div>' +
+    '<div class="tpd-head"><div><div class="tpd-eyebrow"></div><div class="tpd-title"></div><div class="tpd-sub"></div></div>' +
+    '<button type="button" class="tpd-close" aria-label="Close details">×</button></div>' +
+    '<div class="tpd-body"><p class="tpd-text"></p><div class="tpd-details"></div><div class="tpd-tags"></div>' +
+    '<div class="tpd-label"></div><div class="tpd-photos"></div>' +
     '<div class="tpd-nav"><button type="button" class="tpd-prev" aria-label="Previous photo">\u2190</button>' +
     '<span class="tpd-pos" aria-live="polite"></span>' +
     '<button type="button" class="tpd-next" aria-label="Next photo">\u2192</button></div></div>' +
@@ -94,7 +99,7 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
 
   function open(trigger: HTMLElement) {
     const item = store.items[trigger.getAttribute("data-item") || ""];
-    if (!item || !item.photos.length) return;
+    if (!item) return;
     const look = win.getComputedStyle(root);
     panel.style.background = look.backgroundColor;
     panel.style.color = look.color;
@@ -108,7 +113,22 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     const text = panelRoot.querySelector(".tpd-text") as HTMLElement;
     text.textContent = item.text;
     text.style.display = item.text ? "" : "none";
-    panelRoot.setAttribute("aria-label", item.title + " photos");
+    panelRoot.setAttribute("aria-label", item.title + ", details");
+    const eyebrow = panelRoot.querySelector(".tpd-eyebrow") as HTMLElement;
+    eyebrow.textContent = item.section;
+    eyebrow.style.display = item.section ? "" : "none";
+    const details = panelRoot.querySelector(".tpd-details") as HTMLElement;
+    details.textContent = "";
+    (item.details || "").split(/\n\s*\n/).forEach((part) => {
+      if (!part.trim()) return;
+      const para = doc.createElement("p");
+      para.textContent = part.trim();
+      details.appendChild(para);
+    });
+    details.style.display = details.children.length ? "" : "none";
+    const label = panelRoot.querySelector(".tpd-label") as HTMLElement;
+    label.textContent = item.photos.length === 1 ? "Photo" : "Photos (" + item.photos.length + ")";
+    label.style.display = item.photos.length ? "" : "none";
 
     const tags = panelRoot.querySelector(".tpd-tags") as HTMLElement;
     tags.textContent = "";
@@ -156,7 +176,7 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     const el = target as HTMLElement | null;
     if (!el || !el.closest) return null;
     if (el.closest("a")) return null;
-    return el.closest(".tp-item.has-photos") as HTMLElement | null;
+    return el.closest(".tp-item.has-more") as HTMLElement | null;
   }
 
   function onClick(event: Event) {

@@ -12,6 +12,9 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 - Photo panel: a visitor taps an entry that has photos and a panel slides in from the right (from the bottom on phones). It shows the entry's details and its photos in one of three layouts: stack, mosaic or slideshow
 - Card sections arrange themselves by count: 2 or 3 side by side, 4 as two pairs, 5 and 7 with one tall card, 6 as two threes
 - Download: the editor builds one self-contained HTML file of the portfolio
+- Saved templates (`/saved`): named copies saved from the editor, each with download, open in editor and delete
+- Per-section look: each section can have its own background, text colour, accent and font
+- Details panel: entries with photos or a full write-up show "See details", which opens the panel headed by the section name
 - Login is switched off for now. Every page is open to everyone, and each visitor's work is saved in their own browser (IndexedDB)
 - Not built yet: accounts, publishing to a personal link, résumé upload
 

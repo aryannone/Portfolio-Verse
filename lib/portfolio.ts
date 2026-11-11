@@ -9,7 +9,8 @@ export type Item = {
   meta: string; // dates
   text: string;
   tags: string[];
-  photos: string[]; // image data, shown in the photo panel
+  details?: string; // the full write-up, shown when a visitor opens the entry
+  photos: string[]; // image data, shown in the details panel
   gallery?: GalleryId | ""; // this entry's own photo layout; empty means the portfolio's
 };
 
@@ -33,6 +34,11 @@ export type Section = {
   style: SectionStyle;
   hidden: boolean;
   items: Item[];
+  // The section's own look. Each is optional; without it the page's look applies.
+  bg?: string;
+  ink?: string;
+  accent?: string;
+  font?: FontId | "";
 };
 
 export const CARD_STYLES: { id: SectionStyle; name: string }[] = [
@@ -56,7 +62,20 @@ export const LIST_STYLES: { id: SectionStyle; name: string }[] = [
 
 export type ThemeId = "" | "light" | "paper" | "dark" | "accent";
 export type HeroId = "" | "left" | "center" | "split";
-export type MotionId = "rise" | "fade" | "slide" | "zoom" | "none";
+export type MotionId = "rise" | "fade" | "slide" | "zoom" | "blur" | "flip" | "swing" | "drop" | "none";
+export type FrameId = "" | "circle" | "rounded" | "square" | "arch" | "hexagon" | "blob" | "tilt" | "ring";
+
+export const FRAMES: { id: FrameId; name: string }[] = [
+  { id: "", name: "Template's own" },
+  { id: "circle", name: "Circle" },
+  { id: "ring", name: "Circle with a ring" },
+  { id: "rounded", name: "Rounded square" },
+  { id: "square", name: "Square" },
+  { id: "arch", name: "Arch" },
+  { id: "hexagon", name: "Hexagon" },
+  { id: "blob", name: "Soft blob" },
+  { id: "tilt", name: "Tilted with a shadow" },
+];
 
 export const THEMES: { id: ThemeId; name: string }[] = [
   { id: "", name: "Template's own" },
@@ -78,10 +97,14 @@ export const MOTIONS: { id: MotionId; name: string }[] = [
   { id: "fade", name: "Fade in" },
   { id: "slide", name: "Slide from the side" },
   { id: "zoom", name: "Zoom in" },
+  { id: "blur", name: "Blur into focus" },
+  { id: "flip", name: "Flip up" },
+  { id: "swing", name: "Swing in from both sides" },
+  { id: "drop", name: "Drop from above" },
   { id: "none", name: "No animation" },
 ];
 
-export type FontId = "modern" | "serif" | "clean";
+export type FontId = "modern" | "serif" | "clean" | "tech" | "elegant";
 
 export type Portfolio = {
   template: string;
@@ -94,6 +117,9 @@ export type Portfolio = {
   glow: boolean;
   motion: MotionId;
   gallery: GalleryId;
+  frame: FrameId;
+  bodyFont: FontId;
+  progress: boolean;
   name: string;
   role: string;
   city: string;
@@ -111,6 +137,8 @@ export const FONTS: { id: FontId; name: string }[] = [
   { id: "modern", name: "Modern" },
   { id: "serif", name: "Serif" },
   { id: "clean", name: "Clean" },
+  { id: "tech", name: "Tech" },
+  { id: "elegant", name: "Elegant" },
 ];
 
 export const ACCENTS = ["#f5a300", "#e11d48", "#c2410c", "#16a34a", "#0f766e", "#2643e9", "#8b5cf6", "#1b2a4a", "#12141a"];
@@ -139,7 +167,7 @@ export function onColor(hex: string) {
 }
 
 export function newItem(): Item {
-  return { id: uid(), title: "", sub: "", meta: "", text: "", tags: [], photos: [] };
+  return { id: uid(), title: "", sub: "", meta: "", text: "", details: "", tags: [], photos: [] };
 }
 
 export function skillsSection(): Section {
@@ -192,6 +220,9 @@ const LOOK_DEFAULTS = {
   glow: false,
   motion: "rise" as MotionId,
   gallery: "stack" as GalleryId,
+  frame: "" as FrameId,
+  bodyFont: "clean" as FontId,
+  progress: false,
 };
 
 // Fills in anything missing from a portfolio saved by an earlier version of the editor.
@@ -219,9 +250,12 @@ export function inTemplate(p: Portfolio, template: string): Portfolio {
     ...LOOK_DEFAULTS,
     font: template === "creative-5" ? "serif" : "modern",
     template,
-    sections: p.sections.map((section) => ({ ...section, style: "" })),
+    sections: p.sections.map((section) => ({ ...section, style: "", bg: "", ink: "", accent: "", font: "" })),
   };
 }
+
+const SAMPLE_DETAILS =
+  "This is where the full story goes: what the problem was, what you did and what changed because of it.\n\nKeep the short description on the card to one line, and use this space for the detail a recruiter would ask about in an interview.";
 
 // A complete sample person in the given template. Used for previews and as the editor's starting point.
 export function fromSample(template: string): Portfolio {
@@ -237,7 +271,7 @@ export function fromSample(template: string): Portfolio {
       layout: "cards",
       style: "",
       hidden: false,
-      items: s.projects.map((p, i) => ({ id: `w${i}`, title: p.title, sub: "", meta: "", text: p.text, tags: p.tags, photos: photos(i === 1 ? 5 : 3), gallery: GALLERIES[i % 3].id })),
+      items: s.projects.map((p, i) => ({ id: `w${i}`, title: p.title, sub: "", meta: "", text: p.text, details: SAMPLE_DETAILS, tags: p.tags, photos: photos(i === 1 ? 5 : 3), gallery: GALLERIES[i % 3].id })),
     },
   ];
   if (s.experience) {
