@@ -3,17 +3,19 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import PortfolioView from "@/components/PortfolioView";
-import { Choice, ProfileFields, SectionFields } from "@/components/Fields";
+import { Choice, ProfileFields, SectionFields, move } from "@/components/Fields";
 import { TEMPLATES, getTemplate } from "@/lib/templates";
 import {
   ACCENTS,
   FONTS,
+  GALLERIES,
   HEROES,
   MOTIONS,
   THEMES,
   blankPortfolio,
   fromSample,
   newSection,
+  type GalleryId,
   type HeroId,
   type MotionId,
   type Portfolio,
@@ -185,6 +187,7 @@ export default function Editor() {
                 </div>
               </div>
               <Choice<MotionId> label="Animation" value={data.motion} options={MOTIONS} onChange={(motion) => set({ motion })} />
+              <Choice<GalleryId> label="How photos open in the side panel" value={data.gallery} options={GALLERIES} onChange={(gallery) => set({ gallery })} />
               <label className="ed-check">
                 <input type="checkbox" checked={data.bigName} onChange={(e) => set({ bigName: e.target.checked })} />
                 Extra-large name
@@ -204,11 +207,32 @@ export default function Editor() {
             </div>
           </details>
 
-          {data.sections.map((section) => (
+          {data.sections.map((section, index) => (
             <details key={section.id} className="ed-group" open>
-              <summary>
-                {section.title || "Untitled section"}
-                {section.hidden ? <em> (hidden)</em> : null}
+              <summary className="ed-sum">
+                <span className="ed-sum-title">
+                  {section.title || "Untitled section"}
+                  {section.hidden ? <em> (hidden)</em> : null}
+                </span>
+                {/* Move the whole section. preventDefault stops the click from also folding it. */}
+                <button
+                  type="button"
+                  className="ed-icon"
+                  aria-label={`Move section ${section.title} up`}
+                  disabled={index === 0}
+                  onClick={(e) => { e.preventDefault(); set({ sections: move(data.sections, index, -1) }); }}
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  className="ed-icon"
+                  aria-label={`Move section ${section.title} down`}
+                  disabled={index === data.sections.length - 1}
+                  onClick={(e) => { e.preventDefault(); set({ sections: move(data.sections, index, 1) }); }}
+                >
+                  ↓
+                </button>
               </summary>
               <div className="ed-group-in">
                 <SectionFields data={data} section={section} tools={tools} design />

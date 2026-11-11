@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ScaledPreview from "@/components/ScaledPreview";
 import { ProfileFields, SectionFields } from "@/components/Fields";
-import { TEMPLATES } from "@/lib/templates";
+import BuildOwnBanner from "@/components/BuildOwnBanner";
+import { READY_TEMPLATES } from "@/lib/templates";
 import { blankPortfolio, inTemplate, newSection, type Portfolio } from "@/lib/portfolio";
 import { usePortfolio } from "@/lib/usePortfolio";
 
@@ -129,8 +130,15 @@ export default function StartForm() {
             These are your details in every template. Pick one, or build your own from a blank canvas. You can switch
             at any time and mix parts of different templates in the editor.
           </p>
+          <BuildOwnBanner
+            action={
+              <button type="button" className="btn btn-primary" onClick={() => choose("custom")}>
+                Build your own
+              </button>
+            }
+          />
           <div className="gallery-grid">
-            {TEMPLATES.map((t) => (
+            {READY_TEMPLATES.map((t) => (
               <article key={t.id} className="tcard">
                 <ScaledPreview id={t.id} data={data} />
                 <div className="tcard-info">
@@ -139,7 +147,7 @@ export default function StartForm() {
                 </div>
                 <div className="tcard-actions">
                   <button type="button" className="btn btn-primary" onClick={() => choose(t.id)}>
-                    {t.id === "custom" ? "Start from blank" : "Use this template"}
+                    Use this template
                   </button>
                 </div>
               </article>

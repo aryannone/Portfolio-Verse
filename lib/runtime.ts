@@ -6,6 +6,9 @@ export type PanelItem = {
   title: string;
   sub: string;
   text: string;
+  tags: string[];
+  // How the photos are arranged in the panel: "stack", "mosaic" or "slides".
+  layout: string;
   photos: (string | number)[];
 };
 
@@ -63,13 +66,29 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     '<div class="tpd-grab"></div>' +
     '<div class="tpd-head"><div><div class="tpd-title"></div><div class="tpd-sub"></div></div>' +
     '<button type="button" class="tpd-close" aria-label="Close photos">×</button></div>' +
-    '<div class="tpd-body"><p class="tpd-text"></p><div class="tpd-photos"></div></div>' +
+    '<div class="tpd-body"><p class="tpd-text"></p><div class="tpd-tags"></div><div class="tpd-photos"></div>' +
+    '<div class="tpd-nav"><button type="button" class="tpd-prev" aria-label="Previous photo">\u2190</button>' +
+    '<span class="tpd-pos" aria-live="polite"></span>' +
+    '<button type="button" class="tpd-next" aria-label="Next photo">\u2192</button></div></div>' +
     "</aside>";
   doc.body.appendChild(panelRoot);
 
   const panel = panelRoot.querySelector(".tpd-panel") as HTMLElement;
   const closeButton = panelRoot.querySelector(".tpd-close") as HTMLElement;
   const body = panelRoot.querySelector(".tpd-body") as HTMLElement;
+  const photoBox = panelRoot.querySelector(".tpd-photos") as HTMLElement;
+  const nav = panelRoot.querySelector(".tpd-nav") as HTMLElement;
+  const position = panelRoot.querySelector(".tpd-pos") as HTMLElement;
+
+  // Slideshow layout: which photo is in view, and stepping to the next one.
+  function showPosition() {
+    const total = photoBox.children.length;
+    const current = Math.round(photoBox.scrollLeft / Math.max(1, photoBox.clientWidth)) + 1;
+    position.textContent = Math.min(total, Math.max(1, current)) + " / " + total;
+  }
+  function step(by: number) {
+    photoBox.scrollBy({ left: by * photoBox.clientWidth, behavior: still ? "auto" : "smooth" });
+  }
   let opener: HTMLElement | null = null;
   let previousOverflow = "";
 
@@ -91,7 +110,18 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     text.style.display = item.text ? "" : "none";
     panelRoot.setAttribute("aria-label", item.title + " photos");
 
-    const photos = panelRoot.querySelector(".tpd-photos") as HTMLElement;
+    const tags = panelRoot.querySelector(".tpd-tags") as HTMLElement;
+    tags.textContent = "";
+    (item.tags || []).forEach((tag) => {
+      const chip = doc.createElement("span");
+      chip.textContent = tag;
+      tags.appendChild(chip);
+    });
+    tags.style.display = item.tags && item.tags.length ? "" : "none";
+
+    const layout = item.layout === "mosaic" || item.layout === "slides" ? item.layout : "stack";
+    const photos = photoBox;
+    photos.className = "tpd-photos tpd-g-" + layout;
     photos.textContent = "";
     item.photos.forEach((photo, index) => {
       const img = doc.createElement("img");
@@ -101,6 +131,9 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
       photos.appendChild(img);
     });
 
+    nav.style.display = layout === "slides" && item.photos.length > 1 ? "" : "none";
+    photos.scrollLeft = 0;
+    showPosition();
     body.scrollTop = 0;
     opener = trigger;
     previousOverflow = doc.documentElement.style.overflow;
@@ -142,9 +175,14 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
   function onDocKey(event: KeyboardEvent) {
     if (!panelRoot.classList.contains("is-open")) return;
     if (event.key === "Escape") close();
+    if (event.key === "ArrowRight" && nav.style.display !== "none") step(1);
+    if (event.key === "ArrowLeft" && nav.style.display !== "none") step(-1);
     if (event.key === "Tab") {
+      // Keep the keyboard inside the panel while it is open.
+      const buttons = Array.prototype.filter.call(panelRoot.querySelectorAll("button"), (b: HTMLElement) => b.offsetParent !== null) as HTMLElement[];
+      const at = buttons.indexOf(doc.activeElement as HTMLElement);
       event.preventDefault();
-      closeButton.focus();
+      buttons[(at + (event.shiftKey ? -1 : 1) + buttons.length) % buttons.length].focus();
     }
   }
 
@@ -164,6 +202,9 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
   root.addEventListener("keydown", onRootKey);
   doc.addEventListener("keydown", onDocKey);
   closeButton.addEventListener("click", close);
+  (panelRoot.querySelector(".tpd-prev") as HTMLElement).addEventListener("click", () => step(-1));
+  (panelRoot.querySelector(".tpd-next") as HTMLElement).addEventListener("click", () => step(1));
+  photoBox.addEventListener("scroll", showPosition, { passive: true });
   (panelRoot.querySelector(".tpd-backdrop") as HTMLElement).addEventListener("click", close);
   panel.addEventListener("touchstart", onTouchStart, { passive: true });
   panel.addEventListener("touchend", onTouchEnd);

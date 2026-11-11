@@ -11,8 +11,8 @@ type Props = {
 };
 
 // The single way into the product. No account is needed for now.
-// New visitors fill in their details first; returning ones go straight back to the editor.
-// If a template id is passed, that template is the one they land in.
+// New visitors fill in their details first. Returning ones go to the templates, which show
+// their details, or straight to the editor when they picked a template (a template id is passed).
 export default function StartButton({ label = "Start building", variant = "primary", template }: Props) {
   const router = useRouter();
 
@@ -25,7 +25,8 @@ export default function StartButton({ label = "Start building", variant = "prima
       }
     }
     const saved = await loadPortfolio();
-    router.push(hasDetails(saved) ? "/editor" : "/start");
+    if (!hasDetails(saved)) router.push("/start");
+    else router.push(template ? "/editor" : "/templates");
   }
 
   return (

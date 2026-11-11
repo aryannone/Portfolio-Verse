@@ -10,7 +10,17 @@ export type Item = {
   text: string;
   tags: string[];
   photos: string[]; // image data, shown in the photo panel
+  gallery?: GalleryId | ""; // this entry's own photo layout; empty means the portfolio's
 };
+
+// How photos are arranged in the photo panel.
+export type GalleryId = "stack" | "mosaic" | "slides";
+
+export const GALLERIES: { id: GalleryId; name: string }[] = [
+  { id: "stack", name: "Stack: big photos, one after another" },
+  { id: "mosaic", name: "Mosaic: a grid that pops in" },
+  { id: "slides", name: "Slideshow: one at a time" },
+];
 
 // A section's look. Empty means "whatever the template does".
 export type SectionStyle = "" | "outline" | "filled" | "colour" | "sticker" | "glass" | "photo" | "rows" | "lines" | "boxes" | "timeline";
@@ -82,6 +92,7 @@ export type Portfolio = {
   bigName: boolean;
   glow: boolean;
   motion: MotionId;
+  gallery: GalleryId;
   name: string;
   role: string;
   city: string;
@@ -175,6 +186,7 @@ const LOOK_DEFAULTS = {
   bigName: false,
   glow: false,
   motion: "rise" as MotionId,
+  gallery: "stack" as GalleryId,
 };
 
 // Fills in anything missing from a portfolio saved by an earlier version of the editor.
@@ -216,7 +228,7 @@ export function fromSample(template: string): Portfolio {
       layout: "cards",
       style: "",
       hidden: false,
-      items: s.projects.map((p, i) => ({ id: `w${i}`, title: p.title, sub: "", meta: "", text: p.text, tags: p.tags, photos: photos(3) })),
+      items: s.projects.map((p, i) => ({ id: `w${i}`, title: p.title, sub: "", meta: "", text: p.text, tags: p.tags, photos: photos(i === 1 ? 5 : 3), gallery: GALLERIES[i % 3].id })),
     },
   ];
   if (s.experience) {

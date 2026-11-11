@@ -51,6 +51,8 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
         title: item.title,
         sub: [item.sub, item.meta].filter(Boolean).join(" · "),
         text: item.text,
+        tags: item.tags,
+        layout: item.gallery || data.gallery,
         photos: item.photos.map(indexOf),
       };
     }

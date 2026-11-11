@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { CARD_STYLES, LIST_STYLES, newItem, uid, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
+import { CARD_STYLES, GALLERIES, LIST_STYLES, newItem, uid, type GalleryId, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
 import type { PortfolioTools } from "@/lib/usePortfolio";
 
 // The form pieces shared by the details form (/start) and the editor.
@@ -126,7 +126,6 @@ export function ProfileFields({ data, tools }: { data: Portfolio; tools: Tools }
 // "design" adds the layout and style controls, which the details form leaves out.
 export function SectionFields({ data, section, tools, design }: { data: Portfolio; section: Section; tools: Tools; design: boolean }) {
   const { set, setSection, setItem, addPhotos } = tools;
-  const index = data.sections.findIndex((s) => s.id === section.id);
   const styles = section.layout === "cards" ? CARD_STYLES : LIST_STYLES;
 
   return (
@@ -152,12 +151,6 @@ export function SectionFields({ data, section, tools, design }: { data: Portfoli
             <Choice<SectionStyle> label="Style" value={section.style} options={styles} onChange={(style) => setSection(section.id, { style })} />
           </div>
           <div className="ed-tools">
-            <button type="button" className="ed-icon" aria-label="Move section up" disabled={index === 0} onClick={() => set({ sections: move(data.sections, index, -1) })}>
-              ↑
-            </button>
-            <button type="button" className="ed-icon" aria-label="Move section down" disabled={index === data.sections.length - 1} onClick={() => set({ sections: move(data.sections, index, 1) })}>
-              ↓
-            </button>
             <button type="button" className="ed-link" onClick={() => setSection(section.id, { hidden: !section.hidden })}>
               {section.hidden ? "Show" : "Hide"}
             </button>
@@ -228,6 +221,14 @@ export function SectionFields({ data, section, tools, design }: { data: Portfoli
               </label>
             </div>
           </div>
+          {item.photos.length ? (
+            <Choice<GalleryId | "">
+              label="How these photos open"
+              value={item.gallery ?? ""}
+              options={[{ id: "", name: "Same as the rest of the site" }, ...GALLERIES]}
+              onChange={(gallery) => setItem(section.id, item.id, { gallery })}
+            />
+          ) : null}
         </div>
       ))}
       <button type="button" className="btn btn-quiet" onClick={() => setSection(section.id, { items: [...section.items, newItem()] })}>

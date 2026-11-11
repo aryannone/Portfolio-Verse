@@ -37,7 +37,14 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   const items: RuntimeStore["items"] = {};
   for (const section of sections) {
     for (const item of section.items) {
-      items[`${section.id}:${item.id}`] = { title: item.title, sub: subLine(item), text: item.text, photos: item.photos };
+      items[`${section.id}:${item.id}`] = {
+        title: item.title,
+        sub: subLine(item),
+        text: item.text,
+        tags: item.tags,
+        layout: item.gallery || data.gallery,
+        photos: item.photos,
+      };
     }
   }
   store.current.items = items;
@@ -76,6 +83,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
       ref={setRef}
       className={[
         "tp",
+        interactive ? "tp-live" : "",
         `tp-${data.template}`,
         `tp-font-${data.font}`,
         `tp-m-${data.motion}`,
@@ -149,7 +157,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
             section.layout === "cards" ? (
               <div key={section.id} className={`tp-sec tp-cards${section.style ? ` tp-v tp-v-${section.style}` : ""}`}>
                 <Heading className="tp-h">{section.title}</Heading>
-                <div className="tp-grid">
+                <div className={`tp-grid tp-n-${Math.min(section.items.length, 9)}`}>
                   {section.items.map((item) => (
                     <div key={item.id} {...itemProps(section, item, "tp-card")}>
                       {item.photos.length ? (

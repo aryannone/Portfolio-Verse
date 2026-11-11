@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import StartButton from "@/components/StartButton";
@@ -54,7 +55,12 @@ export default function LandingPage() {
               Fill in your details, add your photos, pick a template and download your site. No
               sign-up, no code, no cost.
             </p>
-            <StartButton />
+            <div className="hero-actions">
+              <StartButton />
+              <Link href="/start" className="btn btn-outline">
+                Fill in your details
+              </Link>
+            </div>
             <p className="small">Free during beta. No sign-up. Download your HTML any time.</p>
           </div>
 

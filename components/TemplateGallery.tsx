@@ -6,6 +6,7 @@ import { TEMPLATES, type TemplateCategory } from "@/lib/templates";
 import { useSavedDetails } from "@/lib/usePortfolio";
 import ScaledPreview from "@/components/ScaledPreview";
 import StartButton from "@/components/StartButton";
+import BuildOwnBanner from "@/components/BuildOwnBanner";
 
 type Group = Exclude<TemplateCategory, "custom">;
 type Filter = "all" | Group;
@@ -33,6 +34,9 @@ export default function TemplateGallery() {
           Showing your own details in every template. <Link href="/start">Edit your details</Link>
         </p>
       ) : null}
+      <div className="wrap own-wrap">
+        <BuildOwnBanner action={<StartButton label="Build your own" template="custom" />} />
+      </div>
       <div className="wrap filter-row" role="group" aria-label="Filter templates">
         {FILTERS.map((f) => (
           <button
@@ -69,20 +73,6 @@ export default function TemplateGallery() {
           </div>
         </section>
       ))}
-
-      <section className="wrap gallery-group">
-        <h2 className="group-label">BUILD YOUR OWN</h2>
-        <div className="own-card">
-          <div>
-            <div className="tcard-name">Start from a blank canvas</div>
-            <div className="tcard-blurb">
-              Add sections one by one and choose every part yourself: page colours, header layout, card and
-              timeline styles, and the animation. Any template&apos;s features can be used here.
-            </div>
-          </div>
-          <StartButton label="Build your own" template="custom" />
-        </div>
-      </section>
     </>
   );
 }
