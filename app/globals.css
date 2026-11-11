@@ -417,3 +417,16 @@ a.btn { display: inline-flex; align-items: center; }
 }
 .simple p { color: var(--muted); font-size: 17px; max-width: 34em; }
 .notice { font-size: 15px; color: var(--ink); background: var(--surface); border-radius: var(--radius); padding: 14px 16px; }
+
+/* Admin access */
+.admin-form { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.admin-input {
+  flex: 1 1 220px;
+  max-width: 320px;
+  font: inherit;
+  padding: 12px 14px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  background: #ffffff;
+  color: var(--ink);
+}

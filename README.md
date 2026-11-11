@@ -20,3 +20,7 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 ## Environment variables
 
 See `.env.example`. Without them the site still runs; the Google button shows a "being set up" message.
+
+## Admin access
+
+Set `ADMIN_KEY` in Vercel, redeploy, then open `/admin` and enter the key. That browser can then open login-only pages (such as `/dashboard`) without Google sign-in for 30 days. Without `ADMIN_KEY`, admin access is off.
