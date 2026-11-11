@@ -31,6 +31,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   const localRef = useRef<HTMLDivElement | null>(null);
   const store = useRef<RuntimeStore>({ items: {} });
 
+  const moves = data.motion !== "none";
   const sections = data.sections.filter((s) => !s.hidden && s.items.length > 0);
 
   const items: RuntimeStore["items"] = {};
@@ -43,8 +44,8 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
 
   useEffect(() => {
     if (!interactive || !localRef.current) return;
-    return mountPortfolio(localRef.current, store.current, { reveal });
-  }, [interactive, reveal]);
+    return mountPortfolio(localRef.current, store.current, { reveal: reveal && moves });
+  }, [interactive, reveal, moves]);
 
   const setRef = (node: HTMLDivElement | null) => {
     localRef.current = node;
@@ -73,7 +74,20 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   return (
     <div
       ref={setRef}
-      className={`tp tp-${data.template} tp-font-${data.font}${animate ? " tp-enter" : ""}`}
+      className={[
+        "tp",
+        `tp-${data.template}`,
+        `tp-font-${data.font}`,
+        `tp-m-${data.motion}`,
+        data.theme ? `tp-th-${data.theme}` : "",
+        data.hero ? `tp-hero-${data.hero}` : "",
+        data.photoSize !== "m" ? `tp-av-${data.photoSize}` : "",
+        data.bigName ? "tp-name-xl" : "",
+        data.glow ? "tp-fx-glow" : "",
+        animate && moves ? "tp-enter" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={style}
     >
       <div className="tp-bg" aria-hidden="true" />
@@ -89,7 +103,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                 {data.city ? <span>{data.city}</span> : null}
               </div>
             ) : null}
-            <Name className="tp-name">{data.name}</Name>
+            <Name className="tp-name">{data.name || "Your Name"}</Name>
             {data.bio ? <p className="tp-bio">{data.bio}</p> : null}
             <div className="tp-links">
               {data.email ? (
@@ -133,7 +147,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
 
           {sections.map((section) =>
             section.layout === "cards" ? (
-              <div key={section.id} className="tp-sec tp-cards">
+              <div key={section.id} className={`tp-sec tp-cards${section.style ? ` tp-v tp-v-${section.style}` : ""}`}>
                 <Heading className="tp-h">{section.title}</Heading>
                 <div className="tp-grid">
                   {section.items.map((item) => (
@@ -160,7 +174,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                 </div>
               </div>
             ) : (
-              <div key={section.id} className="tp-sec tp-list">
+              <div key={section.id} className={`tp-sec tp-list${section.style ? ` tp-v tp-v-${section.style}` : ""}`}>
                 <Heading className="tp-h">{section.title}</Heading>
                 <div className="tp-rows">
                   {section.items.map((item) => (

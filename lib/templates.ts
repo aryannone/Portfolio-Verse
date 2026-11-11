@@ -1,4 +1,4 @@
-export type TemplateCategory = "professional" | "creative";
+export type TemplateCategory = "professional" | "creative" | "custom";
 
 export type TemplateInfo = {
   id: string;
@@ -19,7 +19,12 @@ export const TEMPLATES: TemplateInfo[] = [
   { id: "creative-3", name: "Creative 3", category: "creative", blurb: "Playful, sticker-like project cards.", accent: "#ffd43b" },
   { id: "creative-4", name: "Creative 4", category: "creative", blurb: "Dark aurora with glass cards.", accent: "#8b5cf6" },
   { id: "creative-5", name: "Creative 5", category: "creative", blurb: "Editorial, with big serif type.", accent: "#c2410c" },
+  // A plain canvas. Everything about it is chosen in the editor.
+  { id: "custom", name: "Build your own", category: "custom", blurb: "A blank canvas. Choose every part yourself.", accent: "#f5a300" },
 ];
+
+// The ready-made templates, without the blank canvas.
+export const READY_TEMPLATES = TEMPLATES.filter((t) => t.category !== "custom");
 
 export function getTemplate(id: string) {
   return TEMPLATES.find((t) => t.id === id);

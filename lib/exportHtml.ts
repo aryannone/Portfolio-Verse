@@ -26,7 +26,7 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
 
   const clone = root.cloneNode(true) as HTMLElement;
   clone.classList.remove("tp-anim");
-  clone.classList.add("tp-enter");
+  if (data.motion !== "none") clone.classList.add("tp-enter");
   clone.querySelectorAll(".tp-reveal").forEach((el) => {
     el.classList.remove("tp-reveal", "is-in", "is-done");
     (el as HTMLElement).style.removeProperty("--i");
@@ -87,7 +87,7 @@ ${css}
 <body>
 ${clone.outerHTML}
 <script>
-(${mountPortfolio.toString()})(document.querySelector(".tp"), ${json}, { reveal: true });
+(${mountPortfolio.toString()})(document.querySelector(".tp"), ${json}, { reveal: ${data.motion !== "none"} });
 </script>
 </body>
 </html>

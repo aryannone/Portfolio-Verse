@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import TemplatePreview from "@/components/TemplatePreview";
+import type { Portfolio } from "@/lib/portfolio";
 
 const DESIGN_WIDTH = 1200;
 
@@ -13,11 +14,14 @@ export default function ScaledPreview({
   ratio = "16 / 11",
   flat = false,
   auto = false,
+  data,
 }: {
   id: string;
   ratio?: string;
   flat?: boolean;
   auto?: boolean;
+  // The user's own details, shown in place of the sample person.
+  data?: Portfolio | null;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ scale: number; viewHeight: number } | null>(null);
@@ -44,7 +48,7 @@ export default function ScaledPreview({
         style={{ transform: `scale(${size?.scale ?? 0.3})`, opacity: size === null ? 0 : 1 }}
       >
         <div className="scaled-scroll" style={{ "--view-h": `${size?.viewHeight ?? 0}px` } as CSSProperties}>
-          <TemplatePreview id={id} animate={auto} />
+          <TemplatePreview id={id} animate={auto} data={data} />
         </div>
       </div>
     </div>

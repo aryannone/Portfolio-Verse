@@ -32,7 +32,7 @@ export default async function TemplatePreviewPage({ params }: Params) {
           </Link>
           <div className="preview-title">
             {template.name}
-            <span>Sample content. Tap an entry to see its photos.</span>
+            <span>Tap an entry to see its photos.</span>
           </div>
           <StartButton label="Use this template" variant="outline" template={template.id} />
         </div>

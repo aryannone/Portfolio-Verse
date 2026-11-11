@@ -2,11 +2,23 @@
 
 import { useMemo } from "react";
 import PortfolioView from "@/components/PortfolioView";
-import { fromSample } from "@/lib/portfolio";
+import { fromSample, inTemplate, type Portfolio } from "@/lib/portfolio";
+import { useSavedDetails } from "@/lib/usePortfolio";
 
-// A sample person's portfolio in the look of one template.
-// "live" is the full page a visitor can scroll and tap; without it, it is only a picture.
-export default function TemplatePreview({ id, live = false, animate = false }: { id: string; live?: boolean; animate?: boolean }) {
-  const data = useMemo(() => fromSample(id), [id]);
-  return <PortfolioView data={data} interactive={live} reveal={live} semantic={live} animate={live || animate} />;
+type Props = {
+  id: string;
+  // The full page a visitor can scroll and tap. Without it, it is only a picture.
+  live?: boolean;
+  animate?: boolean;
+  // The user's own details, to show in place of the sample person.
+  data?: Portfolio | null;
+};
+
+// One template, filled with the user's details when there are any, and a sample person when not.
+export default function TemplatePreview({ id, live = false, animate = false, data }: Props) {
+  // A full page looks the details up itself; small pictures are handed them by their page.
+  const saved = useSavedDetails();
+  const details = data ?? (live ? saved : null);
+  const shown = useMemo(() => (details ? inTemplate(details, id) : fromSample(id)), [details, id]);
+  return <PortfolioView key={details ? "mine" : "sample"} data={shown} interactive={live} reveal={live} semantic={live} animate={live || animate} />;
 }

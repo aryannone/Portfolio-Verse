@@ -7,8 +7,8 @@ import RevealOnScroll from "@/components/RevealOnScroll";
 
 const STEPS = [
   { title: "Start building", text: "One click. No account or password needed." },
-  { title: "Fill in your details", text: "Education, experience, projects, skills and photos, in one simple panel." },
-  { title: "Pick a template", text: "Switch between nine looks. Change colours, fonts and sections." },
+  { title: "Fill in your details", text: "A short form, one step at a time. Leave and come back whenever you like." },
+  { title: "Pick a template", text: "See your own details in all nine looks, or build your own from blank." },
   { title: "Download", text: "Get your whole portfolio as one HTML file and host it anywhere." },
 ];
 
@@ -16,7 +16,7 @@ const FEATURES = [
   { title: "Photos that open up", text: "Add photos to any project, job or course. Visitors tap it and a photo panel slides in." },
   { title: "Looks right on every screen", text: "Recruiters open links on phones. Your site adapts on its own." },
   { title: "Motion built in", text: "Sections rise in as visitors scroll. No settings, no code." },
-  { title: "Make it yours", text: "Nine templates, any colour, three heading fonts, your own sections." },
+  { title: "Mix and match", text: "Use any template's cards, timeline, colours or animation in any other." },
   { title: "Saves as you type", text: "Your work is kept in this browser, so you can come back to it." },
   { title: "Download the HTML", text: "The site is yours. Take the file and host it wherever you like." },
 ];

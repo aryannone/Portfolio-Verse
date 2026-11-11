@@ -3,10 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { TEMPLATES, type TemplateCategory } from "@/lib/templates";
+import { useSavedDetails } from "@/lib/usePortfolio";
 import ScaledPreview from "@/components/ScaledPreview";
 import StartButton from "@/components/StartButton";
 
-type Filter = "all" | TemplateCategory;
+type Group = Exclude<TemplateCategory, "custom">;
+type Filter = "all" | Group;
 
 const FILTERS: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
@@ -14,16 +16,23 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: "creative", label: "Creative" },
 ];
 
-const GROUPS: { id: TemplateCategory; label: string }[] = [
+const GROUPS: { id: Group; label: string }[] = [
   { id: "professional", label: "PROFESSIONAL" },
   { id: "creative", label: "CREATIVE" },
 ];
 
 export default function TemplateGallery() {
   const [filter, setFilter] = useState<Filter>("all");
+  // Once the user has filled in their details, every template shows them.
+  const mine = useSavedDetails();
 
   return (
     <>
+      {mine ? (
+        <p className="wrap gallery-note" role="status">
+          Showing your own details in every template. <Link href="/start">Edit your details</Link>
+        </p>
+      ) : null}
       <div className="wrap filter-row" role="group" aria-label="Filter templates">
         {FILTERS.map((f) => (
           <button
@@ -44,7 +53,7 @@ export default function TemplateGallery() {
           <div className="gallery-grid">
             {TEMPLATES.filter((t) => t.category === g.id).map((t) => (
               <article key={t.id} className="tcard">
-                <ScaledPreview id={t.id} />
+                <ScaledPreview id={t.id} data={mine} />
                 <div className="tcard-info">
                   <div className="tcard-name">{t.name}</div>
                   <div className="tcard-blurb">{t.blurb}</div>
@@ -60,6 +69,20 @@ export default function TemplateGallery() {
           </div>
         </section>
       ))}
+
+      <section className="wrap gallery-group">
+        <h2 className="group-label">BUILD YOUR OWN</h2>
+        <div className="own-card">
+          <div>
+            <div className="tcard-name">Start from a blank canvas</div>
+            <div className="tcard-blurb">
+              Add sections one by one and choose every part yourself: page colours, header layout, card and
+              timeline styles, and the animation. Any template&apos;s features can be used here.
+            </div>
+          </div>
+          <StartButton label="Build your own" template="custom" />
+        </div>
+      </section>
     </>
   );
 }

@@ -12,13 +12,63 @@ export type Item = {
   photos: string[]; // image data, shown in the photo panel
 };
 
+// A section's look. Empty means "whatever the template does".
+export type SectionStyle = "" | "outline" | "filled" | "colour" | "sticker" | "glass" | "photo" | "rows" | "lines" | "boxes" | "timeline";
+
 export type Section = {
   id: string;
   title: string;
   layout: "cards" | "list";
+  style: SectionStyle;
   hidden: boolean;
   items: Item[];
 };
+
+export const CARD_STYLES: { id: SectionStyle; name: string }[] = [
+  { id: "", name: "Template's own" },
+  { id: "outline", name: "Outlined cards" },
+  { id: "filled", name: "Soft filled cards" },
+  { id: "colour", name: "Colour cards" },
+  { id: "sticker", name: "Sticker cards" },
+  { id: "glass", name: "Glass cards" },
+  { id: "photo", name: "Photo first" },
+  { id: "rows", name: "Rows with a photo" },
+];
+
+export const LIST_STYLES: { id: SectionStyle; name: string }[] = [
+  { id: "", name: "Template's own" },
+  { id: "lines", name: "Simple lines" },
+  { id: "timeline", name: "Timeline" },
+  { id: "boxes", name: "Boxes" },
+  { id: "glass", name: "Glass" },
+];
+
+export type ThemeId = "" | "light" | "paper" | "dark" | "accent";
+export type HeroId = "" | "left" | "center" | "split";
+export type MotionId = "rise" | "fade" | "slide" | "zoom" | "none";
+
+export const THEMES: { id: ThemeId; name: string }[] = [
+  { id: "", name: "Template's own" },
+  { id: "light", name: "White" },
+  { id: "paper", name: "Paper" },
+  { id: "dark", name: "Dark" },
+  { id: "accent", name: "Your colour" },
+];
+
+export const HEROES: { id: HeroId; name: string }[] = [
+  { id: "", name: "Template's own" },
+  { id: "left", name: "Left" },
+  { id: "center", name: "Centred" },
+  { id: "split", name: "Photo on the right" },
+];
+
+export const MOTIONS: { id: MotionId; name: string }[] = [
+  { id: "rise", name: "Rise up" },
+  { id: "fade", name: "Fade in" },
+  { id: "slide", name: "Slide from the side" },
+  { id: "zoom", name: "Zoom in" },
+  { id: "none", name: "No animation" },
+];
 
 export type FontId = "modern" | "serif" | "clean";
 
@@ -26,6 +76,12 @@ export type Portfolio = {
   template: string;
   accent: string; // empty means the template's own colour
   font: FontId;
+  theme: ThemeId;
+  hero: HeroId;
+  photoSize: "s" | "m" | "l";
+  bigName: boolean;
+  glow: boolean;
+  motion: MotionId;
   name: string;
   role: string;
   city: string;
@@ -75,7 +131,7 @@ export function newItem(): Item {
 }
 
 export function newSection(title: string, layout: Section["layout"]): Section {
-  return { id: uid(), title, layout, hidden: false, items: [] };
+  return { id: uid(), title, layout, style: "", hidden: false, items: [] };
 }
 
 // Sample photos are simple drawn pictures, so nothing in a preview pretends to be a real photo.
@@ -109,10 +165,47 @@ export function samplePhoto(template: string, n: number) {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
+// Every look option at its starting value: the template decides.
+const LOOK_DEFAULTS = {
+  accent: "",
+  font: "modern" as FontId,
+  theme: "" as ThemeId,
+  hero: "" as HeroId,
+  photoSize: "m" as const,
+  bigName: false,
+  glow: false,
+  motion: "rise" as MotionId,
+};
+
+// Fills in anything missing from a portfolio saved by an earlier version of the editor.
+export function normalize(saved: Portfolio): Portfolio {
+  return {
+    ...LOOK_DEFAULTS,
+    ...saved,
+    sections: saved.sections.map((section) => ({ ...section, style: section.style ?? "" })),
+  };
+}
+
+// True once the user has typed something of their own.
+export function hasDetails(p: Portfolio | null): p is Portfolio {
+  return Boolean(p && !p.sample && p.name.trim());
+}
+
+// The same details shown in another template, in that template's own look.
+export function inTemplate(p: Portfolio, template: string): Portfolio {
+  return {
+    ...p,
+    ...LOOK_DEFAULTS,
+    font: template === "creative-5" ? "serif" : "modern",
+    template,
+    sections: p.sections.map((section) => ({ ...section, style: "" })),
+  };
+}
+
 // A complete sample person in the given template. Used for previews and as the editor's starting point.
 export function fromSample(template: string): Portfolio {
   const id = getTemplate(template) ? template : TEMPLATES[0].id;
-  const s = SAMPLES[id];
+  const s = SAMPLES[id] ?? SAMPLES[TEMPLATES[0].id];
   let n = 0;
   const photos = (count: number) => Array.from({ length: count }, () => samplePhoto(id, n++));
 
@@ -121,6 +214,7 @@ export function fromSample(template: string): Portfolio {
       id: "work",
       title: s.workLabel,
       layout: "cards",
+      style: "",
       hidden: false,
       items: s.projects.map((p, i) => ({ id: `w${i}`, title: p.title, sub: "", meta: "", text: p.text, tags: p.tags, photos: photos(3) })),
     },
@@ -130,6 +224,7 @@ export function fromSample(template: string): Portfolio {
       id: "experience",
       title: "Experience",
       layout: "list",
+      style: "",
       hidden: false,
       items: s.experience.map((e, i) => ({ id: `x${i}`, title: e.title, sub: e.place, meta: e.years, text: e.text, tags: [], photos: photos(i === 0 ? 3 : 2) })),
     });
@@ -138,13 +233,14 @@ export function fromSample(template: string): Portfolio {
     id: "education",
     title: "Education",
     layout: "list",
+    style: "",
     hidden: false,
     items: s.education.map((e, i) => ({ id: `e${i}`, title: e.title, sub: e.place, meta: e.years, text: "", tags: [], photos: i === 0 ? photos(3) : [] })),
   });
 
   return {
     template: id,
-    accent: "",
+    ...LOOK_DEFAULTS,
     font: id === "creative-5" ? "serif" : "modern",
     name: s.name,
     role: s.role,
@@ -163,12 +259,12 @@ export function fromSample(template: string): Portfolio {
 export function blankPortfolio(template: string): Portfolio {
   return {
     template,
-    accent: "",
+    ...LOOK_DEFAULTS,
     font: template === "creative-5" ? "serif" : "modern",
-    name: "Your Name",
-    role: "What you do",
-    city: "Your city",
-    bio: "One line about you and the work you want.",
+    name: "",
+    role: "",
+    city: "",
+    bio: "",
     about: "",
     photo: "",
     email: "",
