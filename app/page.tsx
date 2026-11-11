@@ -1,7 +1,8 @@
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import GoogleButton from "@/components/GoogleButton";
-import TemplateThumb from "@/components/TemplateThumb";
+import ScaledPreview from "@/components/ScaledPreview";
+import HeroShowcase from "@/components/HeroShowcase";
 
 const STEPS = [
   { title: "Sign in with Google", text: "One tap. No new password to remember." },
@@ -19,18 +20,34 @@ const FEATURES = [
   { title: "A neat share preview", text: "Your name, photo and headline show up when you share the link on WhatsApp." },
 ];
 
+const SLUGS = [
+  "aarav-sharma",
+  "priya-nair",
+  "kabir-singh",
+  "ananya-iyer",
+  "rohan-mehta",
+  "zoya-khan",
+  "meera-joshi",
+  "arjun-reddy",
+  "sneha-kulkarni",
+  "farhan-ali",
+];
+
 export default function LandingPage() {
   return (
     <>
       <SiteHeader />
       <main>
+        <div className="hero-zone">
         <section className="wrap hero">
           <div className="hero-copy">
             <div className="eyebrow">
               <span className="eyebrow-dot" aria-hidden="true" />
               Free for students and first-job seekers
             </div>
-            <h1 className="display h-hero">Your portfolio, live in ten minutes.</h1>
+            <h1 className="display h-hero">
+              Your portfolio, live in <span className="mark">ten minutes.</span>
+            </h1>
             <p className="lead">
               Sign in with Google, fill in your details, pick a template and publish. No code, no
               developer, no cost.
@@ -40,51 +57,22 @@ export default function LandingPage() {
           </div>
 
           <div className="hero-demo">
-            <div className="browser">
-              <div className="browser-bar">
-                <div className="browser-dots" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <div className="browser-url">
-                  portfolio-verse.vercel.app/<strong>aarav-sharma</strong>
-                </div>
-              </div>
-              <div className="demo">
-                <div className="demo-head">
-                  <div className="demo-avatar" aria-hidden="true">AS</div>
-                  <div>
-                    <div className="demo-name">Aarav Sharma</div>
-                    <div className="demo-role">Final-year B.Tech, Computer Engineering · Pune</div>
-                  </div>
-                </div>
-                <p className="demo-bio">
-                  I build small, useful web apps for my college and my city. Looking for a software
-                  internship for summer 2027.
-                </p>
-                <div className="chips">
-                  <span className="chip">Python</span>
-                  <span className="chip">React</span>
-                  <span className="chip">SQL</span>
-                  <span className="chip">Figma</span>
-                </div>
-                <div className="demo-projects">
-                  <div className="demo-project">
-                    <strong>Pune Metro route finder</strong>
-                    <span>Shortest route and fare between any two stations.</span>
-                  </div>
-                  <div className="demo-project">
-                    <strong>Hostel mess feedback app</strong>
-                    <span>Daily ratings that the mess committee reads.</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <HeroShowcase />
           </div>
         </section>
+        </div>
 
-        <section className="band">
+        <div className="ticker" aria-hidden="true">
+          <div className="ticker-track">
+            {[...SLUGS, ...SLUGS].map((slug, i) => (
+              <span key={i}>
+                portfolio-verse.vercel.app/<strong>{slug}</strong>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <section className="band-dark">
           <div className="wrap section">
             <h2 className="display h-section">Four steps. That is all.</h2>
             <ol className="steps">
@@ -109,14 +97,14 @@ export default function LandingPage() {
           </div>
           <div className="styles">
             <div className="style-card">
-              <TemplateThumb id="clarity" />
+              <ScaledPreview id="professional-1" ratio="16 / 10" flat />
               <div className="style-foot">
                 <strong>Professional</strong>
                 <span>Clean, calm and recruiter-friendly.</span>
               </div>
             </div>
             <div className="style-card">
-              <TemplateThumb id="rangoli" />
+              <ScaledPreview id="creative-1" ratio="16 / 10" flat />
               <div className="style-foot">
                 <strong>Creative</strong>
                 <span>Bold colour, big type, more personality.</span>

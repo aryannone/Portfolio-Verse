@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { TEMPLATES, type TemplateCategory } from "@/lib/templates";
-import TemplateThumb from "@/components/TemplateThumb";
+import ScaledPreview from "@/components/ScaledPreview";
 import GoogleButton from "@/components/GoogleButton";
 
 type Filter = "all" | TemplateCategory;
@@ -43,12 +44,15 @@ export default function TemplateGallery() {
           <div className="gallery-grid">
             {TEMPLATES.filter((t) => t.category === g.id).map((t) => (
               <article key={t.id} className="tcard">
-                <TemplateThumb id={t.id} />
-                <div className="tcard-foot">
-                  <div className="tcard-info">
-                    <div className="tcard-name">{t.name}</div>
-                    <div className="tcard-blurb">{t.blurb}</div>
-                  </div>
+                <ScaledPreview id={t.id} />
+                <div className="tcard-info">
+                  <div className="tcard-name">{t.name}</div>
+                  <div className="tcard-blurb">{t.blurb}</div>
+                </div>
+                <div className="tcard-actions">
+                  <Link href={`/templates/${t.id}`} className="btn btn-quiet">
+                    Preview
+                  </Link>
                   <GoogleButton label="Use this template" variant="outline" template={t.id} />
                 </div>
               </article>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Figtree } from "next/font/google";
 import "./globals.css";
+import "./templates.css";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
