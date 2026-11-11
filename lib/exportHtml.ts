@@ -1,4 +1,4 @@
-import { slugOf, type Portfolio } from "@/lib/portfolio";
+import { slugOf, toHref, type Portfolio } from "@/lib/portfolio";
 import { mountPortfolio, type RuntimeStore } from "@/lib/runtime";
 
 const escapeHtml = (text: string) =>
@@ -39,6 +39,11 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
     img.setAttribute("data-ph", String(indexOf(src)));
     img.removeAttribute("src");
   });
+  // The playground starts itself in the downloaded page; remove what the editor's copy left on it.
+  clone.querySelectorAll(".tp-play").forEach((el) => el.classList.remove("tp-play-on"));
+  clone.querySelectorAll(".tp-bub, .tp-buddy-eye i").forEach((el) => el.removeAttribute("style"));
+  clone.querySelectorAll(".tp-bub").forEach((el) => el.classList.remove("is-held"));
+  clone.querySelectorAll(".tp-buddy").forEach((el) => el.classList.remove("is-happy", "is-hop"));
   clone.querySelectorAll(".tp-item.has-more").forEach((el) => {
     el.setAttribute("tabindex", "0");
     el.setAttribute("role", "button");
@@ -55,6 +60,7 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
         text: item.text,
         details: item.details ?? "",
         tags: item.tags,
+        links: (item.links ?? []).filter((l) => l.url.trim()).map((l) => ({ label: l.label.trim() || "Link", url: toHref(l.url) })),
         layout: item.gallery || data.gallery,
         photos: item.photos.map(indexOf),
       };

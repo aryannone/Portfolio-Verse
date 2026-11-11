@@ -13,6 +13,7 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 - Card sections arrange themselves by count: 2 or 3 side by side, 4 as two pairs, 5 and 7 with one tall card, 6 as two threes
 - Download: the editor builds one self-contained HTML file of the portfolio
 - Saved templates (`/saved`): named copies saved from the editor, each with download, open in editor and delete
+- Entry links, a quote block above Contact, and a contact playground: links float as bubbles visitors can drag, throw and tap, watched by a character (robot, cat or ghost)
 - Per-section look: each section can have its own background, text colour, accent and font
 - Details panel: entries with photos or a full write-up show "See details", which opens the panel headed by the section name
 - Login is switched off for now. Every page is open to everyone, and each visitor's work is saved in their own browser (IndexedDB)

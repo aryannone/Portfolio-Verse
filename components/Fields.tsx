@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { CARD_STYLES, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type FontId, type GalleryId, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
+import { BUDDIES, CARD_STYLES, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type BuddyId, type FontId, type GalleryId, type Link, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
 import type { PortfolioTools } from "@/lib/usePortfolio";
 
 // The form pieces shared by the details form (/start) and the editor.
@@ -86,6 +86,46 @@ export function SectionLook({ section, setSection }: { section: Section; setSect
   );
 }
 
+// A list of named links: add, edit, remove.
+export function LinkList({ label, links, onChange, namePlaceholder }: { label: string; links: Link[]; onChange: (links: Link[]) => void; namePlaceholder: string }) {
+  const patch = (id: string, change: Partial<Link>) => onChange(links.map((l) => (l.id === id ? { ...l, ...change } : l)));
+  return (
+    <div className="ed-field">
+      <span>{label}</span>
+      {links.map((link) => (
+        <div key={link.id} className="ed-row">
+          <input className="ed-input" placeholder={namePlaceholder} aria-label="Link name" value={link.label} onChange={(e) => patch(link.id, { label: e.target.value })} />
+          <input className="ed-input" placeholder="https://" aria-label="Link address" value={link.url} onChange={(e) => patch(link.id, { url: e.target.value })} />
+          <button type="button" className="ed-icon" aria-label={`Remove link ${link.label}`} onClick={() => onChange(links.filter((l) => l.id !== link.id))}>
+            ×
+          </button>
+        </div>
+      ))}
+      <button type="button" className="ed-link" onClick={() => onChange([...links, { id: uid(), label: "", url: "" }])}>
+        + Add a link
+      </button>
+    </div>
+  );
+}
+
+// The end of the page: the quote, and the contact playground's character.
+export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Partial<Portfolio>) => void }) {
+  return (
+    <>
+      <Field label="Quote (shown above Contact)">
+        <textarea className="ed-input" rows={2} value={data.quote} placeholder="A line you live or work by." onChange={(e) => set({ quote: e.target.value })} />
+      </Field>
+      <Field label="Who said it">
+        <input className="ed-input" value={data.quoteBy} placeholder="Leave empty if it is yours" onChange={(e) => set({ quoteBy: e.target.value })} />
+      </Field>
+      <Choice<BuddyId> label="Character in the contact playground" value={data.buddy} options={BUDDIES} onChange={(buddy) => set({ buddy })} />
+      <p className="ed-hint">
+        Contact shows your email, phone and every link from About you as bubbles. Visitors can drag and throw them, and tap one to open it.
+      </p>
+    </>
+  );
+}
+
 export function move<T>(list: T[], index: number, by: number) {
   const to = index + by;
   if (to < 0 || to >= list.length) return list;
@@ -99,9 +139,6 @@ type Tools = Pick<PortfolioTools, "set" | "setSection" | "setItem" | "addPhotos"
 
 export function ProfileFields({ data, tools }: { data: Portfolio; tools: Tools }) {
   const { set, setAvatar } = tools;
-  const setLink = (id: string, patch: { label?: string; url?: string }) =>
-    set({ links: data.links.map((l) => (l.id === id ? { ...l, ...patch } : l)) });
-
   return (
     <>
       <div className="ed-field">
@@ -141,21 +178,10 @@ export function ProfileFields({ data, tools }: { data: Portfolio; tools: Tools }
       <Field label="Email">
         <input className="ed-input" type="email" value={data.email} placeholder="you@example.com" onChange={(e) => set({ email: e.target.value })} />
       </Field>
-      <div className="ed-field">
-        <span>Links</span>
-        {data.links.map((link) => (
-          <div key={link.id} className="ed-row">
-            <input className="ed-input" placeholder="LinkedIn" aria-label="Link name" value={link.label} onChange={(e) => setLink(link.id, { label: e.target.value })} />
-            <input className="ed-input" placeholder="https://" aria-label="Link address" value={link.url} onChange={(e) => setLink(link.id, { url: e.target.value })} />
-            <button type="button" className="ed-icon" aria-label={`Remove link ${link.label}`} onClick={() => set({ links: data.links.filter((l) => l.id !== link.id) })}>
-              ×
-            </button>
-          </div>
-        ))}
-        <button type="button" className="ed-link" onClick={() => set({ links: [...data.links, { id: uid(), label: "", url: "" }] })}>
-          + Add a link
-        </button>
-      </div>
+      <Field label="Phone (optional)">
+        <input className="ed-input" type="tel" value={data.phone} placeholder="+91 98765 43210" onChange={(e) => set({ phone: e.target.value })} />
+      </Field>
+      <LinkList label="Social and other links" links={data.links} namePlaceholder="LinkedIn" onChange={(links) => set({ links })} />
     </>
   );
 }
@@ -272,6 +298,12 @@ export function SectionFields({ data, section, tools, design }: { data: Portfoli
           <Field label="Tags, separated by commas">
             <ListInput value={item.tags} onChange={(tags) => setItem(section.id, item.id, { tags })} />
           </Field>
+          <LinkList
+            label="Links for this entry"
+            links={item.links ?? []}
+            namePlaceholder="Live project"
+            onChange={(links) => setItem(section.id, item.id, { links })}
+          />
           <div className="ed-field">
             <span>Photos (shown with the full details)</span>
             <div className="ed-photos">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties, type Ref } from "react";
-import { initialsOf, onColor, type Item, type Portfolio, type Section } from "@/lib/portfolio";
+import { initialsOf, linkBadge, onColor, toHref, type Item, type Link, type Portfolio, type Section } from "@/lib/portfolio";
 import { mountPortfolio, type RuntimeStore } from "@/lib/runtime";
 
 type Props = {
@@ -19,6 +19,10 @@ type Props = {
 
 function subLine(item: Item) {
   return [item.sub, item.meta].filter(Boolean).join(" · ");
+}
+
+function usable(links: Link[] | undefined) {
+  return (links ?? []).filter((link) => link.url.trim()).map((link) => ({ ...link, label: link.label.trim() || "Link", url: toHref(link.url) }));
 }
 
 function photoLabel(count: number) {
@@ -69,6 +73,25 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   );
   const skillsSection = sections.find((s) => s.layout === "skills");
 
+  // Every way to reach the person, for the contact playground.
+  const reach = [
+    ...(data.email ? [{ id: "email", label: "Email", url: `mailto:${data.email}` }] : []),
+    ...(data.phone.trim() ? [{ id: "phone", label: "Call", url: toHref(data.phone) }] : []),
+    ...usable(data.links),
+  ];
+  const external = (url: string) => (/^https?:/.test(url) ? { target: "_blank", rel: "noopener noreferrer" } : {});
+
+  const entryLinks = (item: Item) =>
+    usable(item.links).length ? (
+      <div className="tp-elinks">
+        {usable(item.links).map((link) => (
+          <a key={link.id} href={link.url} {...external(link.url)}>
+            {link.label}
+          </a>
+        ))}
+      </div>
+    ) : null;
+
   const items: RuntimeStore["items"] = {};
   for (const section of sections) {
     for (const item of section.items) {
@@ -79,6 +102,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
         text: item.text,
         details: item.details ?? "",
         tags: item.tags,
+        links: usable(item.links).map(({ label, url }) => ({ label, url })),
         layout: item.gallery || data.gallery,
         photos: item.photos,
       };
@@ -161,8 +185,8 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
               {data.links
                 .filter((link) => link.label)
                 .map((link) =>
-                  link.url ? (
-                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer">
+                  link.url.trim() ? (
+                    <a key={link.id} href={toHref(link.url)} {...external(toHref(link.url))}>
                       {link.label}
                     </a>
                   ) : (
@@ -208,6 +232,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                           ))}
                         </div>
                       ) : null}
+                      {entryLinks(item)}
                       {item.photos.length || item.details?.trim() ? <span className="tp-more">See details</span> : null}
                     </div>
                   ))}
@@ -230,6 +255,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                             ))}
                           </div>
                         ) : null}
+                        {entryLinks(item)}
                         {!item.photos.length && item.details?.trim() ? <span className="tp-more">See details</span> : null}
                       </div>
                       {item.meta ? <span className="tp-years">{item.meta}</span> : null}
@@ -248,12 +274,48 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
             ),
           )}
 
-          {data.email ? (
+          {data.quote.trim() ? (
+            <div className="tp-sec tp-quote">
+              <blockquote>
+                <p>{data.quote.trim()}</p>
+                {data.quoteBy.trim() ? <footer>{data.quoteBy.trim()}</footer> : null}
+              </blockquote>
+            </div>
+          ) : null}
+
+          {reach.length ? (
             <div className="tp-sec tp-contact">
               <Heading className="tp-h">Contact</Heading>
-              <p>
-                <a href={`mailto:${data.email}`}>{data.email}</a>
-              </p>
+              {data.email ? (
+                <p>
+                  <a href={`mailto:${data.email}`}>{data.email}</a>
+                </p>
+              ) : null}
+              {data.phone.trim() ? (
+                <a className="tp-phone" href={toHref(data.phone)}>
+                  {data.phone.trim()}
+                </a>
+              ) : null}
+              <div className="tp-play">
+                {reach.map((link) => (
+                  <a key={link.id} className="tp-bub" href={link.url} aria-label={link.label} {...external(link.url)}>
+                    <b aria-hidden="true">{linkBadge(link.label, link.url)}</b>
+                    <span>{link.label}</span>
+                  </a>
+                ))}
+                {data.buddy !== "none" ? (
+                  <div className={`tp-buddy tp-buddy-${data.buddy}`} aria-hidden="true">
+                    <span className="tp-buddy-eye">
+                      <i />
+                    </span>
+                    <span className="tp-buddy-eye">
+                      <i />
+                    </span>
+                    <span className="tp-buddy-mouth" />
+                  </div>
+                ) : null}
+              </div>
+              <div className="tp-play-hint">Drag a bubble, throw it, or tap it to open.{data.buddy !== "none" ? " Tap the little one to shake things up." : ""}</div>
             </div>
           ) : null}
         </div>

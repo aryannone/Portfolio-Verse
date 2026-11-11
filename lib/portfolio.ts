@@ -10,9 +10,43 @@ export type Item = {
   text: string;
   tags: string[];
   details?: string; // the full write-up, shown when a visitor opens the entry
+  links?: Link[]; // a project site, a repository, a certificate
   photos: string[]; // image data, shown in the details panel
   gallery?: GalleryId | ""; // this entry's own photo layout; empty means the portfolio's
 };
+
+export type Link = { id: string; label: string; url: string };
+
+// Turns what someone typed into an address a browser can open.
+export function toHref(url: string) {
+  const u = url.trim();
+  if (!u || u === "#") return u;
+  if (/^(https?:|mailto:|tel:)/i.test(u)) return u;
+  if (/^[^\s/@]+@[^\s/@]+\.[^\s/@]+$/.test(u)) return `mailto:${u}`;
+  if (/^\+?[\d\s()-]{7,}$/.test(u)) return `tel:${u.replace(/[^\d+]/g, "")}`;
+  return `https://${u}`;
+}
+
+// One or two letters that stand for a link, shown large on its bubble.
+export function linkBadge(label: string, url: string) {
+  const text = `${label} ${url}`.toLowerCase();
+  const known: [string, string][] = [
+    ["linkedin", "in"], ["github", "GH"], ["instagram", "IG"], ["twitter", "X"], ["x.com", "X"], ["youtube", "YT"],
+    ["behance", "Be"], ["dribbble", "Dr"], ["whatsapp", "WA"], ["wa.me", "WA"], ["facebook", "f"], ["medium", "M"],
+    ["vimeo", "V"], ["kaggle", "K"], ["leetcode", "LC"], ["telegram", "TG"], ["mailto:", "@"], ["tel:", "Ph"],
+  ];
+  for (const [key, badge] of known) if (text.includes(key)) return badge;
+  return label.trim().slice(0, 2) || "Go";
+}
+
+export type BuddyId = "robot" | "cat" | "ghost" | "none";
+
+export const BUDDIES: { id: BuddyId; name: string }[] = [
+  { id: "robot", name: "Robot" },
+  { id: "cat", name: "Cat" },
+  { id: "ghost", name: "Ghost" },
+  { id: "none", name: "No character" },
+];
 
 // How photos are arranged in the photo panel.
 export type GalleryId = "stack" | "mosaic" | "slides";
@@ -127,7 +161,11 @@ export type Portfolio = {
   about: string;
   photo: string;
   email: string;
-  links: { id: string; label: string; url: string }[];
+  phone: string;
+  links: Link[];
+  quote: string;
+  quoteBy: string;
+  buddy: BuddyId;
   skills: string[];
   sections: Section[];
   sample: boolean;
@@ -225,10 +263,14 @@ const LOOK_DEFAULTS = {
   progress: false,
 };
 
+// Fields added after the first version, with what they start as.
+const CLOSING_DEFAULTS = { phone: "", quote: "", quoteBy: "", buddy: "robot" as BuddyId };
+
 // Fills in anything missing from a portfolio saved by an earlier version of the editor.
 export function normalize(saved: Portfolio): Portfolio {
   return {
     ...LOOK_DEFAULTS,
+    ...CLOSING_DEFAULTS,
     ...saved,
     // Skills used to sit after every section, so that is where the section goes for older saves.
     sections: [
@@ -271,7 +313,7 @@ export function fromSample(template: string): Portfolio {
       layout: "cards",
       style: "",
       hidden: false,
-      items: s.projects.map((p, i) => ({ id: `w${i}`, title: p.title, sub: "", meta: "", text: p.text, details: SAMPLE_DETAILS, tags: p.tags, photos: photos(i === 1 ? 5 : 3), gallery: GALLERIES[i % 3].id })),
+      items: s.projects.map((p, i) => ({ id: `w${i}`, title: p.title, sub: "", meta: "", text: p.text, details: SAMPLE_DETAILS, links: i === 0 ? [{ id: "s0", label: "Live project", url: "#" }] : [], tags: p.tags, photos: photos(i === 1 ? 5 : 3), gallery: GALLERIES[i % 3].id })),
     },
   ];
   if (s.experience) {
@@ -305,7 +347,11 @@ export function fromSample(template: string): Portfolio {
     about: s.about,
     photo: "",
     email: s.email,
-    links: s.links.map((label, i) => ({ id: `l${i}`, label, url: "" })),
+    ...CLOSING_DEFAULTS,
+    quote: "Small, steady work beats one big burst.",
+    quoteBy: "A note to self",
+    // "#" keeps the sample links tappable without sending anyone to a made-up profile.
+    links: s.links.map((label, i) => ({ id: `l${i}`, label, url: "#" })),
     skills: s.skills,
     sections,
     sample: true,
@@ -324,6 +370,7 @@ export function blankPortfolio(template: string): Portfolio {
     about: "",
     photo: "",
     email: "",
+    ...CLOSING_DEFAULTS,
     links: [],
     skills: [],
     sections: [newSection("Projects", "cards"), newSection("Experience", "list"), newSection("Education", "list"), skillsSection()],

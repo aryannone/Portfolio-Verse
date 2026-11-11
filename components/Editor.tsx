@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import PortfolioView from "@/components/PortfolioView";
-import { Choice, ProfileFields, SectionFields, move } from "@/components/Fields";
+import { Choice, ClosingFields, ProfileFields, SectionFields, move } from "@/components/Fields";
 import { TEMPLATES, getTemplate } from "@/lib/templates";
 import {
   ACCENTS,
@@ -259,6 +259,13 @@ export default function Editor() {
               </div>
             </details>
           ))}
+
+          <details className="ed-group" open>
+            <summary>Quote and contact</summary>
+            <div className="ed-group-in">
+              <ClosingFields data={data} set={set} />
+            </div>
+          </details>
 
           <div className="ed-foot">
             <button type="button" className="btn btn-outline" onClick={() => set({ sections: [...data.sections, newSection("New section", "list")] })}>
