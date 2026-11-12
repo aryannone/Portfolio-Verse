@@ -118,9 +118,15 @@ export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Par
       <Field label="Who said it">
         <input className="ed-input" value={data.quoteBy} placeholder="Leave empty if it is yours" onChange={(e) => set({ quoteBy: e.target.value })} />
       </Field>
-      <Choice<BuddyId> label="Character in the contact playground" value={data.buddy} options={BUDDIES} onChange={(buddy) => set({ buddy })} />
+      <label className="ed-check">
+        <input type="checkbox" checked={data.play} onChange={(e) => set({ play: e.target.checked })} />
+        Let visitors play with the contact links
+      </label>
+      {data.play ? (
+        <Choice<BuddyId> label="Character in the contact playground" value={data.buddy} options={BUDDIES} onChange={(buddy) => set({ buddy })} />
+      ) : null}
       <p className="ed-hint">
-        Contact shows your email, phone and every link from About you as bubbles. Visitors can drag and throw them, and tap one to open it.
+        Contact shows your email, phone and every link from About you as round buttons. With play switched on, visitors can drag and throw them, and tap one to open it.
       </p>
     </>
   );

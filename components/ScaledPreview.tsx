@@ -45,7 +45,8 @@ export default function ScaledPreview({
   const classes = ["scaled", flat ? "scaled-flat" : "", auto ? "scaled-auto" : ""].filter(Boolean).join(" ");
 
   return (
-    <div ref={boxRef} className={classes} style={{ aspectRatio: ratio }} aria-hidden="true">
+    // inert as well as hidden: the picture contains links, and the keyboard must not land on them.
+    <div ref={boxRef} className={classes} style={{ aspectRatio: ratio }} aria-hidden="true" inert>
       <div
         className="scaled-inner"
         style={{ transform: `scale(${size?.scale ?? 0.3})`, opacity: size === null ? 0 : 1 }}

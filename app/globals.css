@@ -70,6 +70,8 @@ a:focus-visible, button:focus-visible {
 .brand {
   display: flex;
   align-items: center;
+  min-width: 44px;
+  min-height: 44px;
   gap: 10px;
   font-family: var(--font-display-stack);
   font-weight: 700;
@@ -448,7 +450,7 @@ a.btn { display: inline-flex; align-items: center; }
 .ed-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
 .ed-seg { display: inline-flex; align-self: flex-start; border: 1px solid var(--line-strong); border-radius: 10px; overflow: hidden; background: #ffffff; }
-.ed-seg button { min-height: 40px; padding: 0 14px; border: 0; background: transparent; color: var(--ink); font-size: 14px; font-weight: 600; }
+.ed-seg button { min-height: 44px; padding: 0 14px; border: 0; background: transparent; color: var(--ink); font-size: 14px; font-weight: 600; }
 .ed-seg button + button { border-left: 1px solid var(--line-strong); }
 .ed-seg button[aria-pressed="true"] { background: var(--ink); color: #ffffff; }
 
@@ -477,24 +479,24 @@ a.btn { display: inline-flex; align-items: center; }
 
 .ed-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
 .ed-field > span { font-size: 13px; font-weight: 600; color: var(--muted); }
-.ed-input { width: 100%; min-height: 42px; font: inherit; font-size: 15px; padding: 9px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: #ffffff; color: var(--ink); resize: vertical; }
+.ed-input { width: 100%; min-height: 44px; font: inherit; font-size: 15px; padding: 9px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: #ffffff; color: var(--ink); resize: vertical; }
 .ed-input:focus-visible, .ed-color:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
 .ed-row { display: flex; gap: 8px; align-items: flex-end; }
 
 .ed-templates { display: flex; flex-wrap: wrap; gap: 6px; }
-.ed-template { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: #ffffff; color: var(--ink); font-size: 13px; font-weight: 600; }
+.ed-template { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: #ffffff; color: var(--ink); font-size: 13px; font-weight: 600; }
 .ed-template i { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(18, 20, 26, 0.2); }
 .ed-template.is-on { background: var(--ink); border-color: var(--ink); color: #ffffff; }
 
 .ed-swatches { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.ed-swatch { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 0 0 1px var(--line-strong); padding: 0; }
+.ed-swatch { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 0 0 1px var(--line-strong); padding: 0; }
 .ed-swatch.is-on { box-shadow: 0 0 0 2px var(--ink); }
-.ed-color { width: 40px; height: 36px; padding: 0; border: 1px solid var(--line-strong); border-radius: 8px; background: #ffffff; cursor: pointer; }
+.ed-color { width: 44px; height: 44px; padding: 0; border: 1px solid var(--line-strong); border-radius: 8px; background: #ffffff; cursor: pointer; }
 
 .ed-tools { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
-.ed-icon { width: 40px; height: 40px; flex: none; border: 1px solid var(--line-strong); border-radius: 10px; background: #ffffff; color: var(--ink); font-size: 17px; line-height: 1; }
+.ed-icon { width: 44px; height: 44px; flex: none; border: 1px solid var(--line-strong); border-radius: 10px; background: #ffffff; color: var(--ink); font-size: 17px; line-height: 1; }
 .ed-icon:disabled { opacity: 0.35; cursor: default; }
-.ed-link { border: 0; background: none; padding: 8px 2px; color: var(--ink); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; align-self: flex-start; }
+.ed-link { display: inline-flex; align-items: center; min-height: 44px; border: 0; background: none; padding: 0 2px; color: var(--ink); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; align-self: flex-start; }
 .ed-danger { color: #b42318; }
 
 .ed-item { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 12px; background: var(--surface); }
@@ -504,22 +506,22 @@ a.btn { display: inline-flex; align-items: center; }
 .ed-photos { display: flex; flex-wrap: wrap; gap: 8px; }
 .ed-photo { position: relative; width: 84px; height: 64px; border-radius: 8px; overflow: hidden; background: var(--line); }
 .ed-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.ed-photo button { position: absolute; top: 3px; right: 3px; width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(18, 20, 26, 0.78); color: #ffffff; font-size: 16px; line-height: 1; }
+.ed-photo button { position: absolute; top: 2px; right: 2px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: rgba(18, 20, 26, 0.78); color: #ffffff; font-size: 16px; line-height: 1; }
 .ed-add { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 84px; height: 64px; padding: 0 12px; border: 1px dashed var(--muted); border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 600; cursor: pointer; }
 .ed-add input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .ed-add:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 .ed-check { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; font-weight: 500; cursor: pointer; }
-.ed-check input { width: 20px; height: 20px; accent-color: var(--ink); }
+.ed-check input { width: 24px; height: 24px; accent-color: var(--ink); }
 .ed-hint { font-size: 13px; color: var(--muted); }
 .ed-photo-me { width: 96px; height: 96px; border-radius: 16px; }
 select.ed-input { appearance: auto; }
-a.ed-link { padding: 0; }
+a.ed-link { display: inline; min-height: 0; padding: 0; }
 
 .ed-colour { flex: 1 1 0; }
 .ed-colour-in { display: flex; align-items: center; gap: 8px; min-height: 40px; }
 .ed-colour-in em { font-style: normal; font-size: 13px; color: var(--muted); }
-.ed-colour-in .ed-link { padding: 4px 0; }
+.ed-colour-in .ed-link { min-height: 32px; }
 .ed-sub { border: 1px solid var(--line); border-radius: 10px; }
 .ed-sub > summary { cursor: pointer; padding: 10px 12px; font-size: 14px; font-weight: 600; }
 .ed-sub > summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 10px; }
@@ -628,3 +630,24 @@ a.ed-link { padding: 0; }
 .btn-danger:hover:not(:disabled) { background: #b42318; color: #ffffff; }
 /* Where a saved portfolio is drawn, out of sight, to build its download. */
 .offscreen { position: fixed; left: -200vw; top: 0; width: 1200px; height: 800px; overflow: hidden; visibility: hidden; pointer-events: none; }
+
+/* Hero slideshow pause button */
+.browser-pause { flex: none; width: 44px; height: 32px; margin: -4px -6px -4px 0; border: 1px solid var(--line); border-radius: 8px; background: #ffffff; color: var(--ink); font-size: 11px; line-height: 1; }
+.browser-pause:hover { border-color: var(--ink); }
+.browser.is-stopped .scaled-auto .scaled-scroll { animation-play-state: paused; }
+
+/* Closing call to action on the home page */
+.band-accent { background: var(--accent); }
+.closing { padding-top: 80px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
+.closing p { font-size: 18px; max-width: 34em; }
+.band-accent .btn-outline { background: transparent; }
+.band-accent .btn-outline:hover:not(:disabled) { background: var(--ink); color: #ffffff; }
+
+/* The template preview bar stays on one line on phones. */
+@media (max-width: 640px) {
+  .preview-bar-in { flex-wrap: nowrap; gap: 10px; }
+  .preview-title { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .preview-title span { display: none; }
+  .preview-bar-in .nav-link { white-space: nowrap; }
+  .preview-bar-in .btn { flex: none; }
+}

@@ -17,7 +17,7 @@ export const TEMPLATES: TemplateInfo[] = [
   { id: "creative-1", name: "Creative 1", category: "creative", blurb: "Colour tags and oversized type.", accent: "#ffd43b" },
   { id: "creative-2", name: "Creative 2", category: "creative", blurb: "Dark gallery that puts photos first.", accent: "#7fc8bc" },
   { id: "creative-3", name: "Creative 3", category: "creative", blurb: "Playful, sticker-like project cards.", accent: "#ffd43b" },
-  { id: "creative-4", name: "Creative 4", category: "creative", blurb: "Dark aurora with glass cards.", accent: "#8b5cf6" },
+  { id: "creative-4", name: "Creative 4", category: "creative", blurb: "Dark aurora with glass cards.", accent: "#7c3aed" },
   { id: "creative-5", name: "Creative 5", category: "creative", blurb: "Editorial, with big serif type.", accent: "#c2410c" },
   // A plain canvas. Everything about it is chosen in the editor.
   { id: "custom", name: "Build your own", category: "custom", blurb: "A blank canvas. Choose every part yourself.", accent: "#f5a300" },

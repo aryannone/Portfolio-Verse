@@ -27,7 +27,7 @@ const serif = Fraunces({
 
 export const metadata: Metadata = {
   title: {
-    default: "PORTFOLIO-VERSE: your portfolio, live in ten minutes",
+    default: "PORTFOLIO-VERSE: your portfolio, ready in ten minutes",
     template: "%s · PORTFOLIO-VERSE",
   },
   description:

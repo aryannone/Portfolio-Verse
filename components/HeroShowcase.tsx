@@ -11,22 +11,24 @@ const ORDER = ["creative-4", "professional-4", "creative-1", "creative-5", "prof
 export default function HeroShowcase() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  // The visitor's own choice, from the pause button. It stays until they press play again.
+  const [stopped, setStopped] = useState(false);
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || stopped) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const timer = window.setInterval(() => {
       setIndex((i) => (i + 1) % ORDER.length);
     }, 6500);
     return () => window.clearInterval(timer);
-  }, [paused]);
+  }, [paused, stopped]);
 
   const id = ORDER[index];
   const sample = SAMPLES[id];
 
   return (
     <div
-      className="browser"
+      className={stopped ? "browser is-stopped" : "browser"}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -37,8 +39,17 @@ export default function HeroShowcase() {
           <span />
         </div>
         <div className="browser-url">
-          portfolio-verse.vercel.app/<strong>{sample.slug}</strong>
+          <strong>{sample.slug}</strong>.html
         </div>
+        <button
+          type="button"
+          className="browser-pause"
+          aria-label={stopped ? "Play the template slideshow" : "Pause the template slideshow"}
+          aria-pressed={stopped}
+          onClick={() => setStopped((v) => !v)}
+        >
+          <span aria-hidden="true">{stopped ? "▶" : "❚❚"}</span>
+        </button>
       </div>
       <div key={id} className="scaled-swap">
         <ScaledPreview id={id} ratio="16 / 12" flat auto />

@@ -84,7 +84,8 @@
 .tp-bio { font-size: 20px; max-width: 32em; opacity: 0.86; }
 
 .tp-links { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; font-size: 15px; font-weight: 500; }
-.tp-links .tp-cta { padding: 9px 18px; border-radius: 999px; background: var(--tp-ink); color: var(--tp-bg); font-weight: 600; transition: translate 0.2s ease; }
+.tp-links a, .tp-links span { display: inline-flex; align-items: center; min-height: 44px; }
+.tp-links .tp-cta { padding: 0 20px; border-radius: 999px; background: var(--tp-ink); color: var(--tp-bg); font-weight: 600; transition: translate 0.2s ease; }
 .tp-links .tp-cta:hover { text-decoration: none; translate: 0 -2px; }
 
 .tp-sec { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
@@ -124,7 +125,7 @@
 
 .tp-shot { position: relative; aspect-ratio: 16 / 10; border-radius: 10px; overflow: hidden; margin-bottom: 6px; background: var(--tp-line); }
 .tp-shot img { width: 100%; height: 100%; object-fit: cover; transition: scale 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
-.tp-count { position: absolute; right: 10px; bottom: 10px; padding: 3px 10px; border-radius: 999px; background: rgba(10, 12, 18, 0.74); color: #ffffff; font-size: 12px; font-weight: 600; }
+.tp-count { position: absolute; right: 10px; bottom: 10px; padding: 3px 10px; border-radius: 999px; background: rgba(10, 12, 18, 0.78); color: #ffffff; font-size: 13px; font-weight: 600; }
 
 .tp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .tp-chips span { padding: 4px 12px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: 999px; font-size: 13px; font-weight: 500; }
@@ -139,7 +140,8 @@
 .tp-thumbs .tp-more { margin-left: 6px; }
 
 /* Links on an entry */
-.tp-elinks { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 4px; font-size: 14px; font-weight: 600; }
+.tp-elinks { display: flex; flex-wrap: wrap; gap: 0 16px; font-size: 14px; font-weight: 600; }
+.tp-elinks a { display: inline-flex; align-items: center; min-height: 32px; }
 .tp .tp-elinks a { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .tp-elinks a::after { content: " \2197"; }
 .tp .tp-elinks a:hover { text-decoration-thickness: 2px; }
@@ -170,17 +172,20 @@
 
 /* Contact playground. Without scripts or motion it is a plain row of round links.
    With them, the links float, can be dragged and thrown, and a character watches the pointer. */
-.tp-play { position: relative; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.tp-play, .tp-reach { position: relative; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.tp .tp-reach .tp-bub { width: 84px; height: 84px; transition: translate 0.25s ease, box-shadow 0.25s ease; }
+.tp .tp-reach .tp-bub:hover { translate: 0 -5px; }
+.tp-reach .tp-bub b { font-size: 22px; }
 .tp .tp-bub { width: 96px; height: 96px; flex: none; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px; background: var(--tp-accent); color: var(--tp-on-accent); text-align: center; text-decoration: none; overflow: hidden; box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.6); -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }
 .tp .tp-bub:nth-of-type(3n + 2) { background: var(--tp-ink); color: var(--tp-bg); }
 .tp .tp-bub:nth-of-type(3n) { background: var(--tp-bg); color: var(--tp-ink); box-shadow: inset 0 0 0 2px var(--tp-ink), 0 10px 24px -14px rgba(0, 0, 0, 0.6); }
 .tp .tp-bub:hover { text-decoration: none; }
 .tp-bub:focus-visible { outline: 3px solid var(--tp-ink); outline-offset: 3px; }
 .tp-bub b { font-family: var(--tp-display); font-size: 26px; font-weight: 700; line-height: 1; }
-.tp-bub span { max-width: 100%; font-size: 11px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tp-bub span { max-width: 100%; font-size: 12px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tp-play-hint { display: none; font-size: 14px; color: var(--tp-muted); }
 
-.tp-play.tp-play-on { display: block; height: 360px; border: 1px dashed color-mix(in srgb, var(--tp-ink) 35%, transparent); border-radius: 24px; overflow: hidden; touch-action: pan-y; }
+.tp-play.tp-play-on { display: block; height: 280px; border: 1px dashed color-mix(in srgb, var(--tp-ink) 35%, transparent); border-radius: 24px; overflow: hidden; touch-action: pan-y; }
 .tp-play-on .tp-bub { position: absolute; left: 0; top: 0; z-index: 1; cursor: grab; touch-action: none; will-change: transform; }
 .tp-play-on .tp-bub.is-held { cursor: grabbing; box-shadow: 0 22px 40px -16px rgba(0, 0, 0, 0.7); }
 .tp-play-on .tp-buddy { position: absolute; left: 50%; bottom: 18px; margin-left: -48px; }
@@ -210,7 +215,7 @@
 .tp-contact p { font-family: var(--tp-display); font-weight: 600; font-size: clamp(22px, 3.4cqw, 34px); letter-spacing: -0.01em; overflow-wrap: anywhere; }
 
 @container (max-width: 640px) {
-  .tp-play.tp-play-on { height: 320px; }
+  .tp-play.tp-play-on { height: 300px; }
   .tp .tp-bub { width: 84px; height: 84px; }
   .tp-bub b { font-size: 22px; }
   .tp-in { padding: 40px 22px; gap: 40px; }
@@ -390,7 +395,7 @@
 .tp-creative-3 .tp-row { border-top-width: 2px; }
 
 /* Creative 4: aurora. Dark, with drifting light and glass cards. */
-.tp-creative-4 { --tp-bg: #090b18; --tp-ink: #f4f5ff; --tp-muted: #a9aed0; --tp-line: rgba(255, 255, 255, 0.14); --tp-accent: #8b5cf6; --tp-on-accent: #ffffff; --tp-hi: #67e8f9; }
+.tp-creative-4 { --tp-bg: #090b18; --tp-ink: #f4f5ff; --tp-muted: #a9aed0; --tp-line: rgba(255, 255, 255, 0.14); --tp-accent: #7c3aed; --tp-on-accent: #ffffff; --tp-hi: #67e8f9; }
 .tp-creative-4 .tp-bg, .tp-fx-glow .tp-bg { display: block; position: absolute; inset: 0; pointer-events: none; }
 .tp-creative-4 .tp-bg::before, .tp-creative-4 .tp-bg::after, .tp-fx-glow .tp-bg::before, .tp-fx-glow .tp-bg::after { content: ""; position: absolute; width: 62cqw; height: 62cqw; max-width: 900px; max-height: 900px; border-radius: 50%; filter: blur(90px); opacity: 0.5; animation: tp-drift 16s ease-in-out infinite alternate; }
 .tp-creative-4 .tp-bg::before, .tp-fx-glow .tp-bg::before { top: -18cqw; left: -12cqw; background: var(--tp-accent); }

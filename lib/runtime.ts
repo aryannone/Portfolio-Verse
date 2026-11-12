@@ -407,6 +407,10 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
         frameId = 0;
       }
     });
+    // Lay the bubbles out once now, so they are already spread when the section scrolls into view.
+    tick();
+    win.cancelAnimationFrame(frameId);
+    frameId = 0;
     watcher.observe(arena);
     arena.addEventListener("pointermove", onArenaMove);
     arena.addEventListener("pointerdown", onArenaDown);

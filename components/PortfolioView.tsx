@@ -296,14 +296,14 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                   {data.phone.trim()}
                 </a>
               ) : null}
-              <div className="tp-play">
+              <div className={data.play ? "tp-play" : "tp-reach"}>
                 {reach.map((link) => (
                   <a key={link.id} className="tp-bub" href={link.url} aria-label={link.label} {...external(link.url)}>
                     <b aria-hidden="true">{linkBadge(link.label, link.url)}</b>
                     <span>{link.label}</span>
                   </a>
                 ))}
-                {data.buddy !== "none" ? (
+                {data.play && data.buddy !== "none" ? (
                   <div className={`tp-buddy tp-buddy-${data.buddy}`} aria-hidden="true">
                     <span className="tp-buddy-eye">
                       <i />
@@ -315,7 +315,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                   </div>
                 ) : null}
               </div>
-              <div className="tp-play-hint">Drag a bubble, throw it, or tap it to open.{data.buddy !== "none" ? " Tap the little one to shake things up." : ""}</div>
+              <div className="tp-play-hint" aria-hidden="true">Drag a bubble, throw it, or tap it to open.{data.buddy !== "none" ? " Tap the little one to shake things up." : ""}</div>
             </div>
           ) : null}
         </div>

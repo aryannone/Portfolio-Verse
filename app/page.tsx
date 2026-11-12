@@ -22,17 +22,18 @@ const FEATURES = [
   { title: "Download the HTML", text: "The site is yours. Take the file and host it wherever you like." },
 ];
 
-const SLUGS = [
-  "aarav-sharma",
-  "priya-nair",
-  "kabir-singh",
-  "ananya-iyer",
-  "rohan-mehta",
-  "zoya-khan",
-  "meera-joshi",
-  "arjun-reddy",
-  "sneha-kulkarni",
-  "farhan-ali",
+// Who the builder is for. Shown as a moving strip under the hero.
+const ROLES = [
+  "Data analysts",
+  "CA students",
+  "Mechanical engineers",
+  "Software engineers",
+  "Illustrators",
+  "Photographers",
+  "UX designers",
+  "Motion designers",
+  "Architects",
+  "MBA freshers",
 ];
 
 export default function LandingPage() {
@@ -49,7 +50,7 @@ export default function LandingPage() {
               Free for students and first-job seekers
             </div>
             <h1 className="display h-hero">
-              Your portfolio, live in <span className="mark">ten minutes.</span>
+              Your portfolio, ready in <span className="mark">ten minutes.</span>
             </h1>
             <p className="lead">
               Fill in your details, add your photos, pick a template and download your site. No
@@ -72,9 +73,9 @@ export default function LandingPage() {
 
         <div className="ticker" aria-hidden="true">
           <div className="ticker-track">
-            {[...SLUGS, ...SLUGS].map((slug, i) => (
+            {[...ROLES, ...ROLES].map((role, i) => (
               <span key={i}>
-                portfolio-verse.vercel.app/<strong>{slug}</strong>
+                Built for <strong>{role}</strong>
               </span>
             ))}
           </div>
@@ -130,6 +131,19 @@ export default function LandingPage() {
                 <span>{f.text}</span>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="band-accent">
+          <div className="wrap closing" data-reveal>
+            <h2 className="display h-section">Ten minutes from now, you could have a portfolio.</h2>
+            <p>No sign-up and nothing to install. Your work stays in your browser until you download it.</p>
+            <div className="hero-actions">
+              <StartButton />
+              <Link href="/templates" className="btn btn-outline">
+                See the templates
+              </Link>
+            </div>
           </div>
         </section>
       </main>
