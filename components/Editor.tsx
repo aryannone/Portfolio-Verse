@@ -96,7 +96,7 @@ export default function Editor() {
     try {
       const { makeResume, resumeFileName, saveBlob } = await import("@/lib/resumePdf");
       saveBlob(await makeResume(data, { photo: data.resumePhoto }), resumeFileName(data));
-      setStatus("Downloaded your résumé PDF");
+      setStatus("Downloaded your résumé PDF. Please read it through before sending it.");
     } catch {
       setStatus("Could not make the résumé. Please try again.");
     }
@@ -294,7 +294,10 @@ export default function Editor() {
                   </button>
                 </p>
               ) : null}
-              <p className="ed-hint">A résumé made from your details always matches what you have edited here.</p>
+              <p className="rs-disclaimer">
+                <strong>Check before you send it.</strong> The résumé is made only from what you have entered here, so it
+                is as accurate as your details. Read through names, dates and links before sharing it.
+              </p>
             </div>
           </details>
 

@@ -745,12 +745,65 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
 }
 
 /* Résumé import */
-.rs-import { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 18px 20px; border: 1px dashed var(--accent); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--accent) 6%, #ffffff); }
-.rs-import > div { flex: 1 1 260px; display: flex; flex-direction: column; gap: 2px; }
-.rs-import > div span { font-size: 15px; color: var(--muted); }
+.rs-import { display: flex; gap: 18px 22px; align-items: flex-start; padding: 18px 20px; border: 1px dashed var(--accent); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--accent) 6%, #ffffff); }
+.rs-main { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.rs-copy { flex: 1 1 240px; display: flex; flex-direction: column; gap: 2px; }
+.rs-copy span { font-size: 15px; color: var(--muted); }
 .rs-import label.btn { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
 .rs-import label.btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .rs-import label.btn:focus-within { outline: 2px solid var(--ink); outline-offset: 3px; }
 .rs-import label.btn.is-busy { opacity: 0.6; cursor: default; }
 .rs-import .rs-note { flex: 1 1 100%; }
-.rs-import.is-compact { padding: 0; border: 0; background: none; }
+.rs-import.is-compact { flex-direction: column; padding: 0; border: 0; background: none; }
+.rs-import.is-compact .rs-main { width: 100%; }
+.rs-disclaimer { flex: 1 1 100%; margin: 0; padding: 10px 12px; border-radius: 10px; background: #fff7e6; border: 1px solid #f3d38a; color: #5c4400; font-size: 13px; line-height: 1.5; }
+.rs-disclaimer strong { color: #3d2d00; }
+@media (max-width: 600px) {
+  .rs-import { flex-direction: column; }
+}
+
+/* Pagey, the résumé robot */
+.bot { flex: none; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 170px; }
+.bot-small { flex-direction: row; align-items: center; width: 100%; gap: 12px; }
+.bot-btn { flex: none; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 16px; }
+.bot-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.bot-svg { display: block; width: 112px; height: 112px; overflow: visible; animation: bot-bob 3.4s ease-in-out infinite; }
+.bot-small .bot-svg { width: 78px; height: 78px; }
+.bot-svg.is-hop { animation: bot-hop 0.6s cubic-bezier(0.3, 0.7, 0.4, 1), bot-bob 3.4s ease-in-out 0.6s infinite; }
+.bot-head, .bot-body { fill: var(--accent); }
+.bot-face { fill: #1a1033; }
+.bot-pupil { fill: #1a1033; transition: transform 0.12s ease-out; }
+.bot-eyes { animation: bot-blink 5s infinite; transform-origin: 44px 42px; }
+.bot-mouth { fill: none; stroke: #ffffff; stroke-width: 2.6; stroke-linecap: round; }
+.bot-antenna, .bot-arm, .bot-legs { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; }
+.bot-tip { fill: var(--ink); }
+.bot-paper rect:first-child { fill: #ffffff; stroke: var(--ink); stroke-width: 2.4; }
+.bot-paper path { fill: none; stroke: #c9ced8; stroke-width: 3; stroke-linecap: round; }
+.bot-scan { fill: var(--accent); opacity: 0; }
+.bot-glass circle { fill: rgba(255, 255, 255, 0.55); stroke: var(--ink); stroke-width: 4; }
+.bot-glass path { stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+.bot-glass { transform-origin: 82px 70px; }
+.bot-say { margin: 0; padding: 8px 12px; border-radius: 12px; background: #ffffff; border: 1px solid var(--line-strong); font-size: 13px; line-height: 1.4; text-align: center; position: relative; }
+.bot-small .bot-say { text-align: left; flex: 1; }
+.bot-more { color: var(--muted); }
+
+/* reading: the light sweeps the page and the glass moves along it */
+.bot-busy .bot-scan { opacity: 0.35; animation: bot-scan 1.1s ease-in-out infinite; }
+.bot-busy .bot-glass { animation: bot-glass 1.1s ease-in-out infinite; }
+.bot-busy .bot-tip { animation: bot-tip 0.5s steps(2) infinite; }
+.bot-done .bot-tip { fill: #16a34a; }
+.bot-error .bot-tip { fill: #e11d48; }
+.bot-error .bot-svg { animation: bot-shake 0.5s ease-in-out 2, bot-bob 3.4s ease-in-out 1s infinite; }
+
+@keyframes bot-bob { 50% { transform: translateY(-4px); } }
+@keyframes bot-hop { 35% { transform: translateY(-22px) rotate(-6deg); } 65% { transform: translateY(0) rotate(3deg); } 85% { transform: translateY(-5px); } }
+@keyframes bot-blink { 0%, 46%, 50%, 100% { transform: scaleY(1); } 48% { transform: scaleY(0.1); } }
+@keyframes bot-scan { 0% { transform: translateY(0); } 50% { transform: translateY(34px); } 100% { transform: translateY(0); } }
+@keyframes bot-glass { 0%, 100% { transform: translate(0, -6px); } 50% { transform: translate(6px, 22px); } }
+@keyframes bot-tip { 50% { fill: var(--accent); } }
+@keyframes bot-shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .bot-svg, .bot-svg.is-hop, .bot-eyes, .bot-busy .bot-scan, .bot-busy .bot-glass, .bot-busy .bot-tip, .bot-error .bot-svg { animation: none; }
+  .bot-busy .bot-scan { opacity: 0.35; }
+}
