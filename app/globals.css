@@ -910,3 +910,20 @@ label.rs-upload:focus-within { outline: 2px solid var(--ink); outline-offset: 3p
   .tg-card:hover .tg-frame, .tg-card:hover .tg-window { transform: none; }
   .tg-card:hover .scaled-scroll { transform: none; }
 }
+
+/* Choosing the part of your photo to keep in view */
+.ed-focus-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.ed-focus { padding: 0; border: 0; background: none; cursor: crosshair; border-radius: 10px; }
+.ed-focus:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.ed-focus-img { position: relative; display: block; line-height: 0; }
+.ed-focus-img img { display: block; max-width: 180px; max-height: 200px; border-radius: 10px; }
+.ed-focus-img i { position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 0 2px var(--accent), 0 4px 12px rgba(0, 0, 0, 0.4); background: color-mix(in srgb, var(--accent) 35%, transparent); pointer-events: none; transition: left 0.2s ease, top 0.2s ease; }
+.ed-focus-previews { display: flex; gap: 8px; align-items: flex-end; }
+.ed-focus-previews span { display: block; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
+.ed-focus-previews img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ed-focus-previews .is-round { width: 56px; height: 56px; border-radius: 50%; }
+.ed-focus-previews .is-tall { width: 48px; height: 72px; border-radius: 8px; }
+.ed-focus-previews .is-wide { width: 80px; height: 44px; border-radius: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  .ed-focus-img i { transition: none; }
+}

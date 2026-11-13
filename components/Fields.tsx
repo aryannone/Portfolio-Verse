@@ -192,6 +192,58 @@ export function move<T>(list: T[], index: number, by: number) {
 
 type Tools = Pick<PortfolioTools, "set" | "setSection" | "setItem" | "addPhotos" | "setAvatar">;
 
+// "Tap the part of your photo that should stay in view." Frames that crop the photo keep that point visible.
+// Arrow keys move the point too.
+function PhotoFocus({ photo, focus, onChange }: { photo: string; focus: string; onChange: (focus: string) => void }) {
+  const [x, y] = (focus || "50% 30%").split(" ").map((v) => parseFloat(v));
+  const place = (nx: number, ny: number) => onChange(`${Math.round(Math.max(0, Math.min(100, nx)))}% ${Math.round(Math.max(0, Math.min(100, ny)))}%`);
+  return (
+    <div className="ed-field">
+      <span>Tap the part of your photo that should always stay in view (usually your face)</span>
+      <div className="ed-focus-row">
+        <button
+          type="button"
+          className="ed-focus"
+          aria-label={`Point to keep in view: ${Math.round(x)}% across, ${Math.round(y)}% down. Click the photo or use the arrow keys to move it.`}
+          onClick={(e) => {
+            const box = e.currentTarget.querySelector("img")!.getBoundingClientRect();
+            place(((e.clientX - box.left) / box.width) * 100, ((e.clientY - box.top) / box.height) * 100);
+          }}
+          onKeyDown={(e) => {
+            const step = e.shiftKey ? 10 : 4;
+            const moves: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+            const m = moves[e.key];
+            if (!m) return;
+            e.preventDefault();
+            place(x + m[0], y + m[1]);
+          }}
+        >
+          <span className="ed-focus-img">
+            <img src={photo} alt="" />
+            <i style={{ left: `${x}%`, top: `${y}%` }} aria-hidden="true" />
+          </span>
+        </button>
+        <div className="ed-focus-previews" aria-hidden="true">
+          <span className="is-round">
+            <img src={photo} alt="" style={{ objectPosition: `${x}% ${y}%` }} />
+          </span>
+          <span className="is-tall">
+            <img src={photo} alt="" style={{ objectPosition: `${x}% ${y}%` }} />
+          </span>
+          <span className="is-wide">
+            <img src={photo} alt="" style={{ objectPosition: `${x}% ${y}%` }} />
+          </span>
+        </div>
+      </div>
+      {focus ? (
+        <button type="button" className="ed-link" onClick={() => onChange("")}>
+          Reset to the top middle
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 export function ProfileFields({ data, tools }: { data: Portfolio; tools: Tools }) {
   const { set, setAvatar } = tools;
   return (
@@ -213,6 +265,7 @@ export function ProfileFields({ data, tools }: { data: Portfolio; tools: Tools }
           </label>
         </div>
       </div>
+      {data.photo ? <PhotoFocus photo={data.photo} focus={data.photoFocus} onChange={(photoFocus) => set({ photoFocus })} /> : null}
       <Field label="Name">
         <input className="ed-input" value={data.name} placeholder="Your full name" onChange={(e) => set({ name: e.target.value })} />
       </Field>

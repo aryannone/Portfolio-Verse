@@ -498,7 +498,7 @@
 .tp.tp-split .tp-side::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(10, 10, 12, 0) 38%, rgba(10, 10, 12, 0.84) 100%); pointer-events: none; }
 .tp.tp-split .tp-side .tp-hero { position: static; display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 14px; padding: 48px; }
 .tp.tp-split .tp-side .tp-avatar { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; border-radius: 0; rotate: 0deg; box-shadow: none; outline: 0; clip-path: none; background: var(--tp-accent); color: rgba(255, 255, 255, 0.24); font-size: clamp(120px, 24cqw, 340px); }
-.tp.tp-split .tp-side .tp-avatar img { object-position: 50% 22%; }
+.tp.tp-split .tp-side .tp-avatar img { object-position: var(--tp-focus, 50% 22%); transform-origin: var(--tp-focus, 50% 22%); }
 .tp.tp-split .tp-side .tp-tags { color: rgba(255, 255, 255, 0.82); }
 .tp.tp-split .tp-name { font-size: clamp(44px, 6.4cqw, 88px); line-height: 0.95; }
 .tp.tp-split .tp-side .tp-links .tp-cta { background: #ffffff; color: #12141a; }
@@ -717,6 +717,15 @@
 .tp-m-none *, .tp-m-none *::before, .tp-m-none *::after { animation: none !important; }
 .tp-m-none.tp-creative-4 .tp-bg::before, .tp-m-none.tp-creative-4 .tp-bg::after { animation: none !important; }
 
+/* ---------- Photos that fit ----------
+   The user's own photo keeps its chosen point in view in every frame. */
+.tp-avatar img, .tp-ct-photo:not(.tp-pt-cut) img { object-position: var(--tp-focus, 50% 30%); }
+/* A photo shaped very differently from its frame is shown whole, on a blurred copy of itself. */
+.tp-shot.tp-fit, .tp-ch-media.tp-fit { isolation: isolate; }
+.tp-shot.tp-fit::before, .tp-ch-media.tp-fit::before { content: ""; position: absolute; inset: -24px; z-index: -1; background: var(--tp-photo) center / cover no-repeat; filter: blur(22px) saturate(1.25); opacity: 0.85; }
+.tp .tp-fit img { position: relative; object-fit: contain; transform: none; }
+.tp .tp-fit img:not(:hover) { scale: 1; }
+
 /* Photo panel. Slides in from the right on wide screens, up from the bottom on phones. */
 
 .tpd { position: fixed; inset: 0; z-index: 1000; visibility: hidden; transition: visibility 0s linear 0.5s; }
@@ -779,7 +788,7 @@
 /* Photo layout 3, slideshow: one photo at a time, swiped or stepped sideways. */
 .tpd-photos.tpd-g-slides { flex-direction: row; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; border-radius: 14px; }
 .tpd-photos.tpd-g-slides::-webkit-scrollbar { display: none; }
-.tpd-photos.tpd-g-slides img { flex: 0 0 100%; width: 100%; max-height: 62vh; object-fit: cover; scroll-snap-align: center; translate: 0 0; scale: 0.9; }
+.tpd-photos.tpd-g-slides img { flex: 0 0 100%; width: 100%; height: 62vh; object-fit: contain; background: color-mix(in srgb, currentColor 6%, transparent); scroll-snap-align: center; translate: 0 0; scale: 0.9; }
 .tpd-nav { display: flex; gap: 14px; align-items: center; justify-content: center; }
 .tpd-nav button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); background: transparent; color: inherit; font-size: 18px; line-height: 1; cursor: pointer; transition: background 0.2s ease, translate 0.2s ease; }
 .tpd-nav button:hover { background: color-mix(in srgb, currentColor 10%, transparent); }

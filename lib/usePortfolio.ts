@@ -125,7 +125,7 @@ export function usePortfolio(
     if (!files || !files[0]) return;
     try {
       // A new photo needs a new cut-out, so the old one is dropped.
-      set({ photo: await imageToDataUrl(files[0], AVATAR_SIDE), photoCut: "" });
+      set({ photo: await imageToDataUrl(files[0], AVATAR_SIDE), photoCut: "", photoFocus: "" });
     } catch {
       setStatus("Could not read that picture");
     }

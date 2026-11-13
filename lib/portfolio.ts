@@ -187,6 +187,8 @@ export type Portfolio = {
   portrait: PortraitId;
   // The photo with its background removed, made once in the editor.
   photoCut: string;
+  // The point of the user's photo that frames keep in view, as "x% y%". Empty means near the top middle.
+  photoFocus: string;
   // The "Download résumé" button visitors see. It only ever offers the user's own file
   // (uploaded, or kept from an import), never one made by the site. "none" hides it.
   resume: ResumeId;
@@ -405,6 +407,7 @@ const CLOSING_DEFAULTS = {
   contactSend: "mailto" as SendId,
   portrait: "plain" as PortraitId,
   photoCut: "",
+  photoFocus: "",
   resume: "original" as ResumeId,
   resumeFile: "",
   resumeName: "",

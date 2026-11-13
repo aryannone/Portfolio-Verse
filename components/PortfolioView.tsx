@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type CSSProperties, type Ref } from "react";
 import { initialsOf, onColor, toHref, type Item, type Link, type Portfolio, type Section } from "@/lib/portfolio";
-import { mountPortfolio, type RuntimeStore } from "@/lib/runtime";
+import { fitPhoto, mountPortfolio, type RuntimeStore } from "@/lib/runtime";
 import ContactBlock from "@/components/ContactBlock";
 import { resumeFileName } from "@/lib/resumePdf";
 
@@ -148,9 +148,11 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
     else if (rootRef) (rootRef as { current: HTMLDivElement | null }).current = node;
   };
 
-  const style = data.accent
-    ? ({ "--tp-accent": data.accent, "--tp-on-accent": onColor(data.accent) } as CSSProperties)
-    : undefined;
+  const style = {
+    ...(data.accent ? { "--tp-accent": data.accent, "--tp-on-accent": onColor(data.accent) } : {}),
+    // The point of the user's photo that every frame keeps in view.
+    ...(data.photoFocus ? { "--tp-focus": data.photoFocus } : {}),
+  } as CSSProperties;
 
 
   const itemProps = (section: Section, item: Item, base: string) => {
@@ -183,7 +185,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
             <article key={item.id} className="tp-chapter">
               {item.photos.length ? (
                 <button type="button" className="tp-ch-media tp-item has-more" data-item={key} aria-label={photosLabel} tabIndex={interactive ? 0 : -1}>
-                  <img src={item.photos[0]} alt="" />
+                  <img src={item.photos[0]} alt="" onLoad={(e) => fitPhoto(e.currentTarget)} />
                   {item.photos.length > 1 ? <span className="tp-count">{photoLabel(item.photos.length)}</span> : null}
                 </button>
               ) : (
@@ -344,7 +346,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                     <div key={item.id} {...itemProps(section, item, "tp-card")}>
                       {item.photos.length ? (
                         <div className="tp-shot">
-                          <img src={item.photos[0]} alt="" />
+                          <img src={item.photos[0]} alt="" onLoad={(e) => fitPhoto(e.currentTarget)} />
                           <span className="tp-count">{photoLabel(item.photos.length)}</span>
                         </div>
                       ) : null}

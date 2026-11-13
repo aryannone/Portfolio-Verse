@@ -25,6 +25,7 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 - Entry links, and a quote block above Contact
 - Sample pictures are drawn mock-ups matched to each sample person (charts, drawings, app screens, posters)
 - Navigation bar (on by default): a sticky bar with a link to each section that highlights the one being read, a back-to-top button, and an optional reading progress line, all driven by `lib/runtime.ts` so they work in the editor, on preview pages and in downloaded files
+- Photos fit their frames: a project photo shaped very differently from its frame is shown whole on a blurred copy of itself (`fitPhoto` in `lib/runtime.ts`), and the user picks the point of their own photo that every frame keeps in view
 - Per-section look: each section can have its own background, text colour, accent and font
 - Details panel: entries with photos or a full write-up show "See details", which opens the panel headed by the section name
 - Login is switched off for now. Every page is open to everyone, and each visitor's work is saved in their own browser (IndexedDB)

@@ -1,5 +1,5 @@
 import { slugOf, toHref, type Portfolio } from "@/lib/portfolio";
-import { mountPortfolio, type RuntimeStore } from "@/lib/runtime";
+import { fitPhoto, mountPortfolio, type RuntimeStore } from "@/lib/runtime";
 
 const escapeHtml = (text: string) =>
   text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -47,6 +47,12 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
     img.removeAttribute("src");
   });
   clone.querySelectorAll(".tp-ct-card").forEach((el) => el.removeAttribute("style"));
+  // The fit decision carries a copy of the photo; the downloaded page makes it again rather than store it twice.
+  clone.querySelectorAll(".tp-fit").forEach((el) => {
+    el.classList.remove("tp-fit");
+    (el as HTMLElement).style.removeProperty("--tp-photo");
+    if (!el.getAttribute("style")) el.removeAttribute("style");
+  });
   clone.querySelectorAll(".tp-form-status").forEach((el) => (el.textContent = ""));
   clone.querySelectorAll(".tp-item.has-more").forEach((el) => {
     el.setAttribute("tabindex", "0");
@@ -110,6 +116,8 @@ ${css}
 <body>
 ${clone.outerHTML}
 <script>
+// mountPortfolio calls fitPhoto, so it is written into the file under the same name the code uses for it.
+var ${fitPhoto.name} = ${fitPhoto.toString()};
 (${mountPortfolio.toString()})(document.querySelector(".tp"), ${json}, { reveal: ${data.motion !== "none"} });
 </script>
 </body>
