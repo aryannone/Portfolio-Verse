@@ -29,18 +29,6 @@ export type RuntimeStore = {
 // A photo whose shape is very different from its frame (a phone screenshot in a wide card) is shown whole,
 // with a blurred copy of itself filling the space around it. Photos close to the frame's shape fill it.
 // Used by the editor's pages on each photo's load, and by downloaded pages through mountPortfolio.
-export function fitPhoto(img: HTMLImageElement) {
-  const frame = img.parentElement as HTMLElement | null;
-  if (!frame || !img.naturalWidth || !img.naturalHeight) return;
-  const frameRatio = frame.clientWidth / Math.max(1, frame.clientHeight);
-  if (!frameRatio || !frame.clientHeight) return;
-  const off = img.naturalWidth / img.naturalHeight / frameRatio;
-  const fit = off < 0.72 || off > 1.45;
-  frame.classList.toggle("tp-fit", fit);
-  if (fit) frame.style.setProperty("--tp-photo", 'url("' + (img.currentSrc || img.src) + '")');
-  else frame.style.removeProperty("--tp-photo");
-}
-
 export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { reveal?: boolean }) {
   const doc = root.ownerDocument;
   const win = doc.defaultView as Window;
@@ -49,12 +37,6 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
 
   root.querySelectorAll("img[data-ph]").forEach((img) => {
     (img as HTMLImageElement).src = src(Number(img.getAttribute("data-ph"))) || "";
-  });
-  // Each framed photo fills its frame or fits inside it, depending on its shape.
-  root.querySelectorAll(".tp-shot img, .tp-ch-media img").forEach((node) => {
-    const img = node as HTMLImageElement;
-    if (img.complete) fitPhoto(img);
-    else img.addEventListener("load", () => fitPhoto(img), { once: true });
   });
 
   // Sections rise in as they are scrolled to.

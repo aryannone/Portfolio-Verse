@@ -5,8 +5,6 @@ import { getTemplate } from "@/lib/templates";
 import { hasDetails, normalize, type Item, type Portfolio, type Section } from "@/lib/portfolio";
 import { imageToDataUrl, loadPortfolio, loadSaved, savePortfolio, startNew, type SavedItem } from "@/lib/store";
 
-const PHOTO_SIDE = 1600;
-const AVATAR_SIDE = 720;
 export const MAX_PHOTOS_PER_ITEM = 12;
 
 // Reads the template picked on another page ("Use this template").
@@ -112,7 +110,7 @@ export function usePortfolio(
     const added: string[] = [];
     for (const file of chosen) {
       try {
-        added.push(await imageToDataUrl(file, PHOTO_SIDE));
+        added.push(await imageToDataUrl(file));
       } catch (error) {
         setStatus(`${file.name}: ${error instanceof Error ? error.message : "could not be read"}`);
       }
@@ -125,7 +123,7 @@ export function usePortfolio(
     if (!files || !files[0]) return;
     try {
       // A new photo needs a new cut-out, so the old one is dropped.
-      set({ photo: await imageToDataUrl(files[0], AVATAR_SIDE), photoCut: "", photoFocus: "" });
+      set({ photo: await imageToDataUrl(files[0]), photoCut: "", photoFocus: "" });
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not read that picture");
     }

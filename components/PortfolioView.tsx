@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type CSSProperties, type Ref } from "react";
 import { initialsOf, onColor, toHref, type Item, type Link, type Portfolio, type Section } from "@/lib/portfolio";
-import { fitPhoto, mountPortfolio, type RuntimeStore } from "@/lib/runtime";
+import { mountPortfolio, type RuntimeStore } from "@/lib/runtime";
 import ContactBlock from "@/components/ContactBlock";
 import { resumeFileName } from "@/lib/resumePdf";
 
@@ -185,7 +185,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
             <article key={item.id} className="tp-chapter">
               {item.photos.length ? (
                 <button type="button" className="tp-ch-media tp-item has-more" data-item={key} aria-label={photosLabel} tabIndex={interactive ? 0 : -1}>
-                  <img src={item.photos[0]} alt="" onLoad={(e) => fitPhoto(e.currentTarget)} />
+                  <img src={item.photos[0]} alt="" />
                   {item.photos.length > 1 ? <span className="tp-count">{photoLabel(item.photos.length)}</span> : null}
                 </button>
               ) : (
@@ -346,7 +346,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                     <div key={item.id} {...itemProps(section, item, "tp-card")}>
                       {item.photos.length ? (
                         <div className="tp-shot">
-                          <img src={item.photos[0]} alt="" onLoad={(e) => fitPhoto(e.currentTarget)} />
+                          <img src={item.photos[0]} alt="" />
                           <span className="tp-count">{photoLabel(item.photos.length)}</span>
                         </div>
                       ) : null}
