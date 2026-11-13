@@ -261,6 +261,7 @@ export default function Editor() {
               <ResumeImport
                 data={data}
                 set={set}
+                replaceWith={replaceWith}
                 compact
                 onDone={(message) => {
                   setImportNote(message);

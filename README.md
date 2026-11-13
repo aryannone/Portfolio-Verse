@@ -14,7 +14,7 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 - Card sections arrange themselves by count: 2 or 3 side by side, 4 as two pairs, 5 and 7 with one tall card, 6 as two threes
 - Download: the editor builds one self-contained HTML file of the portfolio
 - Details and templates are independent: the gallery has a "Show the templates with" picker listing every portfolio's details, and "Use this template" saves the chosen details in that template as a new portfolio
-- Résumé import (`lib/resumeImport.ts`): reads a résumé PDF in the browser with pdf.js and fills in the details; pattern-based, so the user checks the result. The original file is kept (up to 3 MB) for the portfolio's download button
+- Résumé import (`lib/resumeImport.ts`): reads a résumé PDF in the browser with pdf.js and fills in the details; pattern-based, so the user checks the result. If the portfolio open already has the user's own details, the résumé becomes a new portfolio in the same design instead of replacing them. The original file is kept (up to 3 MB) for the portfolio's download button
 - Résumé PDF (`lib/resumePdf.ts`): made in the browser with jsPDF from the current details, from the editor or the "Download résumé" button on a portfolio; the downloaded portfolio carries it inside the file
 - My portfolios (`/saved`): a browser can hold many portfolios. Each saves into its own place as it is edited, so opening or starting another never overwrites one. Each can be opened, renamed, copied, downloaded or deleted
 - Contact section: a headline, a message form (through the visitor's email app, or straight to the inbox via FormSubmit if the owner chooses), the email with a copy button, links, and the photo on a card that tilts to the pointer

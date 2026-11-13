@@ -1,20 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import type { Portfolio } from "@/lib/portfolio";
+import { blankPortfolio, type Portfolio } from "@/lib/portfolio";
 
 const MAX_KEEP = 3 * 1024 * 1024;
 
-// "Fill in from my résumé": reads a PDF and puts what it finds into the portfolio.
+// "Fill in from my résumé": reads a PDF and turns what it finds into a set of details.
+// When the portfolio open now already has the user's own details, the résumé becomes a new portfolio
+// with the same look, and the open one is left exactly as it is. Otherwise it fills this one in.
 // The original file is kept too (up to 3 MB), so it can be offered for download on the portfolio.
 export default function ResumeImport({
   data,
   set,
+  replaceWith,
   onDone,
   compact = false,
 }: {
   data: Portfolio;
   set: (patch: Partial<Portfolio>) => void;
+  // Opens a new portfolio in place of this one, keeping this one in My portfolios.
+  replaceWith: (next: Portfolio) => Promise<void>;
   // Called with the message to show. The editor redraws its panel after an import, so it keeps the message itself.
   onDone?: (message: string) => void;
   compact?: boolean;
@@ -29,8 +34,7 @@ export default function ResumeImport({
       setNote("Please choose a PDF file.");
       return;
     }
-    const hasWork = Boolean(data.name.trim()) || data.sections.some((s) => s.items.length > 0);
-    if (hasWork && !data.sample && !window.confirm("Fill in from this résumé? Details it finds replace the ones here. Your photo and design stay as they are.")) return;
+    const asNew = !data.sample && (Boolean(data.name.trim()) || data.sections.some((s) => s.items.length > 0));
 
     setBusy(true);
     setNote("Reading your résumé…");
@@ -46,12 +50,31 @@ export default function ResumeImport({
               reader.readAsDataURL(file);
             })
           : "";
-      // Over the sample person, start clean, so none of the made-up details are left behind.
-      const base = data.sample
-        ? { ...data, role: "", city: "", bio: "", about: "", email: "", phone: "", links: [], skills: [], quote: "", quoteBy: "", contactNote: "", contactStatus: "" }
-        : data;
-      set({ ...(data.sample ? base : {}), ...applyResume(base, found), resumeFile: keep, resumeName: keep ? file.name : "" });
-      const message = `Filled in from your résumé. Found ${describe(found)}. Please check each part, as some details may need fixing.`;
+      // A clean set of details in the same look: nothing from the sample person or from the other portfolio.
+      const clean: Portfolio = {
+        ...data,
+        name: "",
+        role: "",
+        city: "",
+        bio: "",
+        about: "",
+        email: "",
+        phone: "",
+        links: [],
+        skills: [],
+        sections: blankPortfolio(data.template).sections,
+        quote: "",
+        quoteBy: "",
+        contactNote: "",
+        contactStatus: "",
+        sample: false,
+      };
+      const next: Portfolio = { ...clean, ...applyResume(clean, found), resumeFile: keep, resumeName: keep ? file.name : "" };
+      if (asNew) await replaceWith(next);
+      else set(next);
+      const message = asNew
+        ? `Your résumé is now a new set of details, in the same design. Found ${describe(found)}. Your earlier portfolio is unchanged in My portfolios. Please check each part, as some details may need fixing.`
+        : `Filled in from your résumé. Found ${describe(found)}. Please check each part, as some details may need fixing.`;
       setNote(message);
       onDone?.(message);
     } catch {
