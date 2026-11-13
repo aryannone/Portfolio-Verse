@@ -6,6 +6,7 @@ import { LogoMark } from "@/components/Logo";
 import PortfolioView from "@/components/PortfolioView";
 import { Choice, ClosingFields, ProfileFields, SectionFields, move } from "@/components/Fields";
 import ResumeImport from "@/components/ResumeImport";
+import HelperBot from "@/components/HelperBot";
 import { TEMPLATES, getTemplate } from "@/lib/templates";
 import {
   ACCENTS,
@@ -56,6 +57,15 @@ export default function Editor() {
   const [busy, setBusy] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [importNote, setImportNote] = useState("");
+  // A short notice at the bottom of the screen, shown on every screen size (the status line is hidden on phones).
+  const [toast, setToast] = useState<"" | "resume" | "failed">("");
+  const toastTimer = useRef(0);
+  // It closes by itself after a while, but not while the pointer is over it (Macmey can be played with).
+  const showToast = (kind: "resume" | "failed") => {
+    setToast(kind);
+    window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(""), 14000);
+  };
   const viewRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
@@ -97,8 +107,10 @@ export default function Editor() {
       const { makeResume, resumeFileName, saveBlob } = await import("@/lib/resumePdf");
       saveBlob(await makeResume(data, { photo: data.resumePhoto }), resumeFileName(data));
       setStatus("Downloaded your résumé PDF. Please read it through before sending it.");
+      showToast("resume");
     } catch {
       setStatus("Could not make the résumé. Please try again.");
+      showToast("failed");
     }
   }
 
@@ -122,6 +134,43 @@ export default function Editor() {
 
   return (
     <div className={preview ? "ed is-preview" : "ed"}>
+      {toast ? (
+        <div
+          className="ed-toast"
+          onPointerEnter={() => window.clearTimeout(toastTimer.current)}
+          onPointerLeave={() => {
+            toastTimer.current = window.setTimeout(() => setToast(""), 6000);
+          }}
+        >
+          <HelperBot
+            small
+            mood={toast === "failed" ? "error" : "done"}
+            lines={
+              toast === "failed"
+                ? ["Oops, I dropped the pages. Please try downloading again."]
+                : [
+                    "Here's your résumé! I built it only from what you typed, so I can't catch mistakes in it.",
+                    "I don't spell-check, sorry. A quick read now saves an awkward email later.",
+                    "Tip: open the PDF once and tap every link to be sure it goes where it should.",
+                  ]
+            }
+          />
+          <div className="ed-toast-text">
+            {toast === "failed" ? (
+              <p>Could not make the résumé. Please try again.</p>
+            ) : (
+              <p className="rs-disclaimer">
+                <strong>Résumé downloaded. Check before you send it.</strong> It is made only from the details you entered
+                here, by a free tool without AI, so it is as accurate as they are. Read through names, dates and links
+                before sharing it.
+              </p>
+            )}
+          </div>
+          <button type="button" className="ed-toast-close" aria-label="Close this notice" onClick={() => setToast("")}>
+            ×
+          </button>
+        </div>
+      ) : null}
       <header className="ed-bar">
         <Link href="/" className="brand" aria-label="Portfolio-Verse home">
           <LogoMark size={36} />

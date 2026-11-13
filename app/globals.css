@@ -807,3 +807,13 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
   .bot-svg, .bot-svg.is-hop, .bot-eyes, .bot-busy .bot-scan, .bot-busy .bot-glass, .bot-busy .bot-tip, .bot-error .bot-svg { animation: none; }
   .bot-busy .bot-scan { opacity: 0.35; }
 }
+
+/* A notice that rises from the bottom of the editor, with Macmey */
+.ed-toast { position: fixed; z-index: 2000; left: 50%; bottom: 20px; transform: translateX(-50%); width: min(600px, calc(100vw - 24px)); display: flex; flex-direction: column; gap: 10px; padding: 16px 48px 16px 16px; border: 1px solid var(--line-strong); border-radius: 18px; background: #ffffff; color: var(--ink); font-size: 14px; line-height: 1.45; box-shadow: 0 24px 60px -24px rgba(18, 20, 26, 0.55); animation: ed-toast-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.ed-toast-text p { margin: 0; }
+.ed-toast-close { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border: 1px solid var(--line-strong); border-radius: 50%; background: #ffffff; color: var(--ink); font-size: 18px; line-height: 1; }
+.ed-toast-close:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+@keyframes ed-toast-in { from { opacity: 0; transform: translate(-50%, 24px); } }
+@media (prefers-reduced-motion: reduce) {
+  .ed-toast { animation: none; }
+}

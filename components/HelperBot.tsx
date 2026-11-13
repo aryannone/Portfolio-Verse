@@ -19,7 +19,8 @@ const LINES: Record<BotMood, string[]> = {
 
 // Macmey, a small robot that explains the résumé reader. Its eyes follow the pointer,
 // tapping it brings a new line and a hop, and it acts out reading while a résumé is being read.
-export default function HelperBot({ mood = "idle", small = false }: { mood?: BotMood; small?: boolean }) {
+// "lines" replaces what Macmey says in this place, for uses other than the résumé reader.
+export default function HelperBot({ mood = "idle", small = false, lines: own }: { mood?: BotMood; small?: boolean; lines?: string[] }) {
   const [line, setLine] = useState(0);
   const [hop, setHop] = useState(0);
   const root = useRef<HTMLButtonElement | null>(null);
@@ -52,7 +53,7 @@ export default function HelperBot({ mood = "idle", small = false }: { mood?: Bot
     };
   }, []);
 
-  const lines = LINES[mood];
+  const lines = own && own.length ? own : LINES[mood];
   const said = lines[line % lines.length];
 
   return (
