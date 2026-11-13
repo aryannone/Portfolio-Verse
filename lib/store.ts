@@ -192,27 +192,73 @@ export async function deleteSaved(id: string): Promise<boolean> {
 }
 
 // Shrinks a chosen photo so pages stay fast and downloads stay small.
-export function imageToDataUrl(file: File, maxSide: number): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
-      canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
-      const ctx = canvas.getContext("2d");
-      URL.revokeObjectURL(url);
-      if (!ctx) return reject(new Error("No canvas"));
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", 0.82));
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Not an image"));
-    };
-    img.src = url;
-  });
+// Phones often save photos as HEIC, which most browsers cannot open.
+async function isHeic(file: Blob & { name?: string }): Promise<boolean> {
+  if (/hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name ?? "")) return true;
+  // Some phones send HEIC with no type or a wrong one, so the file's own header is checked too.
+  const head = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+  const text = String.fromCharCode(...head.slice(4, 12));
+  return /^ftyp(heic|heix|hevc|hevx|heim|heis|mif1|msf1)/.test(text);
+}
+
+type Decoded = { source: CanvasImageSource; width: number; height: number; done: () => void };
+
+async function decode(blob: Blob): Promise<Decoded> {
+  // createImageBitmap also turns sideways phone photos the right way up.
+  if (typeof createImageBitmap === "function") {
+    try {
+      const bitmap = await createImageBitmap(blob, { imageOrientation: "from-image" });
+      return { source: bitmap, width: bitmap.width, height: bitmap.height, done: () => bitmap.close() };
+    } catch {
+      // Fall through to the older way below.
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("Not an image"));
+      el.src = url;
+    });
+    return { source: img, width: img.naturalWidth, height: img.naturalHeight, done: () => URL.revokeObjectURL(url) };
+  } catch (error) {
+    URL.revokeObjectURL(url);
+    throw error;
+  }
+}
+
+// Reads a picture the visitor chose and returns it as a smaller JPEG, ready to save.
+// Errors carry a message that can be shown as it is.
+export async function imageToDataUrl(file: File, maxSide: number): Promise<string> {
+  let picture: Decoded;
+  try {
+    picture = await decode(file);
+  } catch {
+    if (!(await isHeic(file))) {
+      throw new Error("This file is not a picture this browser can open. Try a JPG or PNG.");
+    }
+    try {
+      // HEIC is converted in the browser; the photo never leaves the device.
+      const { default: heic2any } = await import("heic2any");
+      const converted = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
+      picture = await decode(Array.isArray(converted) ? converted[0] : converted);
+    } catch {
+      throw new Error("This HEIC photo could not be opened. Save it as JPG on your phone and try again.");
+    }
+  }
+  try {
+    const scale = Math.min(1, maxSide / Math.max(picture.width, picture.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(picture.width * scale));
+    canvas.height = Math.max(1, Math.round(picture.height * scale));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("This browser could not process the picture.");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(picture.source, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.82);
+  } finally {
+    picture.done();
+  }
 }

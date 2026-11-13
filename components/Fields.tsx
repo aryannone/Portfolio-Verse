@@ -143,8 +143,9 @@ export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Par
     try {
       const { imageToDataUrl } = await import("@/lib/store");
       set({ contactPhoto: await imageToDataUrl(file, 1000) });
-    } catch {
-      setNote("Could not read that picture.");
+      setNote("");
+    } catch (error) {
+      setNote(error instanceof Error ? error.message : "Could not read that picture.");
     }
   }
 
@@ -211,7 +212,7 @@ export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Par
             ) : null}
             <label className="ed-add">
               {data.contactPhoto ? "Change" : "Add photo"}
-              <input type="file" accept="image/*" onChange={(e) => { pickContactPhoto(e.target.files); e.target.value = ""; }} />
+              <input type="file" accept="image/*,.heic,.heif" onChange={(e) => { pickContactPhoto(e.target.files); e.target.value = ""; }} />
             </label>
           </div>
         </div>
@@ -324,7 +325,7 @@ export function ProfileFields({ data, tools }: { data: Portfolio; tools: Tools }
           ) : null}
           <label className="ed-add">
             {data.photo ? "Change" : "Add photo"}
-            <input type="file" accept="image/*" onChange={(e) => { setAvatar(e.target.files); e.target.value = ""; }} />
+            <input type="file" accept="image/*,.heic,.heif" onChange={(e) => { setAvatar(e.target.files); e.target.value = ""; }} />
           </label>
         </div>
       </div>
@@ -500,7 +501,7 @@ export function SectionFields({ data, section, tools, design }: { data: Portfoli
               ))}
               <label className="ed-add">
                 Add photos
-                <input type="file" accept="image/*" multiple onChange={(e) => { addPhotos(section.id, item, e.target.files); e.target.value = ""; }} />
+                <input type="file" accept="image/*,.heic,.heif" multiple onChange={(e) => { addPhotos(section.id, item, e.target.files); e.target.value = ""; }} />
               </label>
             </div>
           </div>

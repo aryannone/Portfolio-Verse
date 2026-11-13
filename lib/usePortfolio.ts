@@ -113,8 +113,8 @@ export function usePortfolio(
     for (const file of chosen) {
       try {
         added.push(await imageToDataUrl(file, PHOTO_SIDE));
-      } catch {
-        setStatus(`Could not read ${file.name}`);
+      } catch (error) {
+        setStatus(`${file.name}: ${error instanceof Error ? error.message : "could not be read"}`);
       }
     }
     if (files.length > chosen.length) setStatus(`Up to ${MAX_PHOTOS_PER_ITEM} photos per entry`);
@@ -126,8 +126,8 @@ export function usePortfolio(
     try {
       // A new photo needs a new cut-out, so the old one is dropped.
       set({ photo: await imageToDataUrl(files[0], AVATAR_SIDE), photoCut: "", photoFocus: "" });
-    } catch {
-      setStatus("Could not read that picture");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not read that picture");
     }
   }
 
