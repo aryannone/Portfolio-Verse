@@ -20,7 +20,7 @@ export default function SiteHeader({ current }: { current?: "templates" | "saved
           className={current === "saved" ? "nav-link is-current" : "nav-link"}
           aria-current={current === "saved" ? "page" : undefined}
         >
-          My saved
+          My portfolios
         </Link>
       </nav>
     </header>

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getTemplate } from "@/lib/templates";
 import { hasDetails, normalize, type Item, type Portfolio, type Section } from "@/lib/portfolio";
-import { imageToDataUrl, loadPortfolio, savePortfolio } from "@/lib/store";
+import { imageToDataUrl, loadPortfolio, savePortfolio, startNew } from "@/lib/store";
 
 const PHOTO_SIDE = 1600;
 const AVATAR_SIDE = 720;
@@ -41,14 +41,47 @@ export function usePortfolio(
     });
   }, [options.forgetTemplate]);
 
+  // What still has to be written, if anything, so it can be written at once when the page is left.
+  const unsaved = useRef<Portfolio | null>(null);
+  // Set while one portfolio is being swapped for another, so a late save cannot land in the wrong place.
+  const swapping = useRef(false);
+
   useEffect(() => {
     if (!data || !loaded.current) return;
+    unsaved.current = data;
     const timer = window.setTimeout(async () => {
+      if (swapping.current) return;
+      unsaved.current = null;
       const ok = await savePortfolio(data);
       setStatus(ok ? "Saved in this browser" : "Could not save in this browser");
     }, 500);
     return () => window.clearTimeout(timer);
   }, [data]);
+
+  // Leaving the page within that half second must not lose the last change.
+  useEffect(() => {
+    const flush = () => {
+      if (unsaved.current && !swapping.current) {
+        savePortfolio(unsaved.current);
+        unsaved.current = null;
+      }
+    };
+    window.addEventListener("pagehide", flush);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      flush();
+    };
+  }, []);
+
+  // Starts another portfolio in the editor. The one that was open is saved first and keeps its own place.
+  async function replaceWith(next: Portfolio) {
+    swapping.current = true;
+    if (data) await savePortfolio(data);
+    await startNew(next);
+    unsaved.current = null;
+    swapping.current = false;
+    setData(next);
+  }
 
   const set = (patch: Partial<Portfolio>) => setData((d) => (d ? { ...d, ...patch, sample: false } : d));
 
@@ -98,7 +131,7 @@ export function usePortfolio(
     }
   }
 
-  return { data, setData, set, setSection, setItem, addPhotos, setAvatar, status, setStatus };
+  return { data, setData, set, setSection, setItem, addPhotos, setAvatar, replaceWith, status, setStatus };
 }
 
 export type PortfolioTools = ReturnType<typeof usePortfolio>;

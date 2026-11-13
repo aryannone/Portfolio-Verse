@@ -45,7 +45,7 @@ function start(saved: Portfolio | null, template: string | undefined) {
 
 export default function Editor() {
   const tools = usePortfolio(start, { forgetTemplate: true });
-  const { data, setData, set, status, setStatus } = tools;
+  const { data, set, replaceWith, status, setStatus } = tools;
   const [preview, setPreview] = useState(false);
   const [phone, setPhone] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -72,20 +72,21 @@ export default function Editor() {
     setBusy(false);
   }
 
-  // Keeps a copy of the portfolio as it is now, under a name, on the "My saved templates" page.
+  // Keeps a separate copy of the portfolio as it is now, under a name. The portfolio itself is saved as you type.
   async function saveCopy() {
     if (!data) return;
     const suggested = `${data.name || "My portfolio"}, ${(getTemplate(data.template) ?? TEMPLATES[0]).name}`;
-    const name = window.prompt("Name this saved template:", suggested);
+    const name = window.prompt("Name this copy:", `${suggested} (copy)`);
     if (name === null) return;
     const ok = await addSaved(name.trim() || suggested, data);
-    setStatus(ok ? "Saved to My saved templates" : "Could not save. This browser may be out of space.");
+    setStatus(ok ? "Copy saved to My portfolios" : "Could not save. This browser may be out of space.");
   }
 
-  function startOver(next: Portfolio) {
-    if (!window.confirm("This replaces everything in the editor. Continue?")) return;
-    setData(next);
+  // Starts another portfolio. The one open now stays in My portfolios, so nothing is lost.
+  async function startAnother(next: Portfolio) {
+    await replaceWith(next);
     setResetKey((k) => k + 1);
+    setStatus("Started a new portfolio. Your earlier one is in My portfolios.");
   }
 
   const template = getTemplate(data.template) ?? TEMPLATES[0];
@@ -116,10 +117,10 @@ export default function Editor() {
             {preview ? "Back to editing" : "Preview"}
           </button>
           <button type="button" className="btn btn-outline" onClick={saveCopy}>
-            Save
+            Save a copy
           </button>
           <Link href="/saved" className="btn btn-quiet">
-            My saved
+            My portfolios
           </Link>
           <button type="button" className="btn btn-primary" onClick={download} disabled={busy}>
             {busy ? "Building…" : "Download HTML"}
@@ -274,11 +275,11 @@ export default function Editor() {
             <button type="button" className="btn btn-outline" onClick={() => set({ sections: [...data.sections, newSection("New section", "list")] })}>
               + Add a section
             </button>
-            <button type="button" className="ed-link" onClick={() => startOver(blankPortfolio(data.template))}>
-              Start blank
+            <button type="button" className="ed-link" onClick={() => startAnother(blankPortfolio(data.template))}>
+              Start a new blank portfolio
             </button>
-            <button type="button" className="ed-link" onClick={() => startOver(fromSample(data.template))}>
-              Load sample content
+            <button type="button" className="ed-link" onClick={() => startAnother(fromSample(data.template))}>
+              Start a new one from sample content
             </button>
           </div>
         </aside>
