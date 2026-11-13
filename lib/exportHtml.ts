@@ -39,13 +39,6 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
     img.setAttribute("data-ph", String(indexOf(src)));
     img.removeAttribute("src");
   });
-  // A résumé made from the details is built now and put inside the file, so its button works offline.
-  const generatedCv = clone.querySelector('.tp-cv[data-cv="generated"]');
-  if (generatedCv) {
-    const { makeResume, blobToDataUrl } = await import("@/lib/resumePdf");
-    generatedCv.setAttribute("href", await blobToDataUrl(await makeResume(data, { photo: data.resumePhoto })));
-  }
-  clone.querySelectorAll(".tp-cv").forEach((el) => el.removeAttribute("data-cv"));
   clone.querySelectorAll(".tp-ct-card").forEach((el) => el.removeAttribute("style"));
   clone.querySelectorAll(".tp-form-status").forEach((el) => (el.textContent = ""));
   clone.querySelectorAll(".tp-item.has-more").forEach((el) => {

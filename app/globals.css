@@ -817,3 +817,13 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
 @media (prefers-reduced-motion: reduce) {
   .ed-toast { animation: none; }
 }
+
+/* Résumé group in the editor */
+.ed-sub-block { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
+.ed-sub-block:first-child { padding-top: 0; border-top: 0; }
+.ed-sub-block > strong { font-size: 15px; }
+.rs-file { display: flex; align-items: center; gap: 10px; margin: 2px 0; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.rs-file span { flex: none; padding: 3px 7px; border-radius: 6px; background: #e11d48; color: #ffffff; font-size: 11px; font-weight: 700; }
+label.rs-upload { position: relative; display: inline-flex; align-items: center; align-self: flex-start; cursor: pointer; }
+label.rs-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+label.rs-upload:focus-within { outline: 2px solid var(--ink); outline-offset: 3px; }

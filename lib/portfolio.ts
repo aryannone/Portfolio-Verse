@@ -48,13 +48,7 @@ export const PORTRAITS: { id: PortraitId; name: string }[] = [
   { id: "none", name: "No picture" },
 ];
 
-export type ResumeId = "generated" | "original" | "none";
-
-export const RESUMES: { id: ResumeId; name: string }[] = [
-  { id: "generated", name: "A résumé made from these details" },
-  { id: "original", name: "My uploaded résumé file" },
-  { id: "none", name: "No résumé button" },
-];
+export type ResumeId = "original" | "none";
 
 // How a message typed into the contact form reaches the owner.
 export type SendId = "mailto" | "direct";
@@ -190,7 +184,8 @@ export type Portfolio = {
   portrait: PortraitId;
   // The photo with its background removed, made once in the editor.
   photoCut: string;
-  // The "Download résumé" button: a PDF made from these details, the user's own file, or no button.
+  // The "Download résumé" button visitors see. It only ever offers the user's own file
+  // (uploaded, or kept from an import), never one made by the site. "none" hides it.
   resume: ResumeId;
   resumeFile: string;
   resumeName: string;
@@ -406,7 +401,7 @@ const CLOSING_DEFAULTS = {
   contactSend: "mailto" as SendId,
   portrait: "plain" as PortraitId,
   photoCut: "",
-  resume: "generated" as ResumeId,
+  resume: "original" as ResumeId,
   resumeFile: "",
   resumeName: "",
   resumePhoto: false,
@@ -418,6 +413,8 @@ export function normalize(saved: Portfolio): Portfolio {
     ...LOOK_DEFAULTS,
     ...CLOSING_DEFAULTS,
     ...saved,
+    // Earlier versions could offer a résumé made by the site to visitors; now only the user's own file is offered.
+    resume: (saved.resume as string) === "none" ? "none" : "original",
     // Portrait looks from an earlier version become the plain photo.
     portrait: saved.portrait === "cut" || saved.portrait === "none" ? saved.portrait : "plain",
     // Skills used to sit after every section, so that is where the section goes for older saves.

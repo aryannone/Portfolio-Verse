@@ -39,20 +39,8 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
 
   const moves = data.motion !== "none";
 
-  // The "Download résumé" button: the user's own file as a link, or a PDF made from these details on click.
-  const cv =
-    data.resume === "none"
-      ? null
-      : data.resume === "original" && data.resumeFile
-        ? { href: data.resumeFile, mode: "original" }
-        : { href: "#resume", mode: "generated" };
-  const onCv = async (event: React.MouseEvent) => {
-    if (cv?.mode !== "generated") return;
-    event.preventDefault();
-    if (!interactive) return;
-    const { makeResume, saveBlob } = await import("@/lib/resumePdf");
-    saveBlob(await makeResume(data, { photo: data.resumePhoto }), resumeFileName(data));
-  };
+  // The "Download résumé" button: only the user's own résumé file, and only when there is one.
+  const cv = data.resume !== "none" && data.resumeFile ? data.resumeFile : "";
   const Name = semantic ? "h1" : "div";
   const Heading = semantic ? "h2" : "div";
   const sections = data.sections.filter((s) => !s.hidden && (s.layout === "skills" ? data.skills.length > 0 : s.items.length > 0));
@@ -194,7 +182,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                 </a>
               ) : null}
               {cv ? (
-                <a className="tp-cv" href={cv.href} download={resumeFileName(data)} data-cv={cv.mode} onClick={onCv}>
+                <a className="tp-cv" href={cv} download={data.resumeName || resumeFileName(data)}>
                   Download résumé
                 </a>
               ) : null}

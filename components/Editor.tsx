@@ -12,7 +12,6 @@ import {
   ACCENTS,
   FONTS,
   FRAMES,
-  RESUMES,
   GALLERIES,
   HEROES,
   MOTIONS,
@@ -25,7 +24,6 @@ import {
   type GalleryId,
   type HeroId,
   type MotionId,
-  type ResumeId,
   type Portfolio,
   type ThemeId,
 } from "@/lib/portfolio";
@@ -57,6 +55,8 @@ export default function Editor() {
   const [busy, setBusy] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [importNote, setImportNote] = useState("");
+  // What happened to the last résumé file uploaded for visitors.
+  const [uploadNote, setUploadNote] = useState("");
   // A short notice at the bottom of the screen, shown on every screen size (the status line is hidden on phones).
   const [toast, setToast] = useState<"" | "resume" | "failed">("");
   const toastTimer = useRef(0);
@@ -99,7 +99,24 @@ export default function Editor() {
     setStatus(ok ? "Copy saved to My portfolios" : "Could not save. This browser may be out of space.");
   }
 
-  // A résumé PDF made from the details as they are now.
+  // The user's own résumé file, offered to visitors by the portfolio's "Download résumé" button.
+  async function uploadResume(files: FileList | null) {
+    const file = files?.[0];
+    if (!file) return;
+    if (!/pdf$/i.test(file.type) && !/\.pdf$/i.test(file.name)) return setUploadNote("Please choose a PDF file.");
+    if (file.size > 3 * 1024 * 1024) return setUploadNote("That file is over 3 MB. Please export a smaller PDF.");
+    const url = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => resolve("");
+      reader.readAsDataURL(file);
+    });
+    if (!url) return setUploadNote("Could not read that file. Please try again.");
+    set({ resumeFile: url, resumeName: file.name, resume: "original" });
+    setUploadNote(`Visitors will now get ${file.name} from the Download résumé button.`);
+  }
+
+  // A résumé PDF made from the details as they are now. It is only ever for the user, not for visitors.
   async function downloadResume() {
     if (!data) return;
     setStatus("Making your résumé…");
@@ -307,6 +324,48 @@ export default function Editor() {
           <details className="ed-group" open>
             <summary>Résumé</summary>
             <div className="ed-group-in">
+              <div className="ed-sub-block">
+                <strong>Résumé button on your portfolio</strong>
+                <p className="ed-hint">
+                  Visitors can download your résumé from the top of your portfolio. They get exactly the file you upload
+                  here, or the one you imported. Nothing made by this site is ever given to them.
+                </p>
+                {data.resumeFile ? (
+                  <>
+                    <p className="rs-file">
+                      <span aria-hidden="true">PDF</span>
+                      {data.resumeName || "résumé.pdf"}
+                    </p>
+                    <label className="ed-check">
+                      <input type="checkbox" checked={data.resume !== "none"} onChange={(e) => set({ resume: e.target.checked ? "original" : "none" })} />
+                      Show the Download résumé button
+                    </label>
+                    <div className="ed-tools">
+                      <label className="btn btn-quiet rs-upload">
+                        Replace file
+                        <input type="file" accept="application/pdf,.pdf" onChange={(e) => { uploadResume(e.target.files); e.target.value = ""; }} />
+                      </label>
+                      <button type="button" className="ed-link ed-danger" onClick={() => set({ resumeFile: "", resumeName: "" })}>
+                        Remove file
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <label className="btn btn-outline rs-upload">
+                    Upload my résumé PDF
+                    <input type="file" accept="application/pdf,.pdf" onChange={(e) => { uploadResume(e.target.files); e.target.value = ""; }} />
+                  </label>
+                )}
+                {uploadNote ? (
+                  <p className="ed-hint" role="status">
+                    {uploadNote}
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="ed-sub-block">
+                <strong>Fill in your details from a résumé</strong>
+              </div>
               <ResumeImport
                 data={data}
                 set={set}
@@ -322,6 +381,10 @@ export default function Editor() {
                   {importNote}
                 </p>
               ) : null}
+              <div className="ed-sub-block">
+                <strong>A résumé for yourself</strong>
+                <p className="ed-hint">Made from the details in this editor. Only you get it; it is never put on your portfolio.</p>
+              </div>
               <button type="button" className="btn btn-quiet" onClick={downloadResume}>
                 Download a résumé PDF of these details
               </button>
@@ -329,20 +392,6 @@ export default function Editor() {
                 <input type="checkbox" checked={data.resumePhoto} onChange={(e) => set({ resumePhoto: e.target.checked })} />
                 Put my photo on the résumé
               </label>
-              <Choice<ResumeId>
-                label="Résumé button on your portfolio"
-                value={data.resume}
-                options={RESUMES.filter((r) => r.id !== "original" || data.resumeFile)}
-                onChange={(resume) => set({ resume })}
-              />
-              {data.resumeFile ? (
-                <p className="ed-hint">
-                  Uploaded file: {data.resumeName || "résumé.pdf"}.{" "}
-                  <button type="button" className="ed-link" onClick={() => set({ resumeFile: "", resumeName: "", resume: data.resume === "original" ? "generated" : data.resume })}>
-                    Remove it
-                  </button>
-                </p>
-              ) : null}
               <p className="rs-disclaimer">
                 <strong>Check before you send it.</strong> The résumé is made only from what you have entered here, so it
                 is as accurate as your details. Read through names, dates and links before sharing it.
