@@ -762,7 +762,7 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
   .rs-import { flex-direction: column; }
 }
 
-/* Pagey, the résumé robot */
+/* Macmey, the résumé robot */
 .bot { flex: none; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 170px; }
 .bot-small { flex-direction: row; align-items: center; width: 100%; gap: 12px; }
 .bot-btn { flex: none; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 16px; }

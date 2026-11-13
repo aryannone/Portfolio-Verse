@@ -6,7 +6,7 @@ export type BotMood = "idle" | "busy" | "done" | "error";
 
 const LINES: Record<BotMood, string[]> = {
   idle: [
-    "Hi! I'm Pagey. I read résumés for free, so I'm not a genius. I just look for patterns.",
+    "Hi! I'm Macmey. I read résumés for free, so I'm not a genius. I just look for patterns.",
     "Two-column résumés make me dizzy. Single-column ones I love.",
     "I never make things up. If it's wrong, I put a real line in the wrong box.",
     "Fun fact: I run entirely on your device. Your résumé never leaves it.",
@@ -17,7 +17,7 @@ const LINES: Record<BotMood, string[]> = {
   error: ["That PDF is a picture, not text. I can't read pictures yet.", "I couldn't find any text in there. Typing it in will be quicker than waiting for me."],
 };
 
-// Pagey, a small robot that explains the résumé reader. Its eyes follow the pointer,
+// Macmey, a small robot that explains the résumé reader. Its eyes follow the pointer,
 // tapping it brings a new line and a hop, and it acts out reading while a résumé is being read.
 export default function HelperBot({ mood = "idle", small = false }: { mood?: BotMood; small?: boolean }) {
   const [line, setLine] = useState(0);
@@ -61,7 +61,7 @@ export default function HelperBot({ mood = "idle", small = false }: { mood?: Bot
         ref={root}
         type="button"
         className="bot-btn"
-        aria-label="Pagey the résumé robot. Press for another tip."
+        aria-label="Macmey the résumé robot. Press for another tip."
         onClick={() => {
           setLine((n) => n + 1);
           setHop((n) => n + 1);

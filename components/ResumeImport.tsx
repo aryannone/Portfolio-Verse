@@ -107,7 +107,7 @@ export default function ResumeImport({
         {!compact ? (
           <div className="rs-copy">
             <strong>Have a résumé?</strong>
-            <span>Import the PDF and Pagey will fill in as much as it can. Nothing leaves your device.</span>
+            <span>Import the PDF and Macmey will fill in as much as it can. Nothing leaves your device.</span>
           </div>
         ) : null}
         <label className={busy ? "btn btn-outline is-busy" : "btn btn-outline"}>
