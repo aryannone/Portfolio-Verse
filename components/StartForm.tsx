@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { LogoMark } from "@/components/Logo";
 import { useRouter } from "next/navigation";
 import ScaledPreview from "@/components/ScaledPreview";
 import { ProfileFields, SectionFields } from "@/components/Fields";
@@ -63,9 +64,11 @@ export default function StartForm() {
   return (
     <div className="sf">
       <header className="ed-bar">
-        <Link href="/" className="brand">
-          <span className="brand-mark" aria-hidden="true" />
-          <span className="ed-brand-text">PORTFOLIO-VERSE</span>
+        <Link href="/" className="brand" aria-label="Portfolio-Verse home">
+          <LogoMark size={36} />
+          <span className="brand-text ed-brand-text">
+            PORTFOLIO<span className="brand-verse">VERSE</span>
+          </span>
         </Link>
         <span className="ed-status" role="status">
           {status}

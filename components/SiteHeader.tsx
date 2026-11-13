@@ -1,11 +1,11 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 
 export default function SiteHeader({ current }: { current?: "templates" | "saved" }) {
   return (
     <header className="wrap site-header">
       <Link href="/" className="brand">
-        <span className="brand-mark" aria-hidden="true" />
-        PORTFOLIO-VERSE
+        <Logo />
       </Link>
       <nav className="site-nav">
         <Link

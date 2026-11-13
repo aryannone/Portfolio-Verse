@@ -1,5 +1,5 @@
 /* PORTFOLIO-VERSE design system.
-   White ground, near-black ink, one marigold accent. Layouts wrap on small screens. */
+   White ground, near-black ink, one purple accent taken from the logo. Layouts wrap on small screens. */
 
 :root {
   --ink: #12141a;
@@ -9,7 +9,11 @@
   --line-strong: #cdd1d9;
   --surface: #f4f5f7;
   --ground: #ffffff;
-  --accent: #f5a300;
+  --accent: #8c52ff;
+  --on-accent: #ffffff;
+  /* Lighter purples: one to sit behind dark text, one to read on dark backgrounds. */
+  --accent-soft: #dccbff;
+  --accent-light: #b69cff;
   --radius: 12px;
   --radius-lg: 16px;
   --font-display-stack: var(--font-display), "Segoe UI", system-ui, sans-serif;
@@ -79,13 +83,8 @@ a:focus-visible, button:focus-visible {
   letter-spacing: 0.04em;
 }
 
-.brand-mark {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  background: var(--accent);
-  display: inline-block;
-}
+.logo-mark { flex: none; display: block; color: var(--ink); }
+.brand-verse { color: var(--accent); margin-left: 0.28em; }
 
 .site-nav { display: flex; gap: 28px; align-items: center; }
 
@@ -382,7 +381,7 @@ a.btn { display: inline-flex; align-items: center; }
 .hero-zone > * { position: relative; }
 
 .mark {
-  background: linear-gradient(transparent 60%, var(--accent) 60%, var(--accent) 92%, transparent 92%);
+  background: linear-gradient(transparent 60%, var(--accent-soft) 60%, var(--accent-soft) 92%, transparent 92%);
   white-space: nowrap;
 }
 
@@ -405,7 +404,7 @@ a.btn { display: inline-flex; align-items: center; }
 
 .band-dark { background: var(--ink); color: #ffffff; }
 .band-dark .step { border-top: 1px solid rgba(255, 255, 255, 0.18); padding-top: 20px; }
-.band-dark .step-num { background: none; width: auto; height: auto; justify-content: flex-start; font-size: 56px; line-height: 1; color: var(--accent); }
+.band-dark .step-num { background: none; width: auto; height: auto; justify-content: flex-start; font-size: 56px; line-height: 1; color: var(--accent-light); }
 .band-dark .step-text { color: #b8bdc9; }
 
 .style-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
@@ -549,7 +548,7 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
 .sf-steps { display: flex; gap: 8px; padding-top: 20px; padding-bottom: 8px; overflow-x: auto; }
 .sf-step { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px 0 8px; border: 1px solid var(--line-strong); border-radius: 999px; background: #ffffff; color: var(--ink); font-size: 14px; font-weight: 600; white-space: nowrap; }
 .sf-step span { width: 28px; height: 28px; border-radius: 50%; background: var(--surface); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; }
-.sf-step.is-done span { background: var(--accent); }
+.sf-step.is-done span { background: var(--accent); color: var(--on-accent); }
 .sf-step.is-on { background: var(--ink); border-color: var(--ink); color: #ffffff; }
 .sf-step.is-on span { background: #ffffff; color: var(--ink); }
 .sf-main { max-width: 760px; padding-top: 28px; display: flex; flex-direction: column; gap: 18px; align-items: stretch; }
@@ -637,11 +636,14 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
 .browser.is-stopped .scaled-auto .scaled-scroll { animation-play-state: paused; }
 
 /* Closing call to action on the home page */
-.band-accent { background: var(--accent); }
+.band-accent { background: var(--accent); color: var(--on-accent); }
+.band-accent .btn-primary { background: #ffffff; border-color: #ffffff; color: var(--ink); }
+.band-accent .btn-primary:hover:not(:disabled) { background: var(--ink); border-color: var(--ink); color: #ffffff; }
 .closing { padding-top: 80px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
 .closing p { font-size: 18px; max-width: 34em; }
-.band-accent .btn-outline { background: transparent; }
-.band-accent .btn-outline:hover:not(:disabled) { background: var(--ink); color: #ffffff; }
+.band-accent .btn-outline { background: transparent; border-color: #ffffff; color: #ffffff; }
+.band-accent .btn-outline:hover:not(:disabled) { background: #ffffff; color: var(--ink); }
+.band-accent a:focus-visible, .band-accent button:focus-visible { outline-color: #ffffff; }
 
 /* The template preview bar stays on one line on phones. */
 @media (max-width: 640px) {

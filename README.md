@@ -21,6 +21,11 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 - Login is switched off for now. Every page is open to everyone, and each visitor's work is saved in their own browser (IndexedDB)
 - Not built yet: accounts, publishing to a personal link, résumé upload
 
+## Brand
+
+- Accent colour: purple `#8c52ff`, set once as `--accent` in `app/globals.css`
+- Logo: `components/Logo.tsx` (used in the site), `public/logo-mark.svg` (standalone file), `app/icon.svg` (browser tab)
+
 ## Folders
 
 - `app/` pages and routes

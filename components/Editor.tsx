@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { LogoMark } from "@/components/Logo";
 import PortfolioView from "@/components/PortfolioView";
 import { Choice, ClosingFields, ProfileFields, SectionFields, move } from "@/components/Fields";
 import { TEMPLATES, getTemplate } from "@/lib/templates";
@@ -93,9 +94,11 @@ export default function Editor() {
   return (
     <div className={preview ? "ed is-preview" : "ed"}>
       <header className="ed-bar">
-        <Link href="/" className="brand">
-          <span className="brand-mark" aria-hidden="true" />
-          <span className="ed-brand-text">PORTFOLIO-VERSE</span>
+        <Link href="/" className="brand" aria-label="Portfolio-Verse home">
+          <LogoMark size={36} />
+          <span className="brand-text ed-brand-text">
+            PORTFOLIO<span className="brand-verse">VERSE</span>
+          </span>
         </Link>
         <span className="ed-status" role="status">
           {status}
