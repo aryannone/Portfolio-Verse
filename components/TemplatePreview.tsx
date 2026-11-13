@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import PortfolioView from "@/components/PortfolioView";
 import { fromSample, inTemplate, type Portfolio } from "@/lib/portfolio";
-import { useSavedDetails } from "@/lib/usePortfolio";
+import { useDetails } from "@/lib/usePortfolio";
 
 type Props = {
   id: string;
@@ -19,7 +19,7 @@ type Props = {
 // One template, filled with the user's details when there are any, and a sample person when not.
 export default function TemplatePreview({ id, live = false, animate = false, data, exact = false }: Props) {
   // A full page looks the details up itself; small pictures are handed them by their page.
-  const saved = useSavedDetails();
+  const saved = useDetails().data;
   const details = data ?? (live ? saved : null);
   const shown = useMemo(() => {
     if (exact && data) return data;

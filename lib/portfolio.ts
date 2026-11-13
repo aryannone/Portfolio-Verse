@@ -416,6 +416,16 @@ export function hasDetails(p: Portfolio | null): p is Portfolio {
   return Boolean(p && !p.sample && p.name.trim());
 }
 
+// A fingerprint of a portfolio's details, ignoring its look. Two portfolios with the same fingerprint
+// say the same things, whatever templates they are in.
+export function detailsKey(p: Portfolio) {
+  const links = (list: Link[] | undefined) => (list ?? []).map((l) => [l.label, l.url]);
+  return JSON.stringify([
+    p.name, p.role, p.city, p.bio, p.about, p.email, p.phone, p.photo.length, links(p.links), p.skills, p.quote, p.quoteBy,
+    p.sections.map((s) => [s.title, s.layout, s.items.map((i) => [i.title, i.sub, i.meta, i.text, i.details ?? "", i.tags, links(i.links), i.photos.length])]),
+  ]);
+}
+
 // The same details shown in another template, in that template's own look.
 export function inTemplate(p: Portfolio, template: string): Portfolio {
   return {

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getTemplate } from "@/lib/templates";
 import { hasDetails, normalize, type Item, type Portfolio, type Section } from "@/lib/portfolio";
-import { imageToDataUrl, loadPortfolio, savePortfolio, startNew } from "@/lib/store";
+import { imageToDataUrl, loadPortfolio, loadSaved, savePortfolio, startNew, type SavedItem } from "@/lib/store";
 
 const PHOTO_SIDE = 1600;
 const AVATAR_SIDE = 720;
@@ -136,14 +136,59 @@ export function usePortfolio(
 
 export type PortfolioTools = ReturnType<typeof usePortfolio>;
 
-// The saved portfolio, but only once it has the user's own details in it.
-// Template previews use this to show the user's details in place of the sample person.
-export function useSavedDetails() {
-  const [saved, setSaved] = useState<Portfolio | null>(null);
+// Details and templates are independent: any portfolio's details can be shown in any template.
+// Which details the templates are showing is remembered in this browser under "pv_details"
+// (a portfolio's id, or "sample" for the made-up sample people).
+const DETAILS_KEY = "pv_details";
+
+// Works out which saved portfolio's details are chosen: the remembered one, else the one open in the editor.
+export function pickDetails(items: SavedItem[], current: string): SavedItem | null {
+  const usable = items.filter((item) => hasDetails(item.data));
+  let want = "";
+  try {
+    want = window.localStorage.getItem(DETAILS_KEY) || "";
+  } catch {
+    // Storage can be blocked; the portfolio open in the editor is used.
+  }
+  if (want === "sample") return null;
+  return usable.find((item) => item.id === want) ?? usable.find((item) => item.id === current) ?? usable[0] ?? null;
+}
+
+// Drops a template picked earlier ("Use this template"), so it cannot be applied to a portfolio opened later.
+export function forgetPickedTemplate() {
+  try {
+    window.localStorage.removeItem("pv_template");
+  } catch {
+    // Storage can be blocked; then nothing was remembered either.
+  }
+}
+
+export function rememberDetails(id: string) {
+  try {
+    window.localStorage.setItem(DETAILS_KEY, id || "sample");
+  } catch {
+    // Storage can be blocked; the choice then lasts only for this page.
+  }
+}
+
+// Every set of details in this browser, and the one the templates are showing.
+export function useDetails() {
+  const [items, setItems] = useState<SavedItem[]>([]);
+  const [chosen, setChosen] = useState("");
+
   useEffect(() => {
-    loadPortfolio().then((p) => {
-      if (p && Array.isArray(p.sections) && hasDetails(p)) setSaved(normalize(p));
+    loadSaved().then(({ items: saved, current }) => {
+      const usable = saved.filter((item) => hasDetails(item.data)).map((item) => ({ ...item, data: normalize(item.data) }));
+      setItems(usable);
+      setChosen(pickDetails(usable, current)?.id ?? "");
     });
   }, []);
-  return saved;
+
+  const choose = (id: string) => {
+    setChosen(id);
+    rememberDetails(id);
+  };
+
+  const item = items.find((it) => it.id === chosen) ?? null;
+  return { items, chosen, choose, data: item ? item.data : null };
 }

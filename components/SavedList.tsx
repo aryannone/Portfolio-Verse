@@ -8,6 +8,7 @@ import { getTemplate } from "@/lib/templates";
 import { normalize } from "@/lib/portfolio";
 import { addSaved, deleteSaved, loadSaved, openSaved, renameSaved, startNew, type SavedItem } from "@/lib/store";
 import { buildHtml, downloadHtml } from "@/lib/exportHtml";
+import { forgetPickedTemplate, rememberDetails } from "@/lib/usePortfolio";
 
 // Every portfolio kept in this browser: open, rename, copy, download or delete each one.
 export default function SavedList() {
@@ -54,14 +55,23 @@ export default function SavedList() {
 
   async function open(item: SavedItem) {
     // Whatever is open in the editor now keeps its own place, so nothing needs confirming.
+    forgetPickedTemplate();
     const ok = await openSaved(item.id);
     if (!ok) return setStatus("Could not open that portfolio. Please try again.");
     router.push("/editor");
   }
 
-  async function startAnother() {
+  // New details: an empty form. What is open in the editor keeps its own place.
+  async function addDetails() {
+    forgetPickedTemplate();
     await startNew(null);
     router.push("/start");
+  }
+
+  // Details already here in a different template: mark whose details, then go and pick the template.
+  function tryAnotherLook(item: SavedItem) {
+    rememberDetails(item.id);
+    router.push("/templates");
   }
 
   async function rename(item: SavedItem) {
@@ -96,9 +106,14 @@ export default function SavedList() {
   return (
     <>
       <div className="wrap saved-top">
-        <button type="button" className="btn btn-primary" onClick={startAnother}>
-          + New portfolio
+        <button type="button" className="btn btn-primary" onClick={addDetails}>
+          + Add new details
         </button>
+        {list.length ? (
+          <button type="button" className="btn btn-outline" onClick={() => router.push("/templates")}>
+            + New portfolio from existing details
+          </button>
+        ) : null}
         <span className="saved-meta" role="status">
           {status}
         </span>
@@ -124,6 +139,9 @@ export default function SavedList() {
                 </button>
                 <button type="button" className="btn btn-outline" onClick={() => setExporting(item)} disabled={exporting !== null}>
                   {exporting?.id === item.id ? "Building…" : "Download"}
+                </button>
+                <button type="button" className="btn btn-quiet" onClick={() => tryAnotherLook(item)}>
+                  Other templates
                 </button>
                 <button type="button" className="btn btn-quiet" onClick={() => rename(item)}>
                   Rename

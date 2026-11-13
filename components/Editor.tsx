@@ -27,7 +27,9 @@ import {
 } from "@/lib/portfolio";
 import { usePortfolio } from "@/lib/usePortfolio";
 import { buildHtml, downloadHtml } from "@/lib/exportHtml";
-import { addSaved } from "@/lib/store";
+import { addSaved, loadSaved, savePortfolio } from "@/lib/store";
+import { rememberDetails } from "@/lib/usePortfolio";
+import { useRouter } from "next/navigation";
 
 const PHOTO_SIZES: { id: Portfolio["photoSize"]; name: string }[] = [
   { id: "s", name: "Small" },
@@ -51,6 +53,7 @@ export default function Editor() {
   const [busy, setBusy] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const viewRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
 
   if (!data) {
     return (
@@ -80,6 +83,14 @@ export default function Editor() {
     if (name === null) return;
     const ok = await addSaved(name.trim() || suggested, data);
     setStatus(ok ? "Copy saved to My portfolios" : "Could not save. This browser may be out of space.");
+  }
+
+  // Shows these details in every template, to save them in another look as a separate portfolio.
+  async function otherTemplates() {
+    if (!data) return;
+    await savePortfolio(data);
+    rememberDetails((await loadSaved()).current);
+    router.push("/templates");
   }
 
   // Starts another portfolio. The one open now stays in My portfolios, so nothing is lost.
@@ -274,6 +285,9 @@ export default function Editor() {
           <div className="ed-foot">
             <button type="button" className="btn btn-outline" onClick={() => set({ sections: [...data.sections, newSection("New section", "list")] })}>
               + Add a section
+            </button>
+            <button type="button" className="ed-link" onClick={otherTemplates}>
+              See these details in other templates
             </button>
             <button type="button" className="ed-link" onClick={() => startAnother(blankPortfolio(data.template))}>
               Start a new blank portfolio

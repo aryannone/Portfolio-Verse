@@ -559,6 +559,10 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
 .sf-nav { display: flex; gap: 10px; justify-content: space-between; padding-top: 8px; }
 .sf .gallery-grid { padding-top: 8px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); }
 
+.details-pick { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; padding-bottom: 20px; }
+.details-pick label { display: flex; flex-direction: column; gap: 6px; flex: 0 1 340px; min-width: 0; }
+.details-pick label span { font-size: 13px; font-weight: 600; color: var(--muted); }
+.details-pick p { flex: 1 1 100%; font-size: 15px; color: var(--muted); }
 .gallery-note { font-size: 15px; color: var(--muted); padding-bottom: 16px; }
 .gallery-note a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 

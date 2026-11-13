@@ -13,6 +13,7 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 - Photo panel: a visitor taps an entry that has photos and a panel slides in from the right (from the bottom on phones). It shows the entry's details and its photos in one of three layouts: stack, mosaic or slideshow
 - Card sections arrange themselves by count: 2 or 3 side by side, 4 as two pairs, 5 and 7 with one tall card, 6 as two threes
 - Download: the editor builds one self-contained HTML file of the portfolio
+- Details and templates are independent: the gallery has a "Show the templates with" picker listing every portfolio's details, and "Use this template" saves the chosen details in that template as a new portfolio
 - My portfolios (`/saved`): a browser can hold many portfolios. Each saves into its own place as it is edited, so opening or starting another never overwrites one. Each can be opened, renamed, copied, downloaded or deleted
 - Contact section: a headline, a message form (through the visitor's email app, or straight to the inbox via FormSubmit if the owner chooses), the email with a copy button, links, and the photo on a card that tilts to the pointer
 - Background removal for the contact photo, done in the browser with MediaPipe's selfie segmenter (`lib/cutout.ts`). The model is in `public/vendor/mediapipe/`; the engine is copied there from `node_modules` by `scripts/copy-vendor.mjs` on every build
