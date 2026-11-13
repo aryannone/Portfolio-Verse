@@ -39,6 +39,22 @@ export function linkBadge(label: string, url: string) {
   return label.trim().slice(0, 2) || "Go";
 }
 
+export type ContactStyleId = "card" | "simple" | "play";
+export type PortraitId = "poster" | "duotone" | "plain" | "none";
+
+export const CONTACT_STYLES: { id: ContactStyleId; name: string }[] = [
+  { id: "card", name: "Portrait card" },
+  { id: "simple", name: "Simple row of links" },
+  { id: "play", name: "Playful bubbles" },
+];
+
+export const PORTRAITS: { id: PortraitId; name: string }[] = [
+  { id: "poster", name: "Poster print in your colour" },
+  { id: "duotone", name: "Two-colour print" },
+  { id: "plain", name: "Original photo" },
+  { id: "none", name: "No picture" },
+];
+
 export type BuddyId = "robot" | "cat" | "ghost" | "none";
 
 export const BUDDIES: { id: BuddyId; name: string }[] = [
@@ -166,8 +182,12 @@ export type Portfolio = {
   quote: string;
   quoteBy: string;
   buddy: BuddyId;
-  // Whether the contact links float as a playground or sit in a plain row.
-  play: boolean;
+  // How the Contact section looks, and what its portrait card says.
+  contactStyle: ContactStyleId;
+  contactTitle: string;
+  contactNote: string;
+  contactStatus: string;
+  portrait: PortraitId;
   skills: string[];
   sections: Section[];
   sample: boolean;
@@ -335,6 +355,22 @@ export function samplePhoto(template: string, n: number, pick = n) {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
+// A drawn head-and-shoulders picture, used where a demo needs a portrait and no real photo may be shown.
+export function samplePortrait(accent: string) {
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500">` +
+    `<rect width="400" height="500" fill="#efe9ff"/><circle cx="318" cy="96" r="120" fill="${accent}" opacity="0.28"/>` +
+    `<path d="M40 500c0-110 70-170 160-170s160 60 160 170z" fill="#12141a"/>` +
+    `<path d="M150 300h100v70c-30 26-70 26-100 0z" fill="#e8b48c"/>` +
+    `<ellipse cx="200" cy="218" rx="86" ry="104" fill="#f2c9a5"/>` +
+    `<path d="M112 214c-10-96 38-140 96-140 66 0 104 52 84 142-14-48-36-74-64-82-34 22-76 34-116 80z" fill="#2a1d3b"/>` +
+    `<path d="M172 262c18 14 38 14 56 0" fill="none" stroke="#12141a" stroke-width="6" stroke-linecap="round"/>` +
+    `<circle cx="168" cy="220" r="7" fill="#12141a"/><circle cx="234" cy="220" r="7" fill="#12141a"/>` +
+    `<path d="M150 370l50 60 50-60" fill="none" stroke="${accent}" stroke-width="14" stroke-linejoin="round"/>` +
+    `</svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
 // Every look option at its starting value: the template decides.
 const LOOK_DEFAULTS = {
   accent: "",
@@ -352,12 +388,17 @@ const LOOK_DEFAULTS = {
 };
 
 // Fields added after the first version, with what they start as.
-const CLOSING_DEFAULTS = { phone: "", quote: "", quoteBy: "", buddy: "robot" as BuddyId, play: true };
-
-// The calm Professional templates start with plain contact links; the others start with the playground.
-function playsByDefault(template: string) {
-  return !template.startsWith("professional");
-}
+const CLOSING_DEFAULTS = {
+  phone: "",
+  quote: "",
+  quoteBy: "",
+  buddy: "robot" as BuddyId,
+  contactStyle: "card" as ContactStyleId,
+  contactTitle: "Let's work together.",
+  contactNote: "",
+  contactStatus: "",
+  portrait: "poster" as PortraitId,
+};
 
 // Fills in anything missing from a portfolio saved by an earlier version of the editor.
 export function normalize(saved: Portfolio): Portfolio {
@@ -384,7 +425,6 @@ export function inTemplate(p: Portfolio, template: string): Portfolio {
     ...p,
     ...LOOK_DEFAULTS,
     font: template === "creative-5" ? "serif" : "modern",
-    play: playsByDefault(template),
     template,
     sections: p.sections.map((section) => ({ ...section, style: "", bg: "", ink: "", accent: "", font: "" })),
   };
@@ -442,7 +482,8 @@ export function fromSample(template: string): Portfolio {
     photo: "",
     email: s.email,
     ...CLOSING_DEFAULTS,
-    play: playsByDefault(id),
+    contactStatus: "Open to work",
+    contactNote: `Looking for ${s.role.toLowerCase()} roles. I usually reply within a day.`,
     quote: "Small, steady work beats one big burst.",
     quoteBy: "A note to self",
     // "#" keeps the sample links tappable without sending anyone to a made-up profile.
@@ -466,7 +507,6 @@ export function blankPortfolio(template: string): Portfolio {
     photo: "",
     email: "",
     ...CLOSING_DEFAULTS,
-    play: playsByDefault(template),
     links: [],
     skills: [],
     sections: [newSection("Projects", "cards"), newSection("Experience", "list"), newSection("Education", "list"), skillsSection()],

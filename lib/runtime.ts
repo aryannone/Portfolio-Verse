@@ -196,6 +196,18 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
   }
 
   function onClick(event: Event) {
+    // "Copy" beside the email address.
+    const copy = (event.target as HTMLElement).closest ? ((event.target as HTMLElement).closest(".tp-copy") as HTMLElement | null) : null;
+    if (copy) {
+      const text = copy.getAttribute("data-copy") || "";
+      const done = () => {
+        copy.textContent = "Copied";
+        win.setTimeout(() => (copy.textContent = "Copy"), 1800);
+      };
+      if (win.navigator.clipboard) win.navigator.clipboard.writeText(text).then(done, () => (copy.textContent = text));
+      else copy.textContent = text;
+      return;
+    }
     const item = findItem(event.target);
     if (item) open(item);
   }
@@ -435,6 +447,28 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     };
   }
 
+  // The portrait card leans towards the pointer while it is over the Contact section.
+  const tiltArea = root.querySelector(".tp-ct") as HTMLElement | null;
+  const tiltCard = root.querySelector(".tp-ct-card") as HTMLElement | null;
+  const onTilt = (event: PointerEvent) => {
+    if (!tiltCard) return;
+    const box = tiltCard.getBoundingClientRect();
+    const dx = (event.clientX - (box.left + box.width / 2)) / Math.max(1, box.width);
+    const dy = (event.clientY - (box.top + box.height / 2)) / Math.max(1, box.height);
+    const clamp = (v: number) => Math.max(-1, Math.min(1, v));
+    tiltCard.style.setProperty("--tp-ry", (clamp(dx) * 12).toFixed(1) + "deg");
+    tiltCard.style.setProperty("--tp-rx", (clamp(dy) * -10).toFixed(1) + "deg");
+  };
+  const offTilt = () => {
+    if (!tiltCard) return;
+    tiltCard.style.removeProperty("--tp-rx");
+    tiltCard.style.removeProperty("--tp-ry");
+  };
+  if (tiltArea && tiltCard && !still) {
+    tiltArea.addEventListener("pointermove", onTilt);
+    tiltArea.addEventListener("pointerleave", offTilt);
+  }
+
   root.addEventListener("click", onClick);
   root.addEventListener("keydown", onRootKey);
   doc.addEventListener("keydown", onDocKey);
@@ -449,6 +483,11 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
   return function unmount() {
     close();
     stopPlay();
+    if (tiltArea) {
+      tiltArea.removeEventListener("pointermove", onTilt);
+      tiltArea.removeEventListener("pointerleave", offTilt);
+    }
+    offTilt();
     root.removeEventListener("click", onClick);
     root.removeEventListener("keydown", onRootKey);
     doc.removeEventListener("keydown", onDocKey);

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { ACCENTS, fromSample, linkBadge, onColor, type SectionStyle } from "@/lib/portfolio";
+import ContactBlock from "@/components/ContactBlock";
+import { ACCENTS, fromSample, onColor, samplePortrait, type Portfolio, type SectionStyle } from "@/lib/portfolio";
 import { mountPortfolio, type RuntimeStore } from "@/lib/runtime";
 
 // Three small working pieces of a real portfolio, shown on the home page.
@@ -12,13 +13,6 @@ const STYLES: { id: SectionStyle; name: string }[] = [
   { id: "filled", name: "Soft" },
   { id: "colour", name: "Colour" },
   { id: "sticker", name: "Sticker" },
-];
-
-const LINKS = [
-  { label: "Email", url: "mailto:" },
-  { label: "LinkedIn", url: "linkedin" },
-  { label: "GitHub", url: "github" },
-  { label: "Instagram", url: "instagram" },
 ];
 
 // A piece of a portfolio page, with the portfolio script running on it.
@@ -65,6 +59,12 @@ export default function FeatureDemos() {
     });
     return { items };
   }, [entries]);
+
+  // A sample person for the contact demo, with a drawn portrait standing in for a photo.
+  const contact = useMemo<Portfolio>(
+    () => ({ ...fromSample("professional-4"), photo: samplePortrait("#8c52ff"), portrait: "plain", contactStatus: "Open to internships" }),
+    [],
+  );
 
   const cards = (clickable: boolean) =>
     entries.map((entry) => (
@@ -147,35 +147,22 @@ export default function FeatureDemos() {
 
       <article className="demo-row" data-reveal>
         <div className="demo-copy">
-          <h3 className="display">A contact section people play with.</h3>
+          <h3 className="display">A contact section with presence.</h3>
           <p>
-            Your email and social links float as bubbles. Visitors can drag them, throw them and tap one to open it,
-            while a little character keeps an eye on the pointer. Prefer it plain? One switch turns it into a neat row.
+            Your headline, your email with one-tap copy, your links, and your portrait on a card that leans towards
+            the pointer. Your photo can be shown as it is, as a flat drawn-style poster, or as a two-colour print.
           </p>
-          <p className="demo-hint">Try it: throw a bubble, then tap the robot.</p>
+          <p className="demo-hint">Try it: move your pointer over the card.</p>
         </div>
-        <div className="demo-box">
-          <Piece accent="#8c52ff" className="demo-play">
-            <div className="tp-sec tp-contact">
-              <div className="tp-play">
-                {LINKS.map((link) => (
-                  // These go nowhere: on a real portfolio each one opens the person's own link.
-                  <a key={link.label} className="tp-bub" href="#features" aria-label={`${link.label} (example)`} onClick={(e) => e.preventDefault()}>
-                    <b aria-hidden="true">{linkBadge(link.label, link.url)}</b>
-                    <span>{link.label}</span>
-                  </a>
-                ))}
-                <div className="tp-buddy tp-buddy-robot" aria-hidden="true">
-                  <span className="tp-buddy-eye">
-                    <i />
-                  </span>
-                  <span className="tp-buddy-eye">
-                    <i />
-                  </span>
-                  <span className="tp-buddy-mouth" />
-                </div>
-              </div>
-            </div>
+        {/* The links in this example lead nowhere, so taps on them are swallowed. */}
+        <div
+          className="demo-box"
+          onClickCapture={(e) => {
+            if ((e.target as HTMLElement).closest("a")) e.preventDefault();
+          }}
+        >
+          <Piece accent="#8c52ff" className="demo-contact">
+            <ContactBlock data={contact} />
           </Piece>
         </div>
       </article>

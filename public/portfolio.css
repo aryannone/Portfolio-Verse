@@ -170,6 +170,50 @@
 
 .tp-phone { font-size: 18px; font-weight: 500; }
 
+/* Contact, portrait-card style: words and links on one side, the person's portrait on a card that leans to the pointer. */
+.tp-defs { position: absolute; }
+.tp-ct { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); gap: 40px 64px; align-items: center; }
+.tp-ct.tp-ct-solo { grid-template-columns: minmax(0, 1fr); }
+.tp-ct-text { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; min-width: 0; }
+.tp-ct-status { display: inline-flex; align-items: center; gap: 9px; padding: 6px 14px; border: 1px solid color-mix(in srgb, currentColor 26%, transparent); border-radius: 999px; font-size: 14px; font-weight: 600; }
+.tp-ct-status i { width: 9px; height: 9px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.5); animation: tp-pulse 2.4s ease-out infinite; }
+@keyframes tp-pulse { 70%, 100% { box-shadow: 0 0 0 9px rgba(22, 163, 74, 0); } }
+.tp-ct-title { font-family: var(--tp-display); font-weight: 600; font-size: clamp(32px, 5.2cqw, 60px); line-height: 1.04; letter-spacing: -0.025em; text-wrap: balance; }
+.tp-ct-note { font-size: 18px; color: var(--tp-muted); max-width: 30em; }
+.tp-ct-mail { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.tp .tp-ct-mail a { font-family: var(--tp-display); font-weight: 600; font-size: clamp(19px, 2.4cqw, 26px); text-decoration: underline; text-decoration-color: var(--tp-accent); text-decoration-thickness: 3px; text-underline-offset: 7px; }
+.tp-copy { min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); background: transparent; color: inherit; font: 600 13px var(--tp-body); cursor: pointer; transition: background 0.2s ease; }
+.tp-copy:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
+.tp-copy:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.tp-ct-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.tp .tp-ct-link { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 16px 0 6px; border: 1px solid color-mix(in srgb, currentColor 26%, transparent); border-radius: 999px; font-size: 15px; font-weight: 600; text-decoration: none; transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, translate 0.25s ease; }
+.tp-ct-link b { width: 36px; height: 36px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--tp-accent); color: var(--tp-on-accent); font-family: var(--tp-display); font-size: 13px; font-weight: 700; }
+.tp-ct-link i { font-style: normal; transition: translate 0.25s ease; }
+.tp-ct-link i::after { content: "\2197"; }
+.tp .tp-ct-link:hover { background: var(--tp-ink); border-color: var(--tp-ink); color: var(--tp-bg); translate: 0 -2px; }
+.tp-ct-link:hover i { translate: 2px -2px; }
+.tp-ct-link:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+.tp-ct-card { position: relative; justify-self: center; width: min(100%, 320px); aspect-ratio: 4 / 5; transform: perspective(900px) rotateX(var(--tp-rx, 0deg)) rotateY(var(--tp-ry, -6deg)); transform-style: preserve-3d; transition: transform 0.3s ease-out; }
+.tp-ct-back { position: absolute; inset: 0; border-radius: 28px; background: var(--tp-accent); transform: translate3d(20px, 20px, -50px) rotate(5deg); }
+.tp-ct-photo { position: absolute; inset: 0; border-radius: 28px; overflow: hidden; display: grid; place-items: center; background: color-mix(in srgb, var(--tp-ink) 8%, var(--tp-bg)); color: var(--tp-ink); font-family: var(--tp-display); font-weight: 700; font-size: 84px; letter-spacing: -0.03em; box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.55); transform: translateZ(10px); }
+.tp-ct-photo img { width: 100%; height: 100%; object-fit: cover; }
+.tp-pt-duotone { background: #ffffff; isolation: isolate; }
+.tp-pt-duotone img { filter: grayscale(1) contrast(1.25); }
+.tp-pt-duotone::before, .tp-pt-duotone::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.tp-pt-duotone::before { background: var(--tp-accent); mix-blend-mode: multiply; }
+.tp-pt-duotone::after { background: #1a1033; mix-blend-mode: lighten; }
+.tp-ct-tag { position: absolute; left: -18px; bottom: 26px; max-width: 86%; display: flex; flex-direction: column; padding: 10px 16px; border-radius: 14px; background: var(--tp-bg); color: var(--tp-ink); border: 1px solid color-mix(in srgb, var(--tp-ink) 16%, transparent); box-shadow: 0 18px 34px -18px rgba(0, 0, 0, 0.5); font-size: 13px; line-height: 1.35; transform: translateZ(60px); }
+.tp-ct-tag strong { font-size: 15px; }
+.tp-ct-tag span { color: var(--tp-muted); }
+.tp-creative-5 .tp-ct-back, .tp-creative-5 .tp-ct-photo { border-radius: 0; }
+.tp-creative-3 .tp-ct-photo { border: 2px solid var(--tp-ink); }
+.tp-creative-3 .tp-ct-back { background: var(--tp-ink); }
+@container (max-width: 760px) {
+  .tp-ct { grid-template-columns: minmax(0, 1fr); }
+  .tp-ct-card { width: min(78%, 260px); margin: 8px 0 20px; justify-self: start; margin-left: 18px; }
+}
+
 /* Contact playground. Without scripts or motion it is a plain row of round links.
    With them, the links float, can be dragged and thrown, and a character watches the pointer. */
 .tp-play, .tp-reach { position: relative; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }

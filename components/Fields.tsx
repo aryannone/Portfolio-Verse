@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { BUDDIES, CARD_STYLES, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type BuddyId, type FontId, type GalleryId, type Link, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
+import { BUDDIES, CARD_STYLES, CONTACT_STYLES, PORTRAITS, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type BuddyId, type ContactStyleId, type FontId, type PortraitId, type GalleryId, type Link, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
 import type { PortfolioTools } from "@/lib/usePortfolio";
 
 // The form pieces shared by the details form (/start) and the editor.
@@ -108,7 +108,7 @@ export function LinkList({ label, links, onChange, namePlaceholder }: { label: s
   );
 }
 
-// The end of the page: the quote, and the contact playground's character.
+// The end of the page: the quote, and how the Contact section looks.
 export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Partial<Portfolio>) => void }) {
   return (
     <>
@@ -118,16 +118,26 @@ export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Par
       <Field label="Who said it">
         <input className="ed-input" value={data.quoteBy} placeholder="Leave empty if it is yours" onChange={(e) => set({ quoteBy: e.target.value })} />
       </Field>
-      <label className="ed-check">
-        <input type="checkbox" checked={data.play} onChange={(e) => set({ play: e.target.checked })} />
-        Let visitors play with the contact links
-      </label>
-      {data.play ? (
-        <Choice<BuddyId> label="Character in the contact playground" value={data.buddy} options={BUDDIES} onChange={(buddy) => set({ buddy })} />
+      <Choice<ContactStyleId> label="Contact style" value={data.contactStyle} options={CONTACT_STYLES} onChange={(contactStyle) => set({ contactStyle })} />
+      {data.contactStyle === "card" ? (
+        <>
+          <Field label="Contact headline">
+            <input className="ed-input" value={data.contactTitle} placeholder="Let's work together." onChange={(e) => set({ contactTitle: e.target.value })} />
+          </Field>
+          <Field label="A line under it (optional)">
+            <textarea className="ed-input" rows={2} value={data.contactNote} placeholder="What you are looking for, and how fast you reply." onChange={(e) => set({ contactNote: e.target.value })} />
+          </Field>
+          <Field label="Status badge (optional)">
+            <input className="ed-input" value={data.contactStatus} placeholder="Open to internships" onChange={(e) => set({ contactStatus: e.target.value })} />
+          </Field>
+          <Choice<PortraitId> label="Your portrait on the card" value={data.portrait} options={PORTRAITS} onChange={(portrait) => set({ portrait })} />
+          <p className="ed-hint">The portrait uses your photo from About you. Without one, it shows your initials.</p>
+        </>
       ) : null}
-      <p className="ed-hint">
-        Contact shows your email, phone and every link from About you as round buttons. With play switched on, visitors can drag and throw them, and tap one to open it.
-      </p>
+      {data.contactStyle === "play" ? (
+        <Choice<BuddyId> label="Character in the playground" value={data.buddy} options={BUDDIES} onChange={(buddy) => set({ buddy })} />
+      ) : null}
+      <p className="ed-hint">Contact shows your email, phone and every link from About you.</p>
     </>
   );
 }

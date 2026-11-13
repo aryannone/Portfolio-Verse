@@ -714,7 +714,16 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
 @media (max-width: 480px) {
   .demo-piece .tp-grid.tp-grid.tp-grid { --tp-cols: 1; }
 }
-.demo-piece .tp-contact { gap: 0; }
+.demo-piece.demo-contact { padding: 32px 36px 40px; }
+.demo-contact .tp-contact > .tp-h { display: none; }
+.demo-contact .tp-ct { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); gap: 28px; }
+.demo-contact .tp-ct-title { font-size: 34px; }
+.demo-contact .tp-ct-note { font-size: 15px; }
+.demo-contact .tp-ct-card { width: 100%; margin: 0; justify-self: center; }
+@media (max-width: 640px) {
+  .demo-contact .tp-ct { grid-template-columns: minmax(0, 1fr); }
+  .demo-contact .tp-ct-card { width: min(70%, 240px); margin-left: 16px; justify-self: start; }
+}
 .band .feature { border-top-color: var(--line-strong); }
 
 @media (max-width: 860px) {
