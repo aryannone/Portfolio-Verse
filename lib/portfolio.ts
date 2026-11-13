@@ -48,6 +48,14 @@ export const PORTRAITS: { id: PortraitId; name: string }[] = [
   { id: "none", name: "No picture" },
 ];
 
+export type ResumeId = "generated" | "original" | "none";
+
+export const RESUMES: { id: ResumeId; name: string }[] = [
+  { id: "generated", name: "A résumé made from these details" },
+  { id: "original", name: "My uploaded résumé file" },
+  { id: "none", name: "No résumé button" },
+];
+
 // How a message typed into the contact form reaches the owner.
 export type SendId = "mailto" | "direct";
 
@@ -182,6 +190,11 @@ export type Portfolio = {
   portrait: PortraitId;
   // The photo with its background removed, made once in the editor.
   photoCut: string;
+  // The "Download résumé" button: a PDF made from these details, the user's own file, or no button.
+  resume: ResumeId;
+  resumeFile: string;
+  resumeName: string;
+  resumePhoto: boolean;
   skills: string[];
   sections: Section[];
   sample: boolean;
@@ -393,6 +406,10 @@ const CLOSING_DEFAULTS = {
   contactSend: "mailto" as SendId,
   portrait: "plain" as PortraitId,
   photoCut: "",
+  resume: "generated" as ResumeId,
+  resumeFile: "",
+  resumeName: "",
+  resumePhoto: false,
 };
 
 // Fills in anything missing from a portfolio saved by an earlier version of the editor.

@@ -9,3 +9,4 @@ out
 
 # copied from node_modules by scripts/copy-vendor.mjs
 public/vendor/mediapipe/wasm
+public/vendor/pdfjs

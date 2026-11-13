@@ -6,6 +6,7 @@ import { LogoMark } from "@/components/Logo";
 import { useRouter } from "next/navigation";
 import ScaledPreview from "@/components/ScaledPreview";
 import { ProfileFields, SectionFields } from "@/components/Fields";
+import ResumeImport from "@/components/ResumeImport";
 import BuildOwnBanner from "@/components/BuildOwnBanner";
 import { READY_TEMPLATES } from "@/lib/templates";
 import { blankPortfolio, inTemplate, newSection, type Portfolio } from "@/lib/portfolio";
@@ -31,6 +32,8 @@ export default function StartForm() {
   const tools = usePortfolio(start, { forgetTemplate: false });
   const { data, set, status } = tools;
   const [step, setStep] = useState(0);
+  // Bumped after a résumé import, so the form fields show what was filled in.
+  const [filled, setFilled] = useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -102,7 +105,8 @@ export default function StartForm() {
               : HINTS[section?.title ?? ""] ?? "Add as many entries as you like. You can add photos to each one."}{" "}
             Nothing here is required.
           </p>
-          <div className="sf-card" key={step}>
+          {step === 0 ? <ResumeImport data={data} set={set} onDone={() => setFilled((n) => n + 1)} /> : null}
+          <div className="sf-card" key={`${step}-${filled}`}>
             {step === 0 ? <ProfileFields data={data} tools={tools} /> : null}
             {section ? <SectionFields data={data} section={section} tools={tools} design={false} /> : null}
           </div>

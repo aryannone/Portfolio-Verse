@@ -86,6 +86,10 @@
 .tp-links { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; font-size: 15px; font-weight: 500; }
 .tp-links a, .tp-links span { display: inline-flex; align-items: center; min-height: 44px; }
 .tp-links .tp-cta { padding: 0 20px; border-radius: 999px; background: var(--tp-ink); color: var(--tp-bg); font-weight: 600; transition: translate 0.2s ease; }
+.tp .tp-links .tp-cv { padding: 0 18px; border: 1px solid color-mix(in srgb, currentColor 40%, transparent); border-radius: 999px; font-weight: 600; transition: translate 0.2s ease, background 0.2s ease; }
+.tp .tp-links .tp-cv::after { content: "\2193"; margin-left: 8px; }
+.tp .tp-links .tp-cv:hover { text-decoration: none; translate: 0 -2px; background: color-mix(in srgb, currentColor 10%, transparent); }
+.tp-creative-5 .tp-links .tp-cv { border-radius: 0; }
 .tp-links .tp-cta:hover { text-decoration: none; translate: 0 -2px; }
 
 .tp-sec { display: flex; flex-direction: column; gap: 18px; min-width: 0; }

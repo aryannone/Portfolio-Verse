@@ -5,11 +5,13 @@ import Link from "next/link";
 import { LogoMark } from "@/components/Logo";
 import PortfolioView from "@/components/PortfolioView";
 import { Choice, ClosingFields, ProfileFields, SectionFields, move } from "@/components/Fields";
+import ResumeImport from "@/components/ResumeImport";
 import { TEMPLATES, getTemplate } from "@/lib/templates";
 import {
   ACCENTS,
   FONTS,
   FRAMES,
+  RESUMES,
   GALLERIES,
   HEROES,
   MOTIONS,
@@ -22,6 +24,7 @@ import {
   type GalleryId,
   type HeroId,
   type MotionId,
+  type ResumeId,
   type Portfolio,
   type ThemeId,
 } from "@/lib/portfolio";
@@ -52,6 +55,7 @@ export default function Editor() {
   const [phone, setPhone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [importNote, setImportNote] = useState("");
   const viewRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
@@ -83,6 +87,19 @@ export default function Editor() {
     if (name === null) return;
     const ok = await addSaved(name.trim() || suggested, data);
     setStatus(ok ? "Copy saved to My portfolios" : "Could not save. This browser may be out of space.");
+  }
+
+  // A résumé PDF made from the details as they are now.
+  async function downloadResume() {
+    if (!data) return;
+    setStatus("Making your résumé…");
+    try {
+      const { makeResume, resumeFileName, saveBlob } = await import("@/lib/resumePdf");
+      saveBlob(await makeResume(data, { photo: data.resumePhoto }), resumeFileName(data));
+      setStatus("Downloaded your résumé PDF");
+    } catch {
+      setStatus("Could not make the résumé. Please try again.");
+    }
   }
 
   // Shows these details in every template, to save them in another look as a separate portfolio.
@@ -133,6 +150,9 @@ export default function Editor() {
           <Link href="/saved" className="btn btn-quiet">
             My portfolios
           </Link>
+          <button type="button" className="btn btn-outline" onClick={downloadResume}>
+            Résumé PDF
+          </button>
           <button type="button" className="btn btn-primary" onClick={download} disabled={busy}>
             {busy ? "Building…" : "Download HTML"}
           </button>
@@ -232,6 +252,48 @@ export default function Editor() {
               {data.template === "professional-2" ? (
                 <p className="ed-hint">In this template, Skills stay in the side panel wherever the Skills section is moved.</p>
               ) : null}
+            </div>
+          </details>
+
+          <details className="ed-group" open>
+            <summary>Résumé</summary>
+            <div className="ed-group-in">
+              <ResumeImport
+                data={data}
+                set={set}
+                compact
+                onDone={(message) => {
+                  setImportNote(message);
+                  setResetKey((k) => k + 1);
+                }}
+              />
+              {importNote ? (
+                <p className="ed-hint" role="status">
+                  {importNote}
+                </p>
+              ) : null}
+              <button type="button" className="btn btn-quiet" onClick={downloadResume}>
+                Download a résumé PDF of these details
+              </button>
+              <label className="ed-check">
+                <input type="checkbox" checked={data.resumePhoto} onChange={(e) => set({ resumePhoto: e.target.checked })} />
+                Put my photo on the résumé
+              </label>
+              <Choice<ResumeId>
+                label="Résumé button on your portfolio"
+                value={data.resume}
+                options={RESUMES.filter((r) => r.id !== "original" || data.resumeFile)}
+                onChange={(resume) => set({ resume })}
+              />
+              {data.resumeFile ? (
+                <p className="ed-hint">
+                  Uploaded file: {data.resumeName || "résumé.pdf"}.{" "}
+                  <button type="button" className="ed-link" onClick={() => set({ resumeFile: "", resumeName: "", resume: data.resume === "original" ? "generated" : data.resume })}>
+                    Remove it
+                  </button>
+                </p>
+              ) : null}
+              <p className="ed-hint">A résumé made from your details always matches what you have edited here.</p>
             </div>
           </details>
 

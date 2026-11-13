@@ -4,6 +4,7 @@ import { useEffect, useRef, type CSSProperties, type Ref } from "react";
 import { initialsOf, onColor, toHref, type Item, type Link, type Portfolio, type Section } from "@/lib/portfolio";
 import { mountPortfolio, type RuntimeStore } from "@/lib/runtime";
 import ContactBlock from "@/components/ContactBlock";
+import { resumeFileName } from "@/lib/resumePdf";
 
 type Props = {
   data: Portfolio;
@@ -37,6 +38,21 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   const store = useRef<RuntimeStore>({ items: {} });
 
   const moves = data.motion !== "none";
+
+  // The "Download résumé" button: the user's own file as a link, or a PDF made from these details on click.
+  const cv =
+    data.resume === "none"
+      ? null
+      : data.resume === "original" && data.resumeFile
+        ? { href: data.resumeFile, mode: "original" }
+        : { href: "#resume", mode: "generated" };
+  const onCv = async (event: React.MouseEvent) => {
+    if (cv?.mode !== "generated") return;
+    event.preventDefault();
+    if (!interactive) return;
+    const { makeResume, saveBlob } = await import("@/lib/resumePdf");
+    saveBlob(await makeResume(data, { photo: data.resumePhoto }), resumeFileName(data));
+  };
   const Name = semantic ? "h1" : "div";
   const Heading = semantic ? "h2" : "div";
   const sections = data.sections.filter((s) => !s.hidden && (s.layout === "skills" ? data.skills.length > 0 : s.items.length > 0));
@@ -175,6 +191,11 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
               {data.email ? (
                 <a className="tp-cta" href={`mailto:${data.email}`}>
                   Contact me
+                </a>
+              ) : null}
+              {cv ? (
+                <a className="tp-cv" href={cv.href} download={resumeFileName(data)} data-cv={cv.mode} onClick={onCv}>
+                  Download résumé
                 </a>
               ) : null}
               {data.links
