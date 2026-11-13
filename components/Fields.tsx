@@ -181,6 +181,14 @@ export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Par
             It takes your accent colour, follows the pointer, watches visitors type, waves at your links and cheers when a message is
             sent. Choose Nothing above to remove it.
           </p>
+          {data.photo ? (
+            <p className="ed-hint ed-hint-tip">
+              Your profile photo is not shown here while the character is chosen.{" "}
+              <button type="button" className="ed-link" onClick={() => set({ contactVisual: "photo" })}>
+                Show my photo instead
+              </button>
+            </p>
+          ) : null}
         </>
       ) : null}
       {data.contactVisual === "photo" ? (

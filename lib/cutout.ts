@@ -56,6 +56,7 @@ export async function removeBackground(photo: string): Promise<string> {
   const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
   let kept = 0;
+  let left = canvas.width, right = 0, top = canvas.height, bottom = 0;
   for (let y = 0; y < canvas.height; y++) {
     // The mask can be a different size from the photo, so each pixel looks up its nearest mask point.
     const my = Math.min(mask.height - 1, Math.floor((y / canvas.height) * mask.height));
@@ -65,7 +66,13 @@ export async function removeBackground(photo: string): Promise<string> {
       // A soft edge between "surely background" and "surely the person".
       const t = Math.max(0, Math.min(1, (c - 0.3) / 0.4));
       const alpha = t * t * (3 - 2 * t);
-      if (alpha > 0.5) kept++;
+      if (alpha > 0.5) {
+        kept++;
+        if (x < left) left = x;
+        if (x > right) right = x;
+        if (y < top) top = y;
+        if (y > bottom) bottom = y;
+      }
       pixels.data[(y * canvas.width + x) * 4 + 3] = Math.round(alpha * 255);
     }
   }
@@ -75,5 +82,23 @@ export async function removeBackground(photo: string): Promise<string> {
   if (share < 0.04 || share > 0.97) throw new Error("No person found");
 
   ctx.putImageData(pixels, 0, 0);
-  return canvas.toDataURL("image/png");
+
+  // Crop to the person, so someone small in a corner of the photo still fills the frame.
+  // A little room is kept around the head and sides; the bottom is cut where the person ends.
+  const w = right - left + 1;
+  const h = bottom - top + 1;
+  const pad = Math.round(Math.max(w, h) * 0.08);
+  const x0 = Math.max(0, left - pad);
+  const y0 = Math.max(0, top - pad);
+  const x1 = Math.min(canvas.width, right + 1 + pad);
+  const y1 = Math.min(canvas.height, bottom + 1);
+  // Keep the saved picture a sensible size.
+  const scale = Math.min(1, 1200 / Math.max(x1 - x0, y1 - y0));
+  const out = document.createElement("canvas");
+  out.width = Math.round((x1 - x0) * scale);
+  out.height = Math.round((y1 - y0) * scale);
+  const octx = out.getContext("2d");
+  if (!octx) return canvas.toDataURL("image/png");
+  octx.drawImage(canvas, x0, y0, x1 - x0, y1 - y0, 0, 0, out.width, out.height);
+  return out.toDataURL("image/png");
 }

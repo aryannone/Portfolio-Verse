@@ -513,6 +513,8 @@ a.btn { display: inline-flex; align-items: center; }
 .ed-check { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; font-weight: 500; cursor: pointer; }
 .ed-check input { width: 24px; height: 24px; accent-color: var(--ink); }
 .ed-hint { font-size: 13px; color: var(--muted); }
+.ed-hint-tip { padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, var(--accent, #f5a524) 12%, transparent); color: inherit; }
+button.ed-link { display: inline; min-height: 0; padding: 0; border: 0; background: none; font: inherit; font-weight: 600; color: inherit; text-decoration: underline; cursor: pointer; }
 .ed-photo-me { width: 96px; height: 96px; border-radius: 16px; }
 select.ed-input { appearance: auto; }
 a.ed-link { display: inline; min-height: 0; padding: 0; }
