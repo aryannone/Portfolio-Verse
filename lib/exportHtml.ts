@@ -47,6 +47,13 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
     img.removeAttribute("src");
   });
   clone.querySelectorAll(".tp-ct-card").forEach((el) => el.removeAttribute("style"));
+  // The character starts the downloaded page at rest, saying its usual line.
+  clone.querySelectorAll(".tp-ct-char").forEach((el) => {
+    el.removeAttribute("style");
+    el.classList.remove("is-alive", "is-talk", "is-type", "is-key", "is-wave", "is-happy", "is-spin");
+    const say = el.querySelector(".tp-bot-say");
+    if (say) say.textContent = el.getAttribute("data-hello") || "";
+  });
   // The fit decision carries a copy of the photo; the downloaded page makes it again rather than store it twice.
   clone.querySelectorAll(".tp-fit").forEach((el) => {
     el.classList.remove("tp-fit");

@@ -43,10 +43,27 @@ export function linkBadge(label: string, url: string) {
 // The portrait on the contact card: the photo as it is, the photo with its background removed, or nothing.
 export type PortraitId = "plain" | "cut" | "none";
 
+// What stands beside the contact form.
+export type ContactVisualId = "character" | "photo" | "upload" | "design" | "none";
+export type ContactDesignId = "orbits" | "monogram" | "waves";
+
+export const CONTACT_VISUALS: { id: ContactVisualId; name: string }[] = [
+  { id: "character", name: "A 3D character (default)" },
+  { id: "photo", name: "My profile photo" },
+  { id: "upload", name: "Another photo" },
+  { id: "design", name: "A design" },
+  { id: "none", name: "Nothing" },
+];
+
+export const CONTACT_DESIGNS: { id: ContactDesignId; name: string }[] = [
+  { id: "orbits", name: "Orbits" },
+  { id: "monogram", name: "Monogram" },
+  { id: "waves", name: "Waves" },
+];
+
 export const PORTRAITS: { id: PortraitId; name: string }[] = [
   { id: "plain", name: "Original photo" },
   { id: "cut", name: "Background removed" },
-  { id: "none", name: "No picture" },
 ];
 
 export type ResumeId = "original" | "none";
@@ -185,6 +202,10 @@ export type Portfolio = {
   contactForm: boolean;
   contactSend: SendId;
   portrait: PortraitId;
+  contactVisual: ContactVisualId;
+  contactPhoto: string; // another photo, just for the contact section
+  contactDesign: ContactDesignId;
+  contactHello: string; // what the character says when nothing else is happening
   // The photo with its background removed, made once in the editor.
   photoCut: string;
   // The point of the user's photo that frames keep in view, as "x% y%". Empty means near the top middle.
@@ -406,6 +427,10 @@ const CLOSING_DEFAULTS = {
   contactForm: true,
   contactSend: "mailto" as SendId,
   portrait: "plain" as PortraitId,
+  contactVisual: "character" as ContactVisualId,
+  contactPhoto: "",
+  contactDesign: "orbits" as ContactDesignId,
+  contactHello: "Hi! Say hello.",
   photoCut: "",
   photoFocus: "",
   resume: "original" as ResumeId,
@@ -431,7 +456,9 @@ export function normalize(saved: Portfolio): Portfolio {
     // Earlier versions could offer a résumé made by the site to visitors; now only the user's own file is offered.
     resume: (saved.resume as string) === "none" ? "none" : "original",
     // Portrait looks from an earlier version become the plain photo.
-    portrait: saved.portrait === "cut" || saved.portrait === "none" ? saved.portrait : "plain",
+    portrait: saved.portrait === "cut" ? "cut" : "plain",
+    // Portfolios from before the character keep the picture they had beside the contact form.
+    contactVisual: saved.contactVisual ?? (saved.portrait === "none" ? "none" : saved.photo ? "photo" : "character"),
     // Skills used to sit after every section, so that is where the section goes for older saves.
     sections: [
       ...saved.sections.map((section) => ({ ...section, style: section.style ?? "" })),

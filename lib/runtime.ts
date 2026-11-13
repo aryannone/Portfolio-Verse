@@ -463,12 +463,14 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     const message = read("message");
     if (root.hasAttribute("data-demo")) {
       status.textContent = "On a real portfolio, this sends the message.";
+      root.dispatchEvent(new CustomEvent("tp-sent"));
       return;
     }
     const subject = "Message from " + name + " via your portfolio";
     const viaEmailApp = () => {
       win.location.href = "mailto:" + to + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(message + "\n\n" + name + "\n" + from);
       status.textContent = "Your email app should open with the message ready. Press send there.";
+      root.dispatchEvent(new CustomEvent("tp-sent"));
     };
     if (form.getAttribute("data-send") !== "direct" || !win.fetch) return viaEmailApp();
     status.textContent = "Sending\u2026";
@@ -482,12 +484,143 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
       .then((response) => {
         if (!response.ok) throw new Error("Not sent");
         status.textContent = "Message sent. Thank you.";
+        root.dispatchEvent(new CustomEvent("tp-sent"));
         form.reset();
       })
       .catch(viaEmailApp)
       .then(() => {
         button.disabled = false;
       });
+  }
+
+  // ---------- the contact character ----------
+  // Its head and eyes turn towards the pointer, it watches visitors type, names links it is shown,
+  // and cheers when the email is copied or a message is sent. Without a mouse it glances around by itself.
+  const char = root.querySelector(".tp-ct-char") as HTMLElement | null;
+  let stopChar = () => {};
+  if (char && !still) {
+    const bubble = char.querySelector(".tp-bot-say") as HTMLElement;
+    const hello = char.getAttribute("data-hello") || "";
+    let lastPointer = 0;
+    let typing = false;
+    let sayTimer = 0;
+    const moodTimers: Record<string, number> = {};
+    const clamp = (v: number) => Math.max(-1, Math.min(1, v));
+    const gaze = (x: number, y: number) => {
+      char.style.setProperty("--hx", clamp(x).toFixed(3));
+      char.style.setProperty("--hy", clamp(y).toFixed(3));
+    };
+    const lookAt = (x: number, y: number) => {
+      const head = (char.querySelector(".b-head") as HTMLElement).getBoundingClientRect();
+      gaze((x - (head.left + head.width / 2)) / 320, (y - (head.top + head.height / 2)) / 320);
+    };
+    const lookAtEl = (el: Element) => {
+      const box = el.getBoundingClientRect();
+      lookAt(box.left + box.width / 2, box.top + box.height / 2);
+    };
+    const say = (text: string, ms = 2600) => {
+      bubble.textContent = text;
+      char.classList.add("is-talk");
+      win.clearTimeout(sayTimer);
+      sayTimer = win.setTimeout(() => {
+        bubble.textContent = hello;
+        char.classList.remove("is-talk");
+      }, ms);
+    };
+    const mood = (name: string, ms: number) => {
+      char.classList.remove(name);
+      void char.offsetWidth;
+      char.classList.add(name);
+      win.clearTimeout(moodTimers[name]);
+      moodTimers[name] = win.setTimeout(() => char.classList.remove(name), ms);
+    };
+    const hellos = ["Hello there!", "Nice to see you.", "Write me something!", "Wheee!"];
+    let helloAt = 0;
+
+    const onMove = (event: PointerEvent) => {
+      if (event.pointerType === "touch") return;
+      lastPointer = Date.now();
+      if (!typing) lookAt(event.clientX, event.clientY);
+    };
+    const onOver = (event: Event) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest) return;
+      const link = target.closest(".tp-ct-link") as HTMLElement | null;
+      if (link) {
+        say("Opens " + ((link.querySelector("span") as HTMLElement).textContent || "this link"), 1800);
+        mood("is-wave", 1600);
+      } else if (target.closest(".tp-copy")) say("Copy my email?", 1600);
+      else if (target.closest(".tp-send") && !typing) say("Ready when you are!", 1600);
+    };
+    const onFocus = (event: Event) => {
+      const field = (event.target as HTMLElement).closest ? ((event.target as HTMLElement).closest(".tp-form input, .tp-form textarea") as HTMLElement | null) : null;
+      if (!field) return;
+      typing = true;
+      char.classList.add("is-type");
+      lookAtEl(field);
+      const name = field.getAttribute("name");
+      say(name === "name" ? "Nice to meet you!" : name === "email" ? "I'll keep it safe." : "I'm all ears…", 2400);
+    };
+    const onBlur = (event: FocusEvent) => {
+      const next = event.relatedTarget as HTMLElement | null;
+      if (next && next.closest && next.closest(".tp-form")) return;
+      typing = false;
+      char.classList.remove("is-type");
+    };
+    const onKey = (event: Event) => {
+      const field = event.target as HTMLElement;
+      if (!field.closest || !field.closest(".tp-form")) return;
+      lookAtEl(field);
+      mood("is-key", 220);
+    };
+    const onCharClick = (event: Event) => {
+      const target = event.target as HTMLElement;
+      if (target.closest && target.closest(".tp-ct-char")) {
+        mood("is-spin", 900);
+        say(hellos[helloAt++ % hellos.length], 1800);
+      } else if (target.closest && target.closest(".tp-copy")) {
+        mood("is-happy", 1600);
+        say("Copied!", 1600);
+      }
+    };
+    const onSent = () => {
+      typing = false;
+      char.classList.remove("is-type");
+      gaze(0, -0.2);
+      mood("is-happy", 2200);
+      say("Sent! Talk soon.", 3000);
+    };
+    // Without a mouse, or when the mouse is still, it glances around now and then.
+    const idle = win.setInterval(() => {
+      if (typing || Date.now() - lastPointer < 4000) return;
+      gaze(Math.random() * 1.4 - 0.7, Math.random() * 0.8 - 0.5);
+    }, 2600);
+
+    doc.addEventListener("pointermove", onMove);
+    root.addEventListener("pointerover", onOver);
+    root.addEventListener("focusin", onFocus);
+    root.addEventListener("focusout", onBlur);
+    root.addEventListener("input", onKey);
+    root.addEventListener("click", onCharClick);
+    root.addEventListener("tp-sent", onSent);
+    char.classList.add("is-alive");
+
+    stopChar = () => {
+      win.clearInterval(idle);
+      win.clearTimeout(sayTimer);
+      Object.keys(moodTimers).forEach((k) => win.clearTimeout(moodTimers[k]));
+      doc.removeEventListener("pointermove", onMove);
+      root.removeEventListener("pointerover", onOver);
+      root.removeEventListener("focusin", onFocus);
+      root.removeEventListener("focusout", onBlur);
+      root.removeEventListener("input", onKey);
+      root.removeEventListener("click", onCharClick);
+      root.removeEventListener("tp-sent", onSent);
+      char.classList.remove("is-alive", "is-talk", "is-type", "is-key", "is-wave", "is-happy", "is-spin");
+      char.style.removeProperty("--hx");
+      char.style.removeProperty("--hy");
+      bubble.textContent = hello;
+    };
   }
 
   root.addEventListener("submit", onSubmit);
@@ -521,6 +654,7 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     offTilt();
     root.removeEventListener("click", onClick);
     root.removeEventListener("submit", onSubmit);
+    stopChar();
     root.removeEventListener("keydown", onRootKey);
     doc.removeEventListener("keydown", onDocKey);
     if (observer) observer.disconnect();

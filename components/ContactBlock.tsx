@@ -1,4 +1,5 @@
 import { initialsOf, linkBadge, toHref, type Portfolio } from "@/lib/portfolio";
+import ContactCharacter from "@/components/ContactCharacter";
 
 const external = (url: string) => (/^https?:/.test(url) ? { target: "_blank", rel: "noopener noreferrer" } : {});
 
@@ -16,14 +17,15 @@ export default function ContactBlock({ data, semantic }: { data: Portfolio; sema
   ];
   if (!data.email && !links.length) return null;
 
-  const showCard = data.portrait !== "none";
+  const visual = data.contactVisual ?? "character";
+  const showCard = visual !== "none";
   // The cut-out is used once it exists; until then the original photo stands in.
-  const cut = data.portrait === "cut" && Boolean(data.photoCut);
+  const cut = visual === "photo" && data.portrait === "cut" && Boolean(data.photoCut);
 
   return (
     <div className="tp-sec tp-contact" id="tp-contact">
       <Heading className="tp-h">Contact</Heading>
-      <div className={showCard ? "tp-ct" : "tp-ct tp-ct-solo"}>
+      <div className={showCard ? `tp-ct tp-ct-with-${visual}` : "tp-ct tp-ct-solo"}>
         <div className="tp-ct-text">
           {data.contactStatus.trim() ? (
             <span className="tp-ct-status">
@@ -81,13 +83,31 @@ export default function ContactBlock({ data, semantic }: { data: Portfolio; sema
           ) : null}
         </div>
 
-        {showCard ? (
-          // The portrait is decoration here: the name and photo are already at the top of the page.
+        {visual === "character" ? <ContactCharacter hello={data.contactHello.trim() || "Hi! Say hello."} /> : null}
+        {visual === "photo" || visual === "upload" || visual === "design" ? (
+          // The picture is decoration here: the name and photo are already at the top of the page.
           <div className="tp-ct-card" aria-hidden="true">
             <div className="tp-ct-back" />
-            <div className={cut ? "tp-ct-photo tp-pt-cut" : "tp-ct-photo"}>
-              {data.photo ? <img src={cut ? data.photoCut : data.photo} alt="" /> : <span>{initialsOf(data.name || "Your Name")}</span>}
-            </div>
+            {visual === "design" ? (
+              <div className={`tp-ct-photo tp-ct-design tp-d-${data.contactDesign}`}>
+                <span className="tp-d-art">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <b>{initialsOf(data.name || "Your Name")}</b>
+              </div>
+            ) : (
+              <div className={cut ? "tp-ct-photo tp-pt-cut" : "tp-ct-photo"}>
+                {visual === "upload" && data.contactPhoto ? (
+                  <img src={data.contactPhoto} alt="" className="tp-ct-own" />
+                ) : data.photo ? (
+                  <img src={cut ? data.photoCut : data.photo} alt="" />
+                ) : (
+                  <span>{initialsOf(data.name || "Your Name")}</span>
+                )}
+              </div>
+            )}
             <div className="tp-ct-tag">
               <strong>{data.name || "Your Name"}</strong>
               {data.role ? <span>{data.role}</span> : null}

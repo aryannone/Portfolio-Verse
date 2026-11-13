@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { CARD_STYLES, PORTRAITS, SENDS, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type FontId, type PortraitId, type SendId, type GalleryId, type Link, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
+import { CARD_STYLES, CONTACT_DESIGNS, CONTACT_VISUALS, PORTRAITS, SENDS, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type ContactDesignId, type ContactVisualId, type FontId, type PortraitId, type SendId, type GalleryId, type Link, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
 import type { PortfolioTools } from "@/lib/usePortfolio";
 
 // The form pieces shared by the details form (/start) and the editor.
@@ -114,7 +114,7 @@ export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Par
 
   // Make the cut-out the first time "Background removed" is chosen, and again whenever the photo changes.
   useEffect(() => {
-    if (data.portrait !== "cut" || !data.photo || data.photoCut) return;
+    if (data.contactVisual !== "photo" || data.portrait !== "cut" || !data.photo || data.photoCut) return;
     let stale = false;
     setNote("Removing the background. This can take a few seconds the first time.");
     import("@/lib/cutout")
@@ -134,7 +134,19 @@ export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Par
     };
     // "set" is recreated on every render and must not restart the work.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.portrait, data.photo, data.photoCut]);
+  }, [data.contactVisual, data.portrait, data.photo, data.photoCut]);
+
+  async function pickContactPhoto(files: FileList | null) {
+    // Take the file now: the file box is cleared as soon as this returns.
+    const file = files?.[0];
+    if (!file) return;
+    try {
+      const { imageToDataUrl } = await import("@/lib/store");
+      set({ contactPhoto: await imageToDataUrl(file, 1000) });
+    } catch {
+      setNote("Could not read that picture.");
+    }
+  }
 
   return (
     <>
@@ -154,8 +166,51 @@ export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Par
         <input className="ed-input" value={data.contactStatus} placeholder="Open to internships" onChange={(e) => set({ contactStatus: e.target.value })} />
       </Field>
 
-      <Choice<PortraitId> label="Your photo on the contact card" value={data.portrait} options={PORTRAITS} onChange={(portrait) => set({ portrait })} />
-      {data.portrait === "cut" && !data.photo ? <p className="ed-hint">Add your photo in About you first.</p> : null}
+      <Choice<ContactVisualId>
+        label="Beside the contact form"
+        value={data.contactVisual}
+        options={CONTACT_VISUALS}
+        onChange={(contactVisual) => set({ contactVisual })}
+      />
+      {data.contactVisual === "character" ? (
+        <>
+          <Field label="What the character says">
+            <input className="ed-input" value={data.contactHello} maxLength={40} placeholder="Hi! Say hello." onChange={(e) => set({ contactHello: e.target.value })} />
+          </Field>
+          <p className="ed-hint">
+            It takes your accent colour, follows the pointer, watches visitors type, waves at your links and cheers when a message is
+            sent. Choose Nothing above to remove it.
+          </p>
+        </>
+      ) : null}
+      {data.contactVisual === "photo" ? (
+        <>
+          <Choice<PortraitId> label="Your photo on the contact card" value={data.portrait} options={PORTRAITS} onChange={(portrait) => set({ portrait })} />
+          {!data.photo ? <p className="ed-hint">Add your photo in About you first.</p> : null}
+        </>
+      ) : null}
+      {data.contactVisual === "upload" ? (
+        <div className="ed-field">
+          <span>Photo for the contact section</span>
+          <div className="ed-photos">
+            {data.contactPhoto ? (
+              <div className="ed-photo ed-photo-me">
+                <img src={data.contactPhoto} alt="Photo for the contact section" />
+                <button type="button" aria-label="Remove this photo" onClick={() => set({ contactPhoto: "" })}>
+                  ×
+                </button>
+              </div>
+            ) : null}
+            <label className="ed-add">
+              {data.contactPhoto ? "Change" : "Add photo"}
+              <input type="file" accept="image/*" onChange={(e) => { pickContactPhoto(e.target.files); e.target.value = ""; }} />
+            </label>
+          </div>
+        </div>
+      ) : null}
+      {data.contactVisual === "design" ? (
+        <Choice<ContactDesignId> label="Design" value={data.contactDesign} options={CONTACT_DESIGNS} onChange={(contactDesign) => set({ contactDesign })} />
+      ) : null}
       {note ? (
         <p className="ed-hint" role="status">
           {note}

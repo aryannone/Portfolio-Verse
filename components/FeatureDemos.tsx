@@ -64,7 +64,7 @@ export default function FeatureDemos() {
 
   // A sample person for the contact demo, with a drawn portrait standing in for a photo.
   const contact = useMemo<Portfolio>(
-    () => ({ ...fromSample("professional-4"), photo: samplePortrait("#8c52ff"), portrait: "plain", contactStatus: "Open to internships", contactNote: "" }),
+    () => ({ ...fromSample("professional-4"), photo: samplePortrait("#8c52ff"), contactVisual: "character", contactStatus: "Open to internships", contactNote: "" }),
     [],
   );
 
@@ -151,10 +151,11 @@ export default function FeatureDemos() {
         <div className="demo-copy">
           <h3 className="display">A contact section with presence.</h3>
           <p>
-            Visitors can write to you right on the page. Beside the form sits your portrait on a card that leans
-            towards the pointer, with your photo as it is or with its background removed.
+            Visitors can write to you right on the page, while a small 3D character keeps them company: it follows the
+            pointer, watches them type, waves at your links and cheers when the message is sent. Prefer your photo,
+            another picture or a design? It is one switch.
           </p>
-          <p className="demo-hint">Try it: move your pointer over the card.</p>
+          <p className="demo-hint">Try it: move your pointer, type in the form, or tap the character.</p>
         </div>
         {/* The links in this example lead nowhere, so taps on them are swallowed. */}
         <div
