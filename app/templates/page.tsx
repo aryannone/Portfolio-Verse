@@ -13,11 +13,12 @@ export default function TemplatesPage() {
     <>
       <SiteHeader current="templates" />
       <main>
-        <section className="wrap page-head">
+        <section className="wrap page-head tg-head">
+          <span className="tg-eyebrow">Templates</span>
           <h1 className="display h-page">Pick a starting point.</h1>
           <p>
-            Every template is editable: text, colours, fonts, sections and photos. You can switch
-            later without losing your details. Hover a template to see it scroll.
+            Every template is fully editable, shows your own details, and can be switched at any time without losing
+            anything. Open any one to see the full page.
           </p>
         </section>
         <TemplateGallery />

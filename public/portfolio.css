@@ -458,6 +458,10 @@
 .tp.tp-split .tp-main { display: flex; flex-direction: column; gap: 64px; padding: 72px 56px; min-width: 0; }
 .tp.tp-split .tp-h { color: var(--tp-accent); }
 .tp.tp-split .tp-card { background: var(--tp-card); }
+/* In the small pictures of templates, the photo half is one screen tall, as a visitor would see it,
+   so the photo is not cropped to fit the whole long page. The colour carries on below it. */
+.tp.tp-split:not(.tp-live) .tp-in { background: linear-gradient(to right, var(--tp-accent) 45%, transparent 45%); }
+.tp.tp-split:not(.tp-live) .tp-side { align-self: start; height: 820px; min-height: 0; }
 /* On a full page the photo half stays where it is while the other half scrolls. */
 .tp-live.tp-split .tp-side { position: sticky; top: var(--tp-top, 0px); align-self: start; height: calc(var(--tp-view, 100vh) - var(--tp-top, 0px)); min-height: 0; }
 .tp-has-nav.tp-live.tp-split .tp-side { top: calc(var(--tp-top, 0px) + 56px); height: calc(var(--tp-view, 100vh) - var(--tp-top, 0px) - 56px); }

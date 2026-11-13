@@ -16,6 +16,7 @@ export default function ScaledPreview({
   auto = false,
   data,
   exact = false,
+  width = DESIGN_WIDTH,
 }: {
   id: string;
   ratio?: string;
@@ -25,6 +26,8 @@ export default function ScaledPreview({
   data?: Portfolio | null;
   // Show that portfolio exactly as saved, not restyled into the template "id".
   exact?: boolean;
+  // The width the page is drawn at before shrinking. Narrower makes the text in a small picture larger.
+  width?: number;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ scale: number; viewHeight: number } | null>(null);
@@ -33,14 +36,14 @@ export default function ScaledPreview({
     const box = boxRef.current;
     if (!box) return;
     const update = () => {
-      const scale = box.clientWidth / DESIGN_WIDTH;
+      const scale = box.clientWidth / width;
       setSize({ scale, viewHeight: box.clientHeight / scale });
     };
     update();
     const observer = new ResizeObserver(update);
     observer.observe(box);
     return () => observer.disconnect();
-  }, []);
+  }, [width]);
 
   const classes = ["scaled", flat ? "scaled-flat" : "", auto ? "scaled-auto" : ""].filter(Boolean).join(" ");
 
@@ -49,7 +52,7 @@ export default function ScaledPreview({
     <div ref={boxRef} className={classes} style={{ aspectRatio: ratio }} aria-hidden="true" inert>
       <div
         className="scaled-inner"
-        style={{ transform: `scale(${size?.scale ?? 0.3})`, opacity: size === null ? 0 : 1 }}
+        style={{ width, transform: `scale(${size?.scale ?? 0.3})`, opacity: size === null ? 0 : 1 }}
       >
         <div className="scaled-scroll" style={{ "--view-h": `${size?.viewHeight ?? 0}px` } as CSSProperties}>
           <TemplatePreview id={id} animate={auto} data={data} exact={exact} />

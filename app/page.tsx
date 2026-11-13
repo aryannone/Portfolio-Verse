@@ -6,6 +6,7 @@ import ScaledPreview from "@/components/ScaledPreview";
 import HeroShowcase from "@/components/HeroShowcase";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import FeatureDemos from "@/components/FeatureDemos";
+import { TemplateCard } from "@/components/TemplateCard";
 import { READY_TEMPLATES } from "@/lib/templates";
 
 const STEPS = [
@@ -103,17 +104,9 @@ export default function LandingPage() {
               photographers and makers. Tap any to see the full page.
             </p>
           </div>
-          <div className="tpl-row">
-            {READY_TEMPLATES.map((t, i) => (
-              // The name is the link, stretched over the whole tile. The preview holds links of its own,
-              // so it cannot sit inside one.
-              <div key={t.id} className="tpl-tile" data-reveal style={{ "--i": i % 3 } as React.CSSProperties}>
-                <ScaledPreview id={t.id} ratio="16 / 11" />
-                <Link href={`/templates/${t.id}`} className="tpl-name">
-                  {t.name}
-                </Link>
-                <span className="tpl-blurb">{t.blurb}</span>
-              </div>
+          <div className="tg-grid tg-grid-4">
+            {READY_TEMPLATES.map((t) => (
+              <TemplateCard key={t.id} template={t} compact />
             ))}
           </div>
           <p className="tpl-own" data-reveal>

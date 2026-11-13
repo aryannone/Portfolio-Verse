@@ -824,3 +824,81 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
 label.rs-upload { position: relative; display: inline-flex; align-items: center; align-self: flex-start; cursor: pointer; }
 label.rs-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 label.rs-upload:focus-within { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* Template gallery: equal cards, each picture in a frame tinted with the template's own colour. */
+
+.tg-head { gap: 14px; padding-bottom: 28px; }
+.tg-eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+
+.tg-toolbar { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: flex-end; justify-content: space-between; padding-bottom: 14px; }
+.tg-tabs { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); }
+.tg-tabs button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; color: var(--ink); font-size: 15px; font-weight: 600; transition: background 0.2s ease, color 0.2s ease; }
+.tg-tabs button span { min-width: 22px; padding: 1px 7px; border-radius: 999px; background: #ffffff; color: var(--muted); font-size: 12px; }
+.tg-tabs button.is-on { background: var(--ink); color: #ffffff; }
+.tg-tabs button.is-on span { background: rgba(255, 255, 255, 0.18); color: #ffffff; }
+.tg-details { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.tg-details label { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tg-details label span { font-size: 12px; font-weight: 600; color: var(--muted); }
+.tg-details select { width: auto; max-width: 300px; }
+.tg-note { font-size: 15px; color: var(--muted); padding-bottom: 8px; }
+.tg-note strong { color: var(--ink); }
+
+.tg-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px 28px; padding-top: 24px; padding-bottom: 96px; }
+.tg-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 36px 22px; padding: 0; }
+@media (max-width: 1100px) {
+  .tg-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 1020px) {
+  .tg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .tg-grid { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  /* On phones the home page's templates become one row to swipe through. */
+  .tg-grid-4 { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px; padding: 4px 20px 12px; scrollbar-width: none; }
+  .tg-grid-4::-webkit-scrollbar { display: none; }
+  .tg-grid-4 .tg-card { flex: 0 0 80%; scroll-snap-align: center; }
+  .tg-toolbar { align-items: stretch; }
+  .tg-tabs { display: flex; width: 100%; }
+  .tg-tabs button { flex: 1; justify-content: center; padding: 0 8px; font-size: 14px; gap: 6px; }
+}
+
+.tg-card { position: relative; display: flex; flex-direction: column; gap: 8px; min-width: 0; --tg: var(--accent); }
+.tg-frame { position: relative; overflow: hidden; padding: 20px 20px 0; border-radius: 22px; background: linear-gradient(155deg, color-mix(in srgb, var(--tg) 26%, #ffffff), color-mix(in srgb, var(--tg) 9%, #ffffff) 70%); transition: box-shadow 0.4s ease, transform 0.4s ease; }
+.tg-window { overflow: hidden; border-radius: 12px 12px 0 0; background: #ffffff; box-shadow: 0 0 0 1px rgba(18, 20, 26, 0.06), 0 20px 40px -24px rgba(18, 20, 26, 0.5); transform: translateY(8px); transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.tg-bar { display: flex; align-items: center; gap: 5px; height: 22px; padding: 0 10px; background: #f6f7f9; border-bottom: 1px solid var(--line); }
+.tg-bar i { width: 7px; height: 7px; border-radius: 50%; background: var(--line-strong); }
+.tg-window .scaled { border: 0; border-radius: 0; }
+.tg-card:hover .tg-frame, .tg-card:focus-within .tg-frame { transform: translateY(-4px); box-shadow: 0 30px 60px -34px color-mix(in srgb, var(--tg) 75%, #12141a); }
+.tg-card:hover .tg-window, .tg-card:focus-within .tg-window { transform: translateY(0); }
+.tg-card:hover .scaled-scroll { transform: translateY(calc(var(--view-h, 0px) - 100%)); transition: transform 7s linear; }
+
+.tg-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; }
+.tg-title { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+.tg-link { color: var(--ink); }
+.tg-link:hover { color: var(--ink); }
+/* The name's link covers the whole card, so a tap anywhere opens the preview. */
+.tg-link::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 22px; }
+.tg-link:focus-visible { outline: none; }
+.tg-link:focus-visible::after { outline: 2px solid var(--ink); outline-offset: 6px; }
+.tg-new { padding: 2px 8px; border-radius: 999px; background: var(--accent); color: var(--on-accent, #ffffff); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.tg-tag { flex: none; padding: 3px 10px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.tg-blurb { margin: 0; font-size: 15px; color: var(--muted); }
+.tg-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
+.tg-actions .btn { position: relative; z-index: 2; }
+.tg-more { margin-left: auto; font-size: 14px; font-weight: 600; color: var(--ink); }
+.tg-more::after { content: " \2192"; display: inline-block; transition: transform 0.25s ease; }
+.tg-card:hover .tg-more::after { transform: translateX(4px); }
+
+/* "Build your own": a dashed frame with the page-being-built loop, enlarged. */
+.tg-own .tg-frame { background: color-mix(in srgb, var(--accent) 5%, #ffffff); outline: 2px dashed color-mix(in srgb, var(--accent) 45%, #ffffff); outline-offset: -2px; }
+.tg-own-art { aspect-ratio: 4 / 3; display: grid; place-items: center; background: #ffffff; }
+.tg-own-art .own-art { transform: scale(1.7); border: 0; }
+@media (max-width: 640px) {
+  .tg-own-art .own-art { transform: scale(1.5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tg-frame, .tg-window, .tg-more::after { transition: none; }
+  .tg-card:hover .tg-frame, .tg-card:hover .tg-window { transform: none; }
+  .tg-card:hover .scaled-scroll { transform: none; }
+}
