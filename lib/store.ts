@@ -220,12 +220,17 @@ function describe(file: File): string {
 // The one exception: a format the browser cannot show (such as HEIC from some phones) is turned into a JPG,
 // because it would otherwise appear as a broken image for every visitor.
 export async function imageToDataUrl(file: File): Promise<string> {
+  // A photo kept only in the cloud (for example in Google Photos) can arrive empty.
+  if (file.size === 0) {
+    throw new Error(
+      "This photo is empty: it may be stored only online. Download it to your device from your photos app first, then try again.",
+    );
+  }
   const url = await readFile(file);
   if (await canShow(url)) return url;
   try {
-    const { default: heic2any } = await import("heic2any");
-    const converted = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.92 });
-    const jpg = await readFile(Array.isArray(converted) ? converted[0] : converted);
+    const { heicTo } = await import("heic-to/next");
+    const jpg = await readFile(await heicTo({ blob: file, type: "image/jpeg", quality: 0.92 }));
     if (await canShow(jpg)) return jpg;
   } catch {
     // Not a HEIC photo, or one the converter cannot read.
