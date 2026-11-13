@@ -1,6 +1,7 @@
 // Sample people shown inside template previews. All invented, all Indian context.
 
-export type SampleProject = { title: string; text: string; tags: string[] };
+// "did" and "result" fill in the full story, used by the Case study template.
+export type SampleProject = { title: string; text: string; tags: string[]; did?: string[]; result?: string };
 export type SampleEducation = { title: string; place: string; years: string };
 export type SampleExperience = { title: string; place: string; years: string; text: string };
 
@@ -212,5 +213,54 @@ export const SAMPLES: Record<string, Sample> = {
     ],
     email: "farhan.ali@example.com",
     links: ["Instagram", "LinkedIn"],
+  },
+  case: {
+    slug: "ananya-iyer",
+    name: "Ananya Iyer",
+    initials: "AI",
+    role: "Mechanical Engineer",
+    city: "Chennai",
+    bio: "I fix machines that keep breaking, and I can show you how.",
+    about:
+      "Mechanical engineer from Chennai. I like problems you can measure: a part that fails, a process that wastes time, a design that costs too much. Here are three of them.",
+    workLabel: "Case studies",
+    projects: [
+      {
+        title: "The buggy that finally finished",
+        text: "Our college team's all-terrain buggy kept breaking its rear suspension halfway through endurance races.",
+        tags: ["SolidWorks", "ANSYS", "Team lead"],
+        did: [
+          "Led a team of six on a full redesign of the rear suspension",
+          "Simulated race loads in ANSYS and cut the trailing arm's weight by 18 percent",
+          "Built and broke three prototypes on the college track before the final one",
+        ],
+        result: "Finished all four hours of endurance at Baja SAE India, a first in the team's history.",
+      },
+      {
+        title: "A dryer farmers could build themselves",
+        text: "Farmers near Kanchipuram were losing a fifth of their chillies to sudden rain while drying them in the open.",
+        tags: ["Thermal design", "Field research"],
+        did: [
+          "Interviewed 14 farmers about how they dry and store their crop",
+          "Designed a solar dryer from local materials that two people can assemble in a day",
+          "Logged temperatures and drying times for a month with cheap sensors",
+        ],
+        result: "Drying time fell from six days to three, and the local co-operative has built five more.",
+      },
+      {
+        title: "Why the gearboxes wore out",
+        text: "A two-wheeler maker wanted to know why its gearboxes failed early in city traffic.",
+        tags: ["Metrology", "Data analysis"],
+        did: ["Took apart and measured 12 gearboxes after 40,000 km of riding", "Matched the wear patterns against real riding data from the same bikes"],
+        result: "Traced it to one undersized bearing; a larger one is now in the next model's design.",
+      },
+    ],
+    skills: ["SolidWorks", "ANSYS", "MATLAB", "GD&T", "Prototyping", "Field research"],
+    experience: [
+      { title: "Graduate Engineer Trainee", place: "An automotive supplier, Chennai", years: "2025 to now", text: "Design validation for suspension parts." },
+    ],
+    education: [{ title: "B.E. Mechanical Engineering", place: "College of Engineering, Guindy", years: "2021 to 2025" }],
+    email: "ananya.iyer@example.com",
+    links: ["LinkedIn"],
   },
 };

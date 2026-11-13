@@ -444,6 +444,52 @@
   .tp-creative-5 .tp-about p, .tp-creative-5 .tp-bio { font-size: 20px; }
 }
 
+/* Case study: a big opening statement, then each project as a full-screen chapter of a story. */
+.tp-case { --tp-bg: #f4f6f8; --tp-ink: #0f172a; --tp-muted: #55607a; --tp-line: #dde2ea; --tp-accent: #0ea5e9; --tp-on-accent: #ffffff; --tp-card: #ffffff; --tp-gutter: max(48px, calc((100cqw - 1120px) / 2)); }
+.tp.tp-case .tp-in { max-width: none; padding: 0 0 72px; gap: 0; }
+.tp.tp-case .tp-hero { min-height: 760px; justify-content: center; gap: 22px; padding: 96px var(--tp-gutter) 72px; }
+.tp-live.tp-case .tp-hero { min-height: calc(var(--tp-view, 100vh) - var(--tp-top, 0px) - 56px); }
+.tp.tp-case .tp-avatar { width: calc(76px * var(--tp-avk)); height: calc(76px * var(--tp-avk)); font-size: calc(26px * var(--tp-avk)); }
+.tp.tp-case .tp-name { order: -1; font-size: 15px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tp-accent); }
+.tp.tp-case .tp-avatar { order: -2; }
+.tp.tp-case .tp-bio { font-family: var(--tp-display); font-weight: 600; font-size: clamp(38px, 6cqw, 82px); line-height: 1.02; letter-spacing: -0.03em; max-width: 15em; opacity: 1; }
+.tp.tp-case .tp-hero::after { content: "Scroll for the stories \2193"; margin-top: 18px; font-size: 14px; font-weight: 600; color: var(--tp-muted); }
+.tp.tp-case .tp-links .tp-cta { background: var(--tp-accent); color: var(--tp-on-accent); }
+.tp.tp-case .tp-sec { padding: 88px var(--tp-gutter) 0; }
+.tp.tp-case .tp-h { color: var(--tp-accent); }
+
+/* The chapters run edge to edge, alternating light and dark. */
+.tp.tp-case .tp-sec.tp-chapters { padding: 88px 0 0; gap: 0; }
+.tp.tp-case .tp-chapters > .tp-h { padding: 0 var(--tp-gutter) 28px; }
+.tp-chapter { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 64px; align-items: center; min-height: 760px; padding: 80px var(--tp-gutter); background: var(--tp-card); }
+.tp-live .tp-chapter { min-height: calc(var(--tp-view, 100vh) - var(--tp-top, 0px) - 56px); }
+.tp-chapter:nth-of-type(even) { background: #0f172a; color: #f1f5f9; --tp-muted: #9aa6bd; --tp-line: rgba(255, 255, 255, 0.16); }
+.tp-chapter:nth-of-type(even) .tp-ch-media { order: 2; }
+.tp .tp-ch-media { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; padding: 0; border: 0; border-radius: 26px; overflow: hidden; background: var(--tp-accent); cursor: pointer; box-shadow: 0 40px 80px -40px rgba(15, 23, 42, 0.55); }
+.tp-ch-media img { width: 100%; height: 100%; object-fit: cover; transition: scale 0.8s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.tp-ch-media:hover img { scale: 1.05; }
+.tp-ch-media:focus-visible, .tp-ch-more:focus-visible { outline: 3px solid var(--tp-accent); outline-offset: 4px; }
+.tp .tp-ch-media.is-empty { display: grid; place-items: center; cursor: default; background: linear-gradient(140deg, var(--tp-accent), color-mix(in srgb, var(--tp-accent) 40%, #0f172a)); }
+.tp-ch-media.is-empty span { font-family: var(--tp-display); font-weight: 700; font-size: clamp(90px, 14cqw, 180px); color: rgba(255, 255, 255, 0.85); letter-spacing: -0.04em; }
+.tp-ch-body { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.tp-ch-num { font-size: 13px; font-weight: 700; letter-spacing: 0.16em; color: var(--tp-accent); }
+.tp .tp-ch-title { font-family: var(--tp-display); font-weight: 600; font-size: clamp(30px, 4cqw, 52px); line-height: 1.04; letter-spacing: -0.02em; }
+.tp-ch-label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tp-muted); }
+.tp-ch-block p, .tp-ch-block ul { margin: 0; font-size: 17px; line-height: 1.55; }
+.tp-ch-block ul { padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.tp-ch-result { padding: 18px 22px; border-left: 4px solid var(--tp-accent); border-radius: 0 16px 16px 0; background: color-mix(in srgb, var(--tp-accent) 12%, transparent); }
+.tp-ch-result p { margin: 0; font-family: var(--tp-display); font-weight: 600; font-size: clamp(19px, 2.2cqw, 25px); line-height: 1.3; }
+.tp .tp-ch-more { align-self: flex-start; min-height: 44px; padding: 0 18px; border: 1px solid color-mix(in srgb, currentColor 35%, transparent); border-radius: 999px; background: transparent; color: inherit; font: 600 15px var(--tp-body); cursor: pointer; transition: background 0.2s ease; }
+.tp .tp-ch-more::after { content: " \2192"; }
+.tp .tp-ch-more:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
+@container (max-width: 760px) {
+  .tp-case { --tp-gutter: 22px; }
+  .tp.tp-case .tp-hero, .tp-live.tp-case .tp-hero { min-height: 0; padding: 64px var(--tp-gutter) 48px; }
+  .tp-chapter, .tp-live .tp-chapter { grid-template-columns: minmax(0, 1fr); gap: 28px; min-height: 0; padding: 56px var(--tp-gutter); }
+  .tp-chapter:nth-of-type(even) .tp-ch-media { order: 0; }
+  .tp.tp-case .tp-sec { padding-top: 64px; }
+}
+
 /* Split screen: your photo fills one half and stays put; your work scrolls in the other half. */
 .tp-split { --tp-bg: #faf8f5; --tp-line: #e7e2da; --tp-accent: #ea580c; --tp-on-accent: #ffffff; --tp-card: #ffffff; }
 .tp.tp-split .tp-in { max-width: none; padding: 0; gap: 0; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); align-items: stretch; }
@@ -640,6 +686,8 @@
 .tpd-links a span::after { content: " \2197"; }
 .tpd-links a:hover { translate: 0 -2px; }
 .tpd-links a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.tpd-result { padding: 14px 16px; border-left: 4px solid var(--tp-accent, currentColor); border-radius: 0 12px 12px 0; background: color-mix(in srgb, currentColor 6%, transparent); font-size: 17px; font-weight: 600; line-height: 1.4; }
+.tpd-result::before { content: "Result"; display: block; margin-bottom: 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.66; }
 .tpd-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .tpd-tags span { padding: 4px 12px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: 999px; font-size: 13px; font-weight: 500; }
 .tpd-photos { display: flex; flex-direction: column; gap: 16px; }

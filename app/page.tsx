@@ -98,13 +98,13 @@ export default function LandingPage() {
 
         <section className="wrap section" id="templates">
           <div className="section-head">
-            <h2 className="display h-section" data-reveal>Eight templates. Switch whenever you like.</h2>
+            <h2 className="display h-section" data-reveal>Nine templates. Switch whenever you like.</h2>
             <p>
-              Four Professional looks for placements and job applications, four Creative ones for designers,
+              Five Professional looks for placements and job applications, four Creative ones for designers,
               photographers and makers. Tap any to see the full page.
             </p>
           </div>
-          <div className="tg-grid tg-grid-4">
+          <div className="tg-grid tg-grid-home">
             {READY_TEMPLATES.map((t) => (
               <TemplateCard key={t.id} template={t} compact />
             ))}

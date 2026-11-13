@@ -350,6 +350,14 @@ export function SectionFields({ data, section, tools, design }: { data: Portfoli
               onChange={(e) => setItem(section.id, item.id, { details: e.target.value })}
             />
           </Field>
+          <Field label="Result (optional, one line)">
+            <input
+              className="ed-input"
+              value={item.result ?? ""}
+              placeholder="What changed because of it, e.g. Cut refund failures by a third"
+              onChange={(e) => setItem(section.id, item.id, { result: e.target.value })}
+            />
+          </Field>
           <Field label="Tags, separated by commas">
             <ListInput value={item.tags} onChange={(tags) => setItem(section.id, item.id, { tags })} />
           </Field>

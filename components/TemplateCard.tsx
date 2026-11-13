@@ -5,7 +5,7 @@ import StartButton from "@/components/StartButton";
 import type { Portfolio } from "@/lib/portfolio";
 import type { TemplateInfo } from "@/lib/templates";
 
-const NEW = new Set(["split", "bento"]);
+const NEW = new Set(["case", "split", "bento"]);
 const KIND: Record<string, string> = { professional: "Professional", creative: "Creative" };
 
 // One template in a gallery: a live picture of it in a frame tinted with its own colour,

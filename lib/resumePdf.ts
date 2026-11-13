@@ -197,6 +197,7 @@ export async function makeResume(data: Portfolio, options: ResumeOptions = { pho
         .split(/\n+/)
         .map((p) => p.replace(/^\s*[•\-*–]\s*/, "").trim())
         .filter(Boolean);
+      if (item.result?.trim()) points.push("Result: " + item.result.trim());
       font("normal", 10, ink);
       for (const point of points) {
         const rows = doc.splitTextToSize(safe(point), inner - 14) as string[];

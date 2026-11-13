@@ -5,7 +5,7 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 
 ## What is built so far
 
-- Eight templates: Classic, Résumé, Timeline, Split screen (photo half stays put), Bold, Aurora, Editorial, Bento (tiles in one grid), plus Build your own. Professional 3, Creative 2 and Creative 3 were folded into Classic, Aurora and Bold; portfolios using them move over with matching options (`RETIRED` in `lib/templates.ts`)
+- Nine templates: Classic, Résumé, Timeline, Case study (each project a full-screen chapter: problem, what I did, result), Split screen (photo half stays put), Bold, Aurora, Editorial, Bento (tiles in one grid), plus Build your own. Professional 3, Creative 2 and Creative 3 were folded into Classic, Aurora and Bold; portfolios using them move over with matching options (`RETIRED` in `lib/templates.ts`)
 - Landing page (`/`): a hero where visitors type a name and switch templates, all nine templates, and three working feature demos
 - Template gallery (`/templates`), with nine templates
 - Details form (`/start`): a step-by-step form filled in before choosing a template. Once it has details, every template preview shows them
@@ -21,6 +21,7 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 - My portfolios (`/saved`): a browser can hold many portfolios. Each saves into its own place as it is edited, so opening or starting another never overwrites one. Each can be opened, renamed, copied, downloaded or deleted
 - Contact section: a headline, a message form (through the visitor's email app, or straight to the inbox via FormSubmit if the owner chooses), the email with a copy button, links, and the photo on a card that tilts to the pointer
 - Background removal for the contact photo, done in the browser with MediaPipe's selfie segmenter (`lib/cutout.ts`). The model is in `public/vendor/mediapipe/`; the engine is copied there from `node_modules` by `scripts/copy-vendor.mjs` on every build, as is pdf.js (`public/vendor/pdfjs/`)
+- Each entry can have a one-line Result, highlighted in Case study chapters, the details panel and the generated résumé
 - Entry links, and a quote block above Contact
 - Sample pictures are drawn mock-ups matched to each sample person (charts, drawings, app screens, posters)
 - Navigation bar (on by default): a sticky bar with a link to each section that highlights the one being read, a back-to-top button, and an optional reading progress line, all driven by `lib/runtime.ts` so they work in the editor, on preview pages and in downloaded files

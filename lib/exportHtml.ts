@@ -56,6 +56,7 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
         sub: [item.sub, item.meta].filter(Boolean).join(" · "),
         text: item.text,
         details: item.details ?? "",
+        result: item.result ?? "",
         tags: item.tags,
         links: (item.links ?? []).filter((l) => l.url.trim()).map((l) => ({ label: l.label.trim() || "Link", url: toHref(l.url) })),
         layout: item.gallery || data.gallery,

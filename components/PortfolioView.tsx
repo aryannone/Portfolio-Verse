@@ -113,6 +113,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
         sub: subLine(item),
         text: item.text,
         details: item.details ?? "",
+        result: item.result ?? "",
         tags: item.tags,
         links: usable(item.links).map(({ label, url }) => ({ label, url })),
         layout: item.gallery || data.gallery,
@@ -148,6 +149,81 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
         ? { tabIndex: 0, role: "button", "aria-label": `${item.title}. See details` }
         : {}),
     };
+  };
+
+  // The Case study template tells each entry of a card section as a full-screen chapter.
+  const chapters = (section: Section) => {
+    const items = section.items;
+    const total = String(items.length).padStart(2, "0");
+    return (
+      <div key={section.id} id={anchor(section.id)} className={`tp-sec tp-cards tp-chapters${look(section).extra}`} style={look(section).style}>
+        <Heading className="tp-h">{section.title}</Heading>
+        {items.map((item, i) => {
+          const points = (item.details ?? "")
+            .split(/\n+/)
+            .map((p) => p.replace(/^\s*[\u2022\-*\u2013]\s*/, "").trim())
+            .filter(Boolean);
+          const key = `${section.id}:${item.id}`;
+          const photosLabel = `${item.title}. View ${photoLabel(item.photos.length)}`;
+          return (
+            <article key={item.id} className="tp-chapter">
+              {item.photos.length ? (
+                <button type="button" className="tp-ch-media tp-item has-more" data-item={key} aria-label={photosLabel} tabIndex={interactive ? 0 : -1}>
+                  <img src={item.photos[0]} alt="" />
+                  {item.photos.length > 1 ? <span className="tp-count">{photoLabel(item.photos.length)}</span> : null}
+                </button>
+              ) : (
+                <div className="tp-ch-media is-empty" aria-hidden="true">
+                  <span>{String(i + 1).padStart(2, "0")}</span>
+                </div>
+              )}
+              <div className="tp-ch-body">
+                <span className="tp-ch-num">
+                  {String(i + 1).padStart(2, "0")} / {total}
+                </span>
+                <h3 className="tp-ch-title">{item.title}</h3>
+                {subLine(item) ? <div className="tp-place">{subLine(item)}</div> : null}
+                {item.tags.length ? (
+                  <div className="tp-chips">
+                    {item.tags.map((tag, t) => (
+                      <span key={t}>{tag}</span>
+                    ))}
+                  </div>
+                ) : null}
+                {item.text ? (
+                  <div className="tp-ch-block">
+                    <span className="tp-ch-label">The problem</span>
+                    <p>{item.text}</p>
+                  </div>
+                ) : null}
+                {points.length ? (
+                  <div className="tp-ch-block">
+                    <span className="tp-ch-label">What I did</span>
+                    <ul>
+                      {points.map((p, n) => (
+                        <li key={n}>{p}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {item.result?.trim() ? (
+                  <div className="tp-ch-result">
+                    <span className="tp-ch-label">The result</span>
+                    <p>{item.result.trim()}</p>
+                  </div>
+                ) : null}
+                {entryLinks(item)}
+                {item.photos.length > 1 ? (
+                  <button type="button" className="tp-ch-more tp-item has-more" data-item={key} tabIndex={interactive ? 0 : -1}>
+                    View all {photoLabel(item.photos.length)}
+                  </button>
+                ) : null}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    );
   };
 
   return (
@@ -244,6 +320,8 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
           {sections.map((section) =>
             section.layout === "skills" ? (
               inSide ? null : skills(section, "main")
+            ) : section.layout === "cards" && data.template === "case" ? (
+              chapters(section)
             ) : section.layout === "cards" ? (
               <div key={section.id} id={anchor(section.id)} className={`tp-sec tp-cards${look(section).extra}`} style={look(section).style}>
                 <Heading className="tp-h">{section.title}</Heading>

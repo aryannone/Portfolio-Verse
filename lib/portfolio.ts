@@ -10,6 +10,7 @@ export type Item = {
   text: string;
   tags: string[];
   details?: string; // the full write-up, shown when a visitor opens the entry
+  result?: string; // what came of it, in one line; the Case study template gives it pride of place
   links?: Link[]; // a project site, a repository, a certificate
   photos: string[]; // image data, shown in the details panel
   gallery?: GalleryId | ""; // this entry's own photo layout; empty means the portfolio's
@@ -250,6 +251,7 @@ const PHOTO_COLOURS: Record<string, string[]> = {
   "creative-1": ["#ff8fab", "#ffd43b", "#7fe0d0"],
   split: ["#ea580c", "#fde7d6", "#7c2d12"],
   bento: ["#e11d48", "#ffe4e6", "#1f2937"],
+  case: ["#0ea5e9", "#e0f2fe", "#0f172a"],
   "creative-4": ["#7c3aed", "#22d3ee", "#090b18"],
   "creative-5": ["#c2410c", "#f3ede2", "#1c1917"],
 };
@@ -264,6 +266,7 @@ const PICTURE_KINDS: Record<string, PictureKind[]> = {
   "creative-1": ["poster", "landscape", "poster"],
   split: ["landscape", "poster", "landscape"],
   bento: ["phone", "poster", "chart"],
+  case: ["blueprint", "chart", "code"],
   "creative-4": ["poster", "landscape", "code"],
   "creative-5": ["blueprint", "landscape", "blueprint"],
 };
@@ -445,7 +448,7 @@ export function detailsKey(p: Portfolio) {
   const links = (list: Link[] | undefined) => (list ?? []).map((l) => [l.label, l.url]);
   return JSON.stringify([
     p.name, p.role, p.city, p.bio, p.about, p.email, p.phone, p.photo.length, links(p.links), p.skills, p.quote, p.quoteBy,
-    p.sections.map((s) => [s.title, s.layout, s.items.map((i) => [i.title, i.sub, i.meta, i.text, i.details ?? "", i.tags, links(i.links), i.photos.length])]),
+    p.sections.map((s) => [s.title, s.layout, s.items.map((i) => [i.title, i.sub, i.meta, i.text, i.details ?? "", i.result ?? "", i.tags, links(i.links), i.photos.length])]),
   ]);
 }
 
@@ -477,7 +480,7 @@ export function fromSample(template: string): Portfolio {
       layout: "cards",
       style: "",
       hidden: false,
-      items: s.projects.map((p, i) => ({ id: `w${i}`, title: p.title, sub: "", meta: "", text: p.text, details: SAMPLE_DETAILS, links: i === 0 ? [{ id: "s0", label: "Live project", url: "#" }] : [], tags: p.tags, photos: photos(i === 1 ? 5 : 3, i), gallery: GALLERIES[i % 3].id })),
+      items: s.projects.map((p, i) => ({ id: `w${i}`, title: p.title, sub: "", meta: "", text: p.text, details: p.did ? p.did.map((d) => "\u2022 " + d).join("\n") : SAMPLE_DETAILS, result: p.result ?? "", links: i === 0 ? [{ id: "s0", label: "Live project", url: "#" }] : [], tags: p.tags, photos: photos(i === 1 ? 5 : 3, i), gallery: GALLERIES[i % 3].id })),
     },
   ];
   if (s.experience) {

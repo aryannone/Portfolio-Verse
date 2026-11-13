@@ -10,6 +10,8 @@ export type PanelItem = {
   text: string;
   // The longer write-up, shown only in the panel.
   details: string;
+  // What came of it, shown as a highlight.
+  result?: string;
   tags: string[];
   // Links for the entry: a project site, a repository, a certificate.
   links: { label: string; url: string }[];
@@ -51,7 +53,7 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
       { threshold: 0.12 },
     );
     root.classList.add("tp-anim");
-    root.querySelectorAll(".tp-sec > .tp-h, .tp-sec > p, .tp-sec > .tp-chips, .tp-sec > blockquote, .tp-item").forEach((node) => {
+    root.querySelectorAll(".tp-sec > .tp-h, .tp-sec > p, .tp-sec > .tp-chips, .tp-sec > blockquote, .tp-item, .tp-ch-body").forEach((node) => {
       const el = node as HTMLElement;
       const siblings = el.parentElement ? Array.prototype.indexOf.call(el.parentElement.children, el) : 0;
       el.classList.add("tp-reveal");
@@ -72,7 +74,7 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     '<div class="tpd-grab"></div>' +
     '<div class="tpd-head"><div><div class="tpd-eyebrow"></div><div class="tpd-title"></div><div class="tpd-sub"></div></div>' +
     '<button type="button" class="tpd-close" aria-label="Close details">×</button></div>' +
-    '<div class="tpd-body"><p class="tpd-text"></p><div class="tpd-details"></div><div class="tpd-links"></div><div class="tpd-tags"></div>' +
+    '<div class="tpd-body"><p class="tpd-text"></p><div class="tpd-details"></div><div class="tpd-result"></div><div class="tpd-links"></div><div class="tpd-tags"></div>' +
     '<div class="tpd-label"></div><div class="tpd-photos"></div>' +
     '<div class="tpd-nav"><button type="button" class="tpd-prev" aria-label="Previous photo">\u2190</button>' +
     '<span class="tpd-pos" aria-live="polite"></span>' +
@@ -108,6 +110,7 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     panel.style.fontFamily = look.fontFamily;
     panel.style.setProperty("--tpd-bg", look.backgroundColor);
     panel.style.setProperty("--tp-display", look.getPropertyValue("--tp-display"));
+    panel.style.setProperty("--tp-accent", look.getPropertyValue("--tp-accent"));
 
     (panelRoot.querySelector(".tpd-title") as HTMLElement).textContent = item.title;
     const sub = panelRoot.querySelector(".tpd-sub") as HTMLElement;
@@ -129,6 +132,9 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
       details.appendChild(para);
     });
     details.style.display = details.children.length ? "" : "none";
+    const result = panelRoot.querySelector(".tpd-result") as HTMLElement;
+    result.textContent = item.result || "";
+    result.style.display = item.result ? "" : "none";
     const links = panelRoot.querySelector(".tpd-links") as HTMLElement;
     links.textContent = "";
     (item.links || []).forEach((link) => {
