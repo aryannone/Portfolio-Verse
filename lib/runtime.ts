@@ -277,6 +277,7 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
       const viewHeight = scroller ? scroller.clientHeight : win.innerHeight;
       const read = Math.max(0, Math.min(1, (viewTop - box.top) / Math.max(1, box.height - viewHeight)));
       all(".tp-progress").forEach((bar) => (bar.style.transform = "scaleX(" + read.toFixed(4) + ")"));
+      if (living) drift(viewTop, viewHeight);
       // The back-to-top button appears once the header has scrolled away.
       const hero = root.querySelector(".tp-hero") as HTMLElement | null;
       const navLinks = all(".tp-nav-links a");
@@ -325,6 +326,78 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     // Move keyboard focus along, so the next Tab continues from the section that was jumped to.
     if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
     target.focus({ preventScroll: true });
+  }
+
+  // ---------- living motion ----------
+  // On full pages (not while typing in the editor): photos drift as the page scrolls, and the
+  // Timeline's line draws itself. Pointer effects need a mouse or trackpad.
+  const living = Boolean(opts.reveal) && !still;
+  const finePointer = !still && win.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  function drift(viewTop: number, viewHeight: number) {
+    all(".tp-shot img, .tp-ch-media img").forEach((img) => {
+      const frame = (img.parentElement as HTMLElement).getBoundingClientRect();
+      if (frame.bottom < viewTop - 50 || frame.top > viewTop + viewHeight + 50) return;
+      const t = (frame.top + frame.height / 2 - (viewTop + viewHeight / 2)) / viewHeight;
+      const shift = Math.max(-1, Math.min(1, t)) * frame.height * -0.06;
+      img.style.setProperty("--par", shift.toFixed(1) + "px");
+    });
+    all(".tp-rows").forEach((rows) => {
+      const box = rows.getBoundingClientRect();
+      const drawn = Math.max(0, Math.min(1, (viewTop + viewHeight * 0.7 - box.top) / Math.max(1, box.height)));
+      rows.style.setProperty("--tl", drawn.toFixed(3));
+    });
+  }
+  if (living) root.classList.add("tp-live-motion");
+
+  let tilted: HTMLElement | null = null;
+  let pulled: HTMLElement | null = null;
+  function onPoint(event: PointerEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest) return;
+    // Cards lean towards the pointer.
+    const card = target.closest(".tp-card, .tp-ch-media, .tp-bento .tp-sec, .tp-bento .tp-hero") as HTMLElement | null;
+    if (tilted && tilted !== card) {
+      tilted.style.removeProperty("--tx");
+      tilted.style.removeProperty("--ty");
+    }
+    tilted = card;
+    if (card) {
+      const box = card.getBoundingClientRect();
+      const x = (event.clientX - box.left) / box.width - 0.5;
+      const y = (event.clientY - box.top) / box.height - 0.5;
+      const strength = card.matches(".tp-bento .tp-sec, .tp-bento .tp-hero") ? 3 : 7;
+      card.style.setProperty("--tx", (x * strength).toFixed(2) + "deg");
+      card.style.setProperty("--ty", (y * -strength).toFixed(2) + "deg");
+    }
+    // Main buttons lean towards the cursor.
+    const button = target.closest(".tp-links .tp-cta, .tp-links .tp-cv, .tp-send, .tp-ch-more") as HTMLElement | null;
+    if (pulled && pulled !== button) {
+      pulled.style.removeProperty("--mgx");
+      pulled.style.removeProperty("--mgy");
+    }
+    pulled = button;
+    if (button) {
+      const box = button.getBoundingClientRect();
+      button.style.setProperty("--mgx", ((event.clientX - box.left - box.width / 2) * 0.25).toFixed(1) + "px");
+      button.style.setProperty("--mgy", ((event.clientY - box.top - box.height / 2) * 0.35).toFixed(1) + "px");
+    }
+    // A soft glow follows the cursor (shown by templates that use it).
+    const area = root.getBoundingClientRect();
+    root.style.setProperty("--mx", (event.clientX - area.left).toFixed(0) + "px");
+    root.style.setProperty("--my", (event.clientY - area.top).toFixed(0) + "px");
+  }
+  function offPoint() {
+    [tilted, pulled].forEach((el) => el && ["--tx", "--ty", "--mgx", "--mgy"].forEach((v) => el.style.removeProperty(v)));
+    tilted = null;
+    pulled = null;
+    root.style.removeProperty("--mx");
+    root.style.removeProperty("--my");
+  }
+  if (finePointer) {
+    root.classList.add("tp-pointer");
+    root.addEventListener("pointermove", onPoint);
+    root.addEventListener("pointerleave", offPoint);
   }
 
   scrollTarget.addEventListener("scroll", onScroll, { passive: true });
@@ -414,7 +487,12 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     win.removeEventListener("resize", onScroll);
     root.removeEventListener("click", onJump);
     if (scrollFrame) win.cancelAnimationFrame(scrollFrame);
-    root.classList.remove("tp-scrolled");
+    root.classList.remove("tp-scrolled", "tp-live-motion", "tp-pointer");
+    root.removeEventListener("pointermove", onPoint);
+    root.removeEventListener("pointerleave", offPoint);
+    offPoint();
+    all(".tp-shot img, .tp-ch-media img").forEach((img) => img.style.removeProperty("--par"));
+    all(".tp-rows").forEach((rows) => rows.style.removeProperty("--tl"));
     if (tiltArea) {
       tiltArea.removeEventListener("pointermove", onTilt);
       tiltArea.removeEventListener("pointerleave", offTilt);

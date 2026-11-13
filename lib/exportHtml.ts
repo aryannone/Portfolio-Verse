@@ -25,7 +25,14 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
   };
 
   const clone = root.cloneNode(true) as HTMLElement;
-  clone.classList.remove("tp-anim");
+  clone.classList.remove("tp-anim", "tp-live-motion", "tp-pointer", "tp-scrolled");
+  clone.style.removeProperty("--mx");
+  clone.style.removeProperty("--my");
+  clone.querySelectorAll(".tp-shot img, .tp-ch-media img").forEach((el) => (el as HTMLElement).style.removeProperty("--par"));
+  clone.querySelectorAll(".tp-rows, .tp-card, .tp-ch-media, .tp-sec, .tp-hero, .tp-cta, .tp-cv, .tp-send, .tp-ch-more").forEach((el) => {
+    ["--tl", "--tx", "--ty", "--mgx", "--mgy"].forEach((v) => (el as HTMLElement).style.removeProperty(v));
+    if (!el.getAttribute("style")) el.removeAttribute("style");
+  });
   clone.classList.add("tp-live");
   if (data.motion !== "none") clone.classList.add("tp-enter");
   clone.querySelectorAll(".tp-reveal").forEach((el) => {

@@ -27,6 +27,20 @@ function usable(links: Link[] | undefined) {
   return (links ?? []).filter((link) => link.url.trim()).map((link) => ({ ...link, label: link.label.trim() || "Link", url: toHref(link.url) }));
 }
 
+// Splits text into words that can arrive one after another. The spaces stay as plain text.
+function words(text: string) {
+  let n = 0;
+  return text.split(/(\s+)/).map((part, i) =>
+    /^\s+$/.test(part) || !part ? (
+      part
+    ) : (
+      <span key={i} className="tp-w" style={{ "--w": n++ } as CSSProperties}>
+        {part}
+      </span>
+    ),
+  );
+}
+
 function photoLabel(count: number) {
   return count === 1 ? "1 photo" : `${count} photos`;
 }
@@ -71,7 +85,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
       <Heading className="tp-h">{section.title}</Heading>
       <div className="tp-chips">
         {data.skills.map((skill, i) => (
-          <span key={i}>{skill}</span>
+          <span key={i} style={{ "--c": i } as CSSProperties}>{skill}</span>
         ))}
       </div>
     </div>
@@ -279,8 +293,8 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                 {data.city ? <span>{data.city}</span> : null}
               </div>
             ) : null}
-            <Name className="tp-name">{data.name || "Your Name"}</Name>
-            {data.bio ? <p className="tp-bio">{data.bio}</p> : null}
+            <Name className="tp-name">{words(data.name || "Your Name")}</Name>
+            {data.bio ? <p className="tp-bio">{words(data.bio)}</p> : null}
             <div className="tp-links">
               {data.email ? (
                 <a className="tp-cta" href={`mailto:${data.email}`}>

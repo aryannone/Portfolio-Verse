@@ -410,7 +410,8 @@
 /* Creative 5: editorial. Cream paper, numbered sections, hairlines. */
 .tp-creative-5 { --tp-bg: #f3ede2; --tp-ink: #1c1917; --tp-muted: #6b6257; --tp-line: #1c1917; --tp-accent: #c2410c; --tp-on-accent: #ffffff; counter-reset: tp-sec; }
 .tp-creative-5 .tp-in { max-width: 1120px; gap: 72px; }
-.tp-creative-5 .tp-hero { gap: 22px; padding-bottom: 56px; border-bottom: 1px solid var(--tp-line); }
+.tp-creative-5 .tp-hero { position: relative; gap: 22px; padding-bottom: 56px; }
+.tp-creative-5 .tp-hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--tp-line); transform-origin: 0 50%; }
 .tp-creative-5 .tp-avatar { border-radius: 0; width: calc(144px * var(--tp-avk)); height: calc(180px * var(--tp-avk)); }
 .tp-creative-5 .tp-tags { color: var(--tp-accent); }
 .tp-creative-5 .tp-name { font-weight: 500; font-size: clamp(56px, 12cqw, 148px); line-height: 0.92; letter-spacing: -0.04em; }
@@ -641,6 +642,80 @@
   .tp .tp-v.tp-v.tp-v.tp-v-timeline .tp-rows { padding-left: 22px; }
   .tp .tp-v.tp-v.tp-v.tp-v-timeline .tp-row::before { left: -31px; }
 }
+
+/* ---------- Living motion ----------
+   Words arrive one by one, headings wipe in, skills pop in, photos drift while scrolling,
+   cards lean towards the pointer, and each template has a movement of its own.
+   Everything here stops for "No animation" and for visitors who prefer reduced motion. */
+
+/* Name and intro, word by word */
+.tp-w { display: inline-block; }
+@keyframes tp-word { from { opacity: 0; translate: 0 0.45em; filter: blur(6px); } }
+.tp-enter .tp-hero > .tp-name, .tp-enter .tp-hero > .tp-bio { animation: none; }
+.tp-enter .tp-name .tp-w { animation: tp-word 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.12s + var(--w, 0) * 0.09s); }
+.tp-enter .tp-bio .tp-w { animation: tp-word 0.7s ease both; animation-delay: calc(0.4s + var(--w, 0) * 0.025s); }
+/* Aurora's name is painted with a gradient, which only works on plain text, so it arrives as one piece. */
+.tp-creative-4 .tp-name .tp-w { display: inline; }
+.tp-enter.tp-creative-4 .tp-hero > .tp-name { animation: tp-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.12s both; }
+.tp-enter.tp-creative-4 .tp-name .tp-w { animation: none; }
+
+/* Headings wipe in from the left. The wipe starts only once a heading is in view: hiding it beforehand
+   would stop the page from noticing that it has been scrolled to. */
+.tp-anim .tp-h.tp-reveal { translate: 0 0; }
+.tp-anim .tp-h.tp-reveal.is-in { animation: tp-wipe 0.9s cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 90ms); }
+@keyframes tp-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 -1em 0 0); } }
+
+/* Skills pop in one after another */
+.tp-anim .tp-skills .tp-chips.tp-reveal { translate: 0 0; }
+.tp-anim .tp-skills .tp-chips.tp-reveal span { opacity: 0; scale: 0.6; transition: opacity 0.4s ease, scale 0.5s cubic-bezier(0.3, 1.6, 0.5, 1); transition-delay: calc(0.1s + var(--c, 0) * 0.05s); }
+.tp-anim .tp-skills .tp-chips.tp-reveal.is-in span { opacity: 1; scale: 1; }
+
+/* Photos drift as the page scrolls */
+.tp-live-motion .tp-shot img, .tp-live-motion .tp-ch-media img { transform: translateY(var(--par, 0px)) scale(1.14); }
+
+/* Cards lean towards the pointer. (Repeated classes outrank the scroll-in animation's own transform.) */
+.tp.tp-pointer .tp-card.tp-card.tp-card, .tp.tp-pointer .tp-ch-media.tp-ch-media.tp-ch-media, .tp.tp-pointer.tp-bento .tp-sec.tp-sec.tp-sec, .tp.tp-pointer.tp-bento .tp-hero.tp-hero { transform: perspective(1000px) rotateX(var(--ty, 0deg)) rotateY(var(--tx, 0deg)); transition: transform 0.35s ease-out, translate 0.3s ease, rotate 0.3s ease, box-shadow 0.3s ease, opacity 0.7s ease; }
+
+/* Main buttons lean towards the cursor */
+.tp-pointer .tp-links .tp-cta, .tp-pointer .tp-links .tp-cv, .tp-pointer .tp-send, .tp-pointer .tp-ch-more { transform: translate(var(--mgx, 0px), var(--mgy, 0px)); transition: transform 0.25s ease-out, translate 0.2s ease, background 0.2s ease; }
+
+/* Classic: an accent bar grows under the name */
+.tp-professional-1 .tp-name::after { content: ""; display: block; width: 72px; height: 6px; margin-top: 18px; border-radius: 999px; background: var(--tp-accent); }
+.tp-enter.tp-professional-1 .tp-name::after { animation: tp-grow 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.7s both; }
+@keyframes tp-grow { from { width: 0; opacity: 0; } }
+
+/* Résumé: the side panel's colour shifts slowly */
+.tp-professional-2 .tp-side { background-image: linear-gradient(160deg, var(--tp-accent), color-mix(in srgb, var(--tp-accent) 60%, #000000), var(--tp-accent)); background-size: 100% 300%; animation: tp-pan 14s ease-in-out infinite alternate; }
+@keyframes tp-pan { to { background-position: 0 100%; } }
+
+/* Timeline: the line draws itself while scrolling */
+.tp-v-timeline .tp-rows { position: relative; }
+.tp-live-motion.tp-professional-4 .tp-sec:not(.tp-v) .tp-rows::after, .tp-live-motion .tp-v-timeline .tp-rows::after { content: ""; position: absolute; left: -2px; top: 0; width: 2px; height: 100%; background: var(--tp-accent); transform-origin: 50% 0; transform: scaleY(var(--tl, 0)); }
+
+/* Split screen: the photo slowly zooms and pans */
+.tp.tp-split .tp-side .tp-avatar img { animation: tp-kenburns 22s ease-in-out infinite alternate; }
+@keyframes tp-kenburns { from { scale: 1; translate: 0 0; } to { scale: 1.14; translate: -2% -3%; } }
+
+/* Bold: the colour tags wiggle now and then */
+.tp-creative-1 .tp-tags span { display: inline-block; animation: tp-wiggle 5s ease-in-out infinite; }
+.tp-creative-1 .tp-tags span:nth-child(2) { animation-delay: 0.6s; }
+@keyframes tp-wiggle { 0%, 84%, 100% { rotate: 0deg; } 88% { rotate: -7deg; } 92% { rotate: 6deg; } 96% { rotate: -3deg; } }
+
+/* Aurora: a glow follows the cursor */
+.tp-pointer.tp-creative-4 { background-image: radial-gradient(520px circle at var(--mx, -9999px) var(--my, -9999px), color-mix(in srgb, var(--tp-accent) 22%, transparent), transparent 65%); }
+
+/* Editorial: the rule under the name draws across */
+.tp-enter.tp-creative-5 .tp-hero::after { animation: tp-draw 1.4s cubic-bezier(0.6, 0, 0.2, 1) 0.6s both; }
+@keyframes tp-draw { from { transform: scaleX(0); } }
+
+/* Bento: tiles lift on hover, and the intro tile has a slow sheen */
+.tp.tp-bento .tp-sec:hover { translate: 0 -4px; box-shadow: 0 24px 50px -30px rgba(22, 23, 29, 0.45); }
+.tp.tp-bento .tp-hero { background-image: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.07) 50%, transparent 70%); background-size: 250% 100%; animation: tp-sheen 7s ease-in-out infinite; }
+@keyframes tp-sheen { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+
+/* "No animation" turns all of it off. */
+.tp-m-none *, .tp-m-none *::before, .tp-m-none *::after { animation: none !important; }
+.tp-m-none.tp-creative-4 .tp-bg::before, .tp-m-none.tp-creative-4 .tp-bg::after { animation: none !important; }
 
 /* Photo panel. Slides in from the right on wide screens, up from the bottom on phones. */
 
