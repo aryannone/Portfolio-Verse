@@ -11,7 +11,7 @@ import { READY_TEMPLATES } from "@/lib/templates";
 const STEPS = [
   { title: "Start building", text: "One click. No account or password needed." },
   { title: "Fill in your details", text: "A short form, one step at a time. Leave and come back whenever you like." },
-  { title: "Pick a template", text: "See your own details in all nine looks, or build your own from blank." },
+  { title: "Pick a template", text: "See your own details in every template, or build your own from blank." },
   { title: "Download", text: "Get your whole portfolio as one HTML file and host it anywhere." },
 ];
 
@@ -97,9 +97,9 @@ export default function LandingPage() {
 
         <section className="wrap section" id="templates">
           <div className="section-head">
-            <h2 className="display h-section" data-reveal>Nine templates. Switch whenever you like.</h2>
+            <h2 className="display h-section" data-reveal>Eight templates. Switch whenever you like.</h2>
             <p>
-              Four Professional looks for placements and job applications, five Creative ones for designers,
+              Four Professional looks for placements and job applications, four Creative ones for designers,
               photographers and makers. Tap any to see the full page.
             </p>
           </div>

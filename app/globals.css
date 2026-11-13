@@ -670,7 +670,7 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
 .try-dot:hover { transform: scale(1.12); }
 .try-dot.is-on { box-shadow: 0 0 0 2px var(--ink); transform: scale(1.12); }
 
-/* Home page: all nine templates */
+/* Home page: all the templates */
 
 .tpl-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 24px; }
 .tpl-tile { position: relative; display: flex; flex-direction: column; gap: 4px; min-width: 0; }

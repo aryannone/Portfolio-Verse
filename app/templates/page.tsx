@@ -5,7 +5,7 @@ import TemplateGallery from "@/components/TemplateGallery";
 
 export const metadata: Metadata = {
   title: "Templates",
-  description: "Four Professional and five Creative portfolio templates, all fully editable.",
+  description: "Four Professional and four Creative portfolio templates, all fully editable.",
 };
 
 export default function TemplatesPage() {

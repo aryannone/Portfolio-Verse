@@ -1,5 +1,5 @@
 import { SAMPLES } from "@/lib/samples";
-import { TEMPLATES, getTemplate } from "@/lib/templates";
+import { RETIRED, TEMPLATES, getTemplate } from "@/lib/templates";
 
 // One entry in a section: a project, a job, a degree, anything.
 export type Item = {
@@ -246,11 +246,10 @@ export function newSection(title: string, layout: Section["layout"]): Section {
 const PHOTO_COLOURS: Record<string, string[]> = {
   "professional-1": ["#f5a300", "#12141a", "#ffe9b8"],
   "professional-2": ["#1f3a34", "#d9e8e2", "#7fb3a4"],
-  "professional-3": ["#1b2a4a", "#c9d2e6", "#6f86bd"],
   "professional-4": ["#2643e9", "#faf8f4", "#9fb0ff"],
   "creative-1": ["#ff8fab", "#ffd43b", "#7fe0d0"],
-  "creative-2": ["#2f6f68", "#7fc8bc", "#1c4b47"],
-  "creative-3": ["#12141a", "#ffd43b", "#ffffff"],
+  split: ["#ea580c", "#fde7d6", "#7c2d12"],
+  bento: ["#e11d48", "#ffe4e6", "#1f2937"],
   "creative-4": ["#7c3aed", "#22d3ee", "#090b18"],
   "creative-5": ["#c2410c", "#f3ede2", "#1c1917"],
 };
@@ -261,11 +260,10 @@ type PictureKind = "chart" | "table" | "blueprint" | "code" | "poster" | "landsc
 const PICTURE_KINDS: Record<string, PictureKind[]> = {
   "professional-1": ["chart", "table", "chart"],
   "professional-2": ["table", "chart", "table"],
-  "professional-3": ["blueprint", "chart", "blueprint"],
   "professional-4": ["code", "phone", "chart"],
   "creative-1": ["poster", "landscape", "poster"],
-  "creative-2": ["landscape", "landscape", "poster"],
-  "creative-3": ["phone", "poster", "phone"],
+  split: ["landscape", "poster", "landscape"],
+  bento: ["phone", "poster", "chart"],
   "creative-4": ["poster", "landscape", "code"],
   "creative-5": ["blueprint", "landscape", "blueprint"],
 };
@@ -412,6 +410,14 @@ const CLOSING_DEFAULTS = {
 
 // Fills in anything missing from a portfolio saved by an earlier version of the editor.
 export function normalize(saved: Portfolio): Portfolio {
+  // A template that was folded into another moves there, with the options that recreate its look.
+  const moved = RETIRED[saved.template];
+  if (moved) {
+    const style = (from: SectionStyle) => saved.sections.map((s) => (s.layout === "cards" && !s.style ? { ...s, style: from } : s));
+    if (saved.template === "professional-3") saved = { ...saved, template: moved, hero: saved.hero || "center", sections: style("filled") };
+    else if (saved.template === "creative-3") saved = { ...saved, template: moved, theme: saved.theme || "accent", accent: saved.accent || "#ffd43b", sections: style("sticker") };
+    else saved = { ...saved, template: moved, sections: style("photo") };
+  }
   return {
     ...LOOK_DEFAULTS,
     ...CLOSING_DEFAULTS,
@@ -512,6 +518,8 @@ export function fromSample(template: string): Portfolio {
     quoteBy: "A note to self",
     // "#" keeps the sample links tappable without sending anyone to a made-up profile.
     links: s.links.map((label, i) => ({ id: `l${i}`, label, url: "#" })),
+    // Split screen is built around a photo, so its sample person has a drawn one.
+    ...(id === "split" ? { photo: samplePortrait(getTemplate(id)?.accent ?? "#ea580c") } : {}),
     skills: s.skills,
     sections,
     sample: true,

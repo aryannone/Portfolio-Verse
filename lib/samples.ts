@@ -68,29 +68,6 @@ export const SAMPLES: Record<string, Sample> = {
     email: "rohan.mehta@example.com",
     links: ["LinkedIn"],
   },
-  "professional-3": {
-    slug: "ananya-iyer",
-    name: "Ananya Iyer",
-    initials: "AI",
-    role: "Mechanical Engineer",
-    city: "Chennai",
-    bio: "I design things that have to survive real roads and real weather.",
-    about:
-      "Final-year mechanical engineering student and suspension lead of my college Baja team. Looking for a graduate role in vehicle design.",
-    workLabel: "Projects",
-    projects: [
-      { title: "Baja SAE buggy", text: "Led suspension design for an all-terrain buggy that finished endurance.", tags: ["SolidWorks", "ANSYS"] },
-      { title: "Solar crop dryer", text: "A low-cost dryer built with farmers near Kanchipuram.", tags: ["Thermal", "Fabrication"] },
-      { title: "Gearbox teardown study", text: "Wear analysis of a two-wheeler gearbox after 40,000 km.", tags: ["Metrology"] },
-    ],
-    skills: ["SolidWorks", "ANSYS", "AutoCAD", "GD&T", "MATLAB"],
-    education: [
-      { title: "B.E. Mechanical Engineering", place: "College of Engineering, Guindy", years: "2023 to 2027" },
-      { title: "Class XII", place: "P. S. Senior Secondary School, Chennai", years: "2023" },
-    ],
-    email: "ananya.iyer@example.com",
-    links: ["LinkedIn"],
-  },
   "creative-1": {
     slug: "kabir-singh",
     name: "Kabir Singh",
@@ -113,7 +90,7 @@ export const SAMPLES: Record<string, Sample> = {
     email: "kabir.singh@example.com",
     links: ["Instagram", "Behance"],
   },
-  "creative-2": {
+  split: {
     slug: "meera-joshi",
     name: "Meera Joshi",
     initials: "MJ",
@@ -135,7 +112,7 @@ export const SAMPLES: Record<string, Sample> = {
     email: "meera.joshi@example.com",
     links: ["Instagram"],
   },
-  "creative-3": {
+  bento: {
     slug: "zoya-khan",
     name: "Zoya Khan",
     initials: "ZK",

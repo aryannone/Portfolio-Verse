@@ -5,6 +5,7 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 
 ## What is built so far
 
+- Eight templates: Classic, Résumé, Timeline, Split screen (photo half stays put), Bold, Aurora, Editorial, Bento (tiles in one grid), plus Build your own. Professional 3, Creative 2 and Creative 3 were folded into Classic, Aurora and Bold; portfolios using them move over with matching options (`RETIRED` in `lib/templates.ts`)
 - Landing page (`/`): a hero where visitors type a name and switch templates, all nine templates, and three working feature demos
 - Template gallery (`/templates`), with nine templates
 - Details form (`/start`): a step-by-step form filled in before choosing a template. Once it has details, every template preview shows them

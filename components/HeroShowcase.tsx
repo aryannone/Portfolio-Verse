@@ -12,9 +12,8 @@ const ORDER = [
   "professional-2",
   "creative-5",
   "professional-1",
-  "creative-3",
-  "professional-3",
-  "creative-2",
+  "split",
+  "bento",
 ];
 
 // The hero's browser frame, and a way to try the product on the spot:
