@@ -192,13 +192,45 @@ export async function deleteSaved(id: string): Promise<boolean> {
 }
 
 // Shrinks a chosen photo so pages stay fast and downloads stay small.
-function readFile(file: Blob): Promise<string> {
+function readOnce(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error("Could not read that picture."));
+    reader.onerror = () => reject(reader.error ?? new Error("Read failed"));
     reader.readAsDataURL(file);
   });
+}
+
+async function bytesToDataUrl(file: Blob): Promise<string> {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  let text = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) text += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return `data:${file.type || "application/octet-stream"};base64,${btoa(text)}`;
+}
+
+// Phones sometimes hand over a photo before it is fully ready (Android can still be preparing a HEIC photo),
+// and the first read fails. It is tried a few ways, with short pauses, before giving up.
+async function readFile(file: Blob): Promise<string> {
+  let last: unknown;
+  for (const wait of [0, 400, 1200, 2500]) {
+    if (wait) await new Promise((r) => setTimeout(r, wait));
+    try {
+      return await readOnce(file);
+    } catch (error) {
+      last = error;
+    }
+    try {
+      return await bytesToDataUrl(file);
+    } catch (error) {
+      last = error;
+    }
+  }
+  const why = last instanceof Error ? `${last.name}: ${last.message}` : String(last);
+  const kind = file.type || "unknown type";
+  throw new Error(
+    `Could not read that picture (${kind}, ${(file.size / 1e6).toFixed(1)} MB; ${why}). ` +
+      "Open it in your gallery, save a copy as JPG (or take a screenshot of it), and upload that.",
+  );
 }
 
 // True when this browser can actually show the picture.
