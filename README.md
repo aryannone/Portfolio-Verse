@@ -5,7 +5,8 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 
 ## What is built so far
 
-- Landing page (`/`) and template gallery (`/templates`), with nine templates
+- Landing page (`/`): a hero where visitors type a name and switch templates, all nine templates, and three working feature demos
+- Template gallery (`/templates`), with nine templates
 - Details form (`/start`): a step-by-step form filled in before choosing a template. Once it has details, every template preview shows them
 - Editor (`/editor`): pick a template, colour and heading font, fill in details, add sections and entries, add photos to any entry
 - Mix and match: page background, header layout, photo size, animation and each section's style can be set in any template, and "Build your own" starts from a blank canvas

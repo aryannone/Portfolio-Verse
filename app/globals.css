@@ -653,3 +653,78 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
   .preview-bar-in .nav-link { white-space: nowrap; }
   .preview-bar-in .btn { flex: none; }
 }
+
+/* Hero: try the product on the spot */
+
+.hero-try { display: flex; flex-direction: column; gap: 14px; }
+.try { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: flex-end; }
+.try-name { flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.try-name > span, .try-pick > span { font-size: 13px; font-weight: 600; color: var(--muted); }
+.try-pick > span strong { color: var(--ink); }
+.try-pick { display: flex; flex-direction: column; gap: 6px; }
+.try-dots { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 44px; }
+.try-dot { width: 28px; height: 28px; padding: 0; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 0 0 1px var(--line-strong); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.try-dot:hover { transform: scale(1.12); }
+.try-dot.is-on { box-shadow: 0 0 0 2px var(--ink); transform: scale(1.12); }
+
+/* Home page: all nine templates */
+
+.tpl-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 24px; }
+.tpl-tile { position: relative; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tpl-name::after { content: ""; position: absolute; inset: 0; }
+.tpl-name:hover { color: inherit; }
+.tpl-name:focus-visible { outline: none; }
+.tpl-name:focus-visible::after { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 14px; }
+.tpl-tile .scaled { margin-bottom: 10px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.tpl-tile:hover .scaled, .tpl-tile:focus-within .scaled { transform: translateY(-4px); box-shadow: 0 24px 50px -28px rgba(18, 20, 26, 0.35); }
+.tpl-tile:hover .scaled-scroll { transform: translateY(calc(var(--view-h, 0px) - 100%)); transition: transform 7s linear; }
+.tpl-name { font-weight: 600; font-size: 17px; }
+.tpl-blurb { font-size: 14px; color: var(--muted); }
+.tpl-own { font-size: 16px; color: var(--muted); }
+.tpl-own a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width: 900px) {
+  .tpl-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* On phones the templates become one row to swipe through. */
+@media (max-width: 600px) {
+  .tpl-row { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px; padding: 4px 20px 12px; scrollbar-width: none; }
+  .tpl-row::-webkit-scrollbar { display: none; }
+  .tpl-tile { flex: 0 0 78%; scroll-snap-align: center; }
+}
+
+/* Home page: working feature demos */
+
+.demos { display: flex; flex-direction: column; gap: 56px; }
+.demo-row { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px 56px; align-items: center; }
+.demo-row.is-flipped .demo-copy { order: 2; }
+.demo-copy { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.demo-copy h3 { font-size: clamp(24px, 2.4vw, 32px); letter-spacing: -0.02em; line-height: 1.12; }
+.demo-copy p { font-size: 17px; color: var(--muted); max-width: 30em; }
+.demo-copy .demo-hint { font-size: 14px; font-weight: 600; color: var(--accent); }
+.demo-controls { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.demo-box { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; background: #ffffff; box-shadow: 0 24px 60px -40px rgba(18, 20, 26, 0.35); }
+.demo-piece { padding: 28px; }
+.demo-piece.demo-play { padding: 20px; }
+/* The demo cards sit side by side even in this narrow box, so the demo stays short. */
+.demo-piece .tp-grid.tp-grid.tp-grid { --tp-cols: 2; gap: 16px; }
+.demo-piece .tp-card { padding: 16px; }
+.demo-piece .tp-card strong { font-size: 16px; }
+.demo-piece .tp-card p { font-size: 14px; }
+@media (max-width: 480px) {
+  .demo-piece .tp-grid.tp-grid.tp-grid { --tp-cols: 1; }
+}
+.demo-piece .tp-contact { gap: 0; }
+.band .feature { border-top-color: var(--line-strong); }
+
+@media (max-width: 860px) {
+  .demo-row { grid-template-columns: minmax(0, 1fr); }
+  .demo-row.is-flipped .demo-copy { order: 0; }
+  .demo-piece { padding: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .try-dot, .tpl-tile .scaled { transition: none; }
+  .try-dot:hover, .try-dot.is-on, .tpl-tile:hover .scaled { transform: none; }
+  .tpl-tile:hover .scaled-scroll { transform: none; }
+}

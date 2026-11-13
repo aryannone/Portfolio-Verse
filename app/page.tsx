@@ -5,6 +5,8 @@ import StartButton from "@/components/StartButton";
 import ScaledPreview from "@/components/ScaledPreview";
 import HeroShowcase from "@/components/HeroShowcase";
 import RevealOnScroll from "@/components/RevealOnScroll";
+import FeatureDemos from "@/components/FeatureDemos";
+import { READY_TEMPLATES } from "@/lib/templates";
 
 const STEPS = [
   { title: "Start building", text: "One click. No account or password needed." },
@@ -13,11 +15,8 @@ const STEPS = [
   { title: "Download", text: "Get your whole portfolio as one HTML file and host it anywhere." },
 ];
 
-const FEATURES = [
-  { title: "Photos that open up", text: "Add photos to any project, job or course. Visitors tap it and a photo panel slides in." },
+const EXTRAS = [
   { title: "Looks right on every screen", text: "Recruiters open links on phones. Your site adapts on its own." },
-  { title: "Motion built in", text: "Sections rise in as visitors scroll. No settings, no code." },
-  { title: "Mix and match", text: "Use any template's cards, timeline, colours or animation in any other." },
   { title: "Saves as you type", text: "Your work is kept in this browser, so you can come back to it." },
   { title: "Download the HTML", text: "The site is yours. Take the file and host it wherever you like." },
 ];
@@ -58,8 +57,8 @@ export default function LandingPage() {
             </p>
             <div className="hero-actions">
               <StartButton />
-              <Link href="/start" className="btn btn-outline">
-                Fill in your details
+              <Link href="/templates" className="btn btn-outline">
+                See templates
               </Link>
             </div>
             <p className="small">Free during beta. No sign-up. Download your HTML any time.</p>
@@ -96,41 +95,47 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="wrap section">
+        <section className="wrap section" id="templates">
           <div className="section-head">
-            <h2 className="display h-section" data-reveal>Two styles, nine templates.</h2>
+            <h2 className="display h-section" data-reveal>Nine templates. Switch whenever you like.</h2>
             <p>
-              Professional for placements and job applications. Creative for designers,
-              photographers and makers.
+              Four Professional looks for placements and job applications, five Creative ones for designers,
+              photographers and makers. Tap any to see the full page.
             </p>
           </div>
-          <div className="styles">
-            <div className="style-card" data-reveal>
-              <ScaledPreview id="professional-1" ratio="16 / 10" flat />
-              <div className="style-foot">
-                <strong>Professional</strong>
-                <span>Clean, calm and recruiter-friendly.</span>
-              </div>
-            </div>
-            <div className="style-card" data-reveal>
-              <ScaledPreview id="creative-4" ratio="16 / 10" flat />
-              <div className="style-foot">
-                <strong>Creative</strong>
-                <span>Bold colour, big type, more personality.</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="wrap section" style={{ paddingTop: 0 }}>
-          <h2 className="display h-section" data-reveal>What you get, free.</h2>
-          <div className="features">
-            {FEATURES.map((f, i) => (
-              <div key={f.title} className="feature" data-reveal style={{ "--i": i % 3 } as React.CSSProperties}>
-                <strong>{f.title}</strong>
-                <span>{f.text}</span>
+          <div className="tpl-row">
+            {READY_TEMPLATES.map((t, i) => (
+              // The name is the link, stretched over the whole tile. The preview holds links of its own,
+              // so it cannot sit inside one.
+              <div key={t.id} className="tpl-tile" data-reveal style={{ "--i": i % 3 } as React.CSSProperties}>
+                <ScaledPreview id={t.id} ratio="16 / 11" />
+                <Link href={`/templates/${t.id}`} className="tpl-name">
+                  {t.name}
+                </Link>
+                <span className="tpl-blurb">{t.blurb}</span>
               </div>
             ))}
+          </div>
+          <p className="tpl-own" data-reveal>
+            Want none of them? <Link href="/templates">Build your own from a blank canvas</Link>.
+          </p>
+        </section>
+
+        <section className="band" id="features">
+          <div className="wrap section">
+            <div className="section-head">
+              <h2 className="display h-section" data-reveal>Three things you can try right here.</h2>
+              <p>These are working pieces of a real portfolio, not pictures of one.</p>
+            </div>
+            <FeatureDemos />
+            <div className="features">
+              {EXTRAS.map((f, i) => (
+                <div key={f.title} className="feature" data-reveal style={{ "--i": i } as React.CSSProperties}>
+                  <strong>{f.title}</strong>
+                  <span>{f.text}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
