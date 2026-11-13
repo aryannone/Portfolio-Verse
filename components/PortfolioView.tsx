@@ -67,7 +67,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   // Professional 2 is the exception: its design keeps them in the side panel.
   const inSide = data.template === "professional-2";
   const skills = (section: Section, place: "side" | "main") => (
-    <div key={section.id} className={`tp-sec tp-skills tp-skills-${place}${look(section).extra}`} style={look(section).style}>
+    <div key={section.id} id={place === "main" ? anchor(section.id) : undefined} className={`tp-sec tp-skills tp-skills-${place}${look(section).extra}`} style={look(section).style}>
       <Heading className="tp-h">{section.title}</Heading>
       <div className="tp-chips">
         {data.skills.map((skill, i) => (
@@ -77,6 +77,19 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
     </div>
   );
   const skillsSection = sections.find((s) => s.layout === "skills");
+
+  // The links in the navigation bar, one per section that is shown, in page order.
+  const anchor = (id: string) => `tp-s-${id.replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const hasContact = Boolean(data.email || data.phone.trim() || data.links.some((l) => l.url.trim()));
+  const navLinks = [
+    ...(data.about ? [{ href: "#tp-about", label: "About" }] : []),
+    ...sections
+      .filter((section) => !(section.layout === "skills" && data.template === "professional-2"))
+      .map((section) => ({ href: `#${anchor(section.id)}`, label: section.title || "Section" })),
+    ...(hasContact ? [{ href: "#tp-contact", label: "Contact" }] : []),
+  ];
+  // Only on full pages: the small pictures of templates have no use for it.
+  const showNav = data.nav && interactive && navLinks.length > 1;
 
   const external = (url: string) => (/^https?:/.test(url) ? { target: "_blank", rel: "noopener noreferrer" } : {});
 
@@ -153,17 +166,34 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
         data.bodyFont !== "clean" ? `tp-bf-${data.bodyFont}` : "",
         data.bigName ? "tp-name-xl" : "",
         data.glow ? "tp-fx-glow" : "",
+        showNav ? "tp-has-nav" : "",
         animate && moves ? "tp-enter" : "",
       ]
         .filter(Boolean)
         .join(" ")}
       style={style}
     >
-      {data.progress && interactive ? <div className="tp-progress" aria-hidden="true" /> : null}
+      {showNav ? (
+        <nav className="tp-nav" aria-label="Sections">
+          <a className="tp-nav-name" href="#tp-top">
+            {data.name || "Your Name"}
+          </a>
+          <div className="tp-nav-links">
+            {navLinks.map((link) => (
+              <a key={link.href} href={link.href}>
+                {link.label}
+              </a>
+            ))}
+          </div>
+          {data.progress ? <div className="tp-progress" aria-hidden="true" /> : null}
+        </nav>
+      ) : data.progress && interactive ? (
+        <div className="tp-progress tp-progress-solo" aria-hidden="true" />
+      ) : null}
       <div className="tp-bg" aria-hidden="true" />
       <div className="tp-in">
         <div className="tp-side">
-          <div className="tp-hero">
+          <div className="tp-hero" id="tp-top">
             <div className="tp-avatar">
               {data.photo ? <img src={data.photo} alt={data.name} /> : <span aria-hidden="true">{initialsOf(data.name)}</span>}
             </div>
@@ -205,7 +235,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
 
         <div className="tp-main">
           {data.about ? (
-            <div className="tp-sec tp-about">
+            <div className="tp-sec tp-about" id="tp-about">
               <Heading className="tp-h">About</Heading>
               <p>{data.about}</p>
             </div>
@@ -215,7 +245,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
             section.layout === "skills" ? (
               inSide ? null : skills(section, "main")
             ) : section.layout === "cards" ? (
-              <div key={section.id} className={`tp-sec tp-cards${look(section).extra}`} style={look(section).style}>
+              <div key={section.id} id={anchor(section.id)} className={`tp-sec tp-cards${look(section).extra}`} style={look(section).style}>
                 <Heading className="tp-h">{section.title}</Heading>
                 <div className={`tp-grid tp-n-${Math.min(section.items.length, 9)}`}>
                   {section.items.map((item) => (
@@ -243,7 +273,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                 </div>
               </div>
             ) : (
-              <div key={section.id} className={`tp-sec tp-list${look(section).extra}`} style={look(section).style}>
+              <div key={section.id} id={anchor(section.id)} className={`tp-sec tp-list${look(section).extra}`} style={look(section).style}>
                 <Heading className="tp-h">{section.title}</Heading>
                 <div className="tp-rows">
                   {section.items.map((item) => (
@@ -290,6 +320,13 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
           <ContactBlock data={data} semantic={semantic} />
         </div>
       </div>
+      {showNav ? (
+        <div className="tp-totop-wrap">
+          <a className="tp-totop" href="#tp-top" aria-label="Back to top">
+            <span aria-hidden="true">{"\u2191"}</span>
+          </a>
+        </div>
+      ) : null}
     </div>
   );
 }

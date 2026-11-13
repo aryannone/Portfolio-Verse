@@ -164,6 +164,8 @@ export type Portfolio = {
   frame: FrameId;
   bodyFont: FontId;
   progress: boolean;
+  // A slim bar at the top with a link to each section, and a back-to-top button.
+  nav: boolean;
   name: string;
   role: string;
   city: string;
@@ -387,6 +389,7 @@ const LOOK_DEFAULTS = {
   frame: "" as FrameId,
   bodyFont: "clean" as FontId,
   progress: false,
+  nav: true,
 };
 
 // Fields added after the first version, with what they start as.

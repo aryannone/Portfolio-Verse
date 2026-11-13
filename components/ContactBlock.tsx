@@ -21,7 +21,7 @@ export default function ContactBlock({ data, semantic }: { data: Portfolio; sema
   const cut = data.portrait === "cut" && Boolean(data.photoCut);
 
   return (
-    <div className="tp-sec tp-contact">
+    <div className="tp-sec tp-contact" id="tp-contact">
       <Heading className="tp-h">Contact</Heading>
       <div className={showCard ? "tp-ct" : "tp-ct tp-ct-solo"}>
         <div className="tp-ct-text">

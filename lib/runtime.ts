@@ -246,6 +246,86 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
     touchStart = -1;
   }
 
+  // ---------- navigation bar, back-to-top button and reading progress ----------
+  // The page may scroll inside a box (the editor's preview) or as a whole (a published page).
+  const scrollerOf = (el: HTMLElement): HTMLElement | null => {
+    for (let p = el.parentElement; p && p !== doc.body; p = p.parentElement) {
+      const overflow = win.getComputedStyle(p).overflowY;
+      if ((overflow === "auto" || overflow === "scroll") && p.scrollHeight > p.clientHeight) return p;
+    }
+    return null;
+  };
+  const scroller = scrollerOf(root);
+  const scrollTarget: HTMLElement | Window = scroller || win;
+  // Looked up on every frame, because the editor can add or remove the bar and sections at any time.
+  const all = (selector: string) => Array.prototype.slice.call(root.querySelectorAll(selector)) as HTMLElement[];
+  let scrollFrame = 0;
+  let active = "";
+
+  function onScroll() {
+    if (scrollFrame) return;
+    scrollFrame = win.requestAnimationFrame(() => {
+      scrollFrame = 0;
+      const box = root.getBoundingClientRect();
+      const viewTop = scroller ? scroller.getBoundingClientRect().top : 0;
+      const viewHeight = scroller ? scroller.clientHeight : win.innerHeight;
+      const read = Math.max(0, Math.min(1, (viewTop - box.top) / Math.max(1, box.height - viewHeight)));
+      all(".tp-progress").forEach((bar) => (bar.style.transform = "scaleX(" + read.toFixed(4) + ")"));
+      // The back-to-top button appears once the header has scrolled away.
+      const hero = root.querySelector(".tp-hero") as HTMLElement | null;
+      const navLinks = all(".tp-nav-links a");
+      const past = hero ? hero.getBoundingClientRect().bottom < viewTop + 40 : read > 0.1;
+      root.classList.toggle("tp-scrolled", past);
+      // The section being read is the last one whose top has passed a third of the way down.
+      if (!navLinks.length) return;
+      const line = viewTop + viewHeight * 0.33;
+      let current = "";
+      navLinks.forEach((link) => {
+        const target = root.querySelector(link.getAttribute("href") || "") as HTMLElement | null;
+        if (target && target.getBoundingClientRect().top <= line) current = link.getAttribute("href") || "";
+      });
+      // At the very bottom the last section is the one being read, even if it is short.
+      if (read > 0.995) current = navLinks[navLinks.length - 1].getAttribute("href") || current;
+      if (current === active && navLinks.every((link) => link.classList.contains("is-on") === (link.getAttribute("href") === current))) return;
+      active = current;
+      navLinks.forEach((link) => {
+        const on = link.getAttribute("href") === current;
+        link.classList.toggle("is-on", on);
+        if (on) {
+          link.setAttribute("aria-current", "true");
+          // Keep the active link in view inside the bar on small screens, without moving the page.
+          const strip = link.parentElement as HTMLElement;
+          const left = link.offsetLeft - strip.clientWidth / 2 + link.offsetWidth / 2;
+          strip.scrollTo({ left: left, behavior: still ? "auto" : "smooth" });
+        } else link.removeAttribute("aria-current");
+      });
+    });
+  }
+
+  // Links in the bar and the back-to-top button scroll smoothly, and do not change the address.
+  function onJump(event: Event) {
+    const link = (event.target as HTMLElement).closest ? ((event.target as HTMLElement).closest(".tp-nav a, .tp-totop") as HTMLAnchorElement | null) : null;
+    if (!link) return;
+    const target = root.querySelector(link.getAttribute("href") || "") as HTMLElement | null;
+    if (!target) return;
+    event.preventDefault();
+    if (link.classList.contains("tp-totop") || link.classList.contains("tp-nav-name")) {
+      // The top of the portfolio inside the editor's preview box, or simply the top of a published page.
+      const top = scroller ? scroller.scrollTop + root.getBoundingClientRect().top - scroller.getBoundingClientRect().top : 0;
+      (scroller || win).scrollTo({ top: Math.max(0, top), behavior: still ? "auto" : "smooth" });
+    } else {
+      target.scrollIntoView({ behavior: still ? "auto" : "smooth", block: "start" });
+    }
+    // Move keyboard focus along, so the next Tab continues from the section that was jumped to.
+    if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+    target.focus({ preventScroll: true });
+  }
+
+  scrollTarget.addEventListener("scroll", onScroll, { passive: true });
+  win.addEventListener("resize", onScroll);
+  root.addEventListener("click", onJump);
+  onScroll();
+
   // The portrait card leans towards the pointer while it is over the Contact section.
   const tiltArea = root.querySelector(".tp-ct") as HTMLElement | null;
   const tiltCard = root.querySelector(".tp-ct-card") as HTMLElement | null;
@@ -324,6 +404,11 @@ export function mountPortfolio(root: HTMLElement, store: RuntimeStore, opts: { r
 
   return function unmount() {
     close();
+    scrollTarget.removeEventListener("scroll", onScroll);
+    win.removeEventListener("resize", onScroll);
+    root.removeEventListener("click", onJump);
+    if (scrollFrame) win.cancelAnimationFrame(scrollFrame);
+    root.classList.remove("tp-scrolled");
     if (tiltArea) {
       tiltArea.removeEventListener("pointermove", onTilt);
       tiltArea.removeEventListener("pointerleave", offTilt);

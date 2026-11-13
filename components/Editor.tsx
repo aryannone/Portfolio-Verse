@@ -311,6 +311,10 @@ export default function Editor() {
                 Glowing background
               </label>
               <label className="ed-check">
+                <input type="checkbox" checked={data.nav} onChange={(e) => set({ nav: e.target.checked })} />
+                Navigation bar with section links and a back-to-top button
+              </label>
+              <label className="ed-check">
                 <input type="checkbox" checked={data.progress} onChange={(e) => set({ progress: e.target.checked })} />
                 Reading progress bar at the top
               </label>

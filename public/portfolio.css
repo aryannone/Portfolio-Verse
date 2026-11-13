@@ -270,12 +270,39 @@
 .tp-m-swing.tp-enter .tp-hero > * { animation-name: tp-slide; }
 .tp-m-drop.tp-enter .tp-hero > * { animation-name: tp-drop; }
 
-/* A thin bar at the top that fills as the page is read. Needs a browser with scroll-driven animation. */
-.tp-progress { display: none; }
-@supports (animation-timeline: scroll()) {
-  .tp-progress { display: block; position: fixed; z-index: 900; top: 0; left: 0; width: 100%; height: 4px; background: var(--tp-accent); transform-origin: 0 50%; animation: tp-progress linear both; animation-timeline: scroll(nearest block); }
+/* Navigation bar: stays at the top while the page scrolls, with a link to each section. */
+.tp-nav { position: sticky; top: var(--tp-top, 0px); z-index: 50; display: flex; align-items: center; gap: 18px; height: 56px; padding: 0 24px; background: color-mix(in srgb, var(--tp-bg) 95%, transparent); color: var(--tp-ink); border-bottom: 1px solid var(--tp-line); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); font-size: 14px; }
+.tp .tp-nav a { text-decoration: none; }
+.tp-nav-name { flex: none; max-width: 30%; font-family: var(--tp-display); font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tp-nav-links { flex: 1; min-width: 0; display: flex; justify-content: flex-end; gap: 4px; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+.tp-nav-links::-webkit-scrollbar { display: none; }
+.tp-nav-links a { flex: none; display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 999px; color: var(--tp-muted); font-weight: 600; white-space: nowrap; transition: background 0.2s ease, color 0.2s ease; }
+.tp .tp-nav-links a:hover { color: var(--tp-ink); background: color-mix(in srgb, var(--tp-ink) 8%, transparent); }
+.tp-nav-links a.is-on { color: var(--tp-on-accent); background: var(--tp-accent); }
+.tp .tp-nav-links a.is-on:hover { color: var(--tp-on-accent); background: var(--tp-accent); }
+.tp-nav a:focus-visible { outline: 2px solid var(--tp-ink); outline-offset: 2px; }
+/* Sections stop just under the bar when jumped to. */
+.tp-has-nav .tp-sec, .tp-has-nav .tp-hero { scroll-margin-top: calc(var(--tp-top, 0px) + 72px); }
+.tp-sec:focus { outline: none; }
+/* Professional 2's side panel sits under the bar. */
+.tp-has-nav.tp-live.tp-professional-2 .tp-side { top: calc(var(--tp-top, 0px) + 56px); max-height: calc(var(--tp-view, 100vh) - var(--tp-top, 0px) - 56px); }
+@container (max-width: 640px) {
+  .tp-nav { gap: 10px; padding: 0 10px 0 16px; height: 52px; }
+  .tp-nav-name { display: none; }
+  .tp-nav-links { justify-content: flex-start; }
 }
-@keyframes tp-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Reading progress: a thin line that fills as the page is read, under the bar or alone at the top. */
+.tp-progress { position: absolute; left: 0; bottom: -1px; width: 100%; height: 3px; background: var(--tp-accent); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none; }
+.tp-progress-solo { position: sticky; top: var(--tp-top, 0px); z-index: 50; display: block; height: 4px; margin-bottom: -4px; }
+
+/* Back to top: a round button that rises in once the header has scrolled away. */
+.tp-totop-wrap { position: sticky; bottom: 20px; z-index: 50; height: 0; display: flex; justify-content: flex-end; padding: 0 20px; pointer-events: none; }
+.tp-totop { width: 48px; height: 48px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--tp-ink); color: var(--tp-bg); font-size: 20px; font-weight: 700; box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.55); transform: translateY(-48px) scale(0.6); opacity: 0; pointer-events: none; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease; }
+.tp .tp-totop { text-decoration: none; color: var(--tp-bg); }
+.tp-scrolled .tp-totop { transform: translateY(-48px) scale(1); opacity: 1; pointer-events: auto; }
+.tp .tp-totop:hover { transform: translateY(-52px) scale(1); }
+.tp-totop:focus-visible { outline: 3px solid var(--tp-accent); outline-offset: 3px; }
 @keyframes tp-fade { from { opacity: 0; } }
 @keyframes tp-slide { from { opacity: 0; translate: -56px 0; } }
 .tp-m-fade.tp-enter .tp-hero > * { animation-name: tp-fade; }
