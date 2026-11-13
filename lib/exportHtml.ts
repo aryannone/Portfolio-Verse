@@ -39,12 +39,8 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
     img.setAttribute("data-ph", String(indexOf(src)));
     img.removeAttribute("src");
   });
-  // The playground starts itself in the downloaded page; remove what the editor's copy left on it.
-  clone.querySelectorAll(".tp-play").forEach((el) => el.classList.remove("tp-play-on"));
   clone.querySelectorAll(".tp-ct-card").forEach((el) => el.removeAttribute("style"));
-  clone.querySelectorAll(".tp-bub, .tp-buddy-eye i").forEach((el) => el.removeAttribute("style"));
-  clone.querySelectorAll(".tp-bub").forEach((el) => el.classList.remove("is-held"));
-  clone.querySelectorAll(".tp-buddy").forEach((el) => el.classList.remove("is-happy", "is-hop"));
+  clone.querySelectorAll(".tp-form-status").forEach((el) => (el.textContent = ""));
   clone.querySelectorAll(".tp-item.has-more").forEach((el) => {
     el.setAttribute("tabindex", "0");
     el.setAttribute("role", "button");

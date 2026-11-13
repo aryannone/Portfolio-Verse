@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useId, useRef, type CSSProperties, type Ref } from "react";
+import { useEffect, useRef, type CSSProperties, type Ref } from "react";
 import { initialsOf, onColor, toHref, type Item, type Link, type Portfolio, type Section } from "@/lib/portfolio";
 import { mountPortfolio, type RuntimeStore } from "@/lib/runtime";
-import { getTemplate } from "@/lib/templates";
 import ContactBlock from "@/components/ContactBlock";
 
 type Props = {
@@ -38,19 +37,6 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   const store = useRef<RuntimeStore>({ items: {} });
 
   const moves = data.motion !== "none";
-
-  // The five tones of the poster portrait, dark to light, mixed from the accent colour.
-  // Each portfolio on a page gets its own filter, because each can have its own accent.
-  const toonId = `tp-toon-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
-  const accentHex = /^#[0-9a-f]{6}$/i.test(data.accent) ? data.accent : getTemplate(data.template)?.accent ?? "#8c52ff";
-  const accentRgb = [1, 3, 5].map((at) => parseInt(accentHex.slice(at, at + 2), 16) / 255);
-  const tones = (channel: number) => {
-    const c = accentRgb[channel];
-    const dark = [0.08, 0.06, 0.14][channel];
-    const light = [1, 0.98, 0.95][channel];
-    const mix = (from: number, to: number, t: number) => from + (to - from) * t;
-    return [dark, mix(dark, c, 0.6), c, mix(c, light, 0.6), light].map((v) => v.toFixed(3)).join(" ");
-  };
   const Name = semantic ? "h1" : "div";
   const Heading = semantic ? "h2" : "div";
   const sections = data.sections.filter((s) => !s.hidden && (s.layout === "skills" ? data.skills.length > 0 : s.items.length > 0));
@@ -170,18 +156,6 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
       style={style}
     >
       {data.progress && interactive ? <div className="tp-progress" aria-hidden="true" /> : null}
-      {/* The "poster" portrait effect: the photo is reduced to five flat tones of the accent colour, like a screen print. */}
-      <svg className="tp-defs" width="0" height="0" aria-hidden="true" focusable="false">
-        <filter id={toonId} colorInterpolationFilters="sRGB">
-          <feColorMatrix type="saturate" values="0" />
-          <feGaussianBlur stdDeviation="0.9" />
-          <feComponentTransfer>
-            <feFuncR type="discrete" tableValues={tones(0)} />
-            <feFuncG type="discrete" tableValues={tones(1)} />
-            <feFuncB type="discrete" tableValues={tones(2)} />
-          </feComponentTransfer>
-        </filter>
-      </svg>
       <div className="tp-bg" aria-hidden="true" />
       <div className="tp-in">
         <div className="tp-side">
@@ -304,7 +278,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
             </div>
           ) : null}
 
-          <ContactBlock data={data} semantic={semantic} toonId={toonId} />
+          <ContactBlock data={data} semantic={semantic} />
         </div>
       </div>
     </div>

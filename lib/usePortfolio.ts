@@ -91,7 +91,8 @@ export function usePortfolio(
   async function setAvatar(files: FileList | null) {
     if (!files || !files[0]) return;
     try {
-      set({ photo: await imageToDataUrl(files[0], AVATAR_SIDE) });
+      // A new photo needs a new cut-out, so the old one is dropped.
+      set({ photo: await imageToDataUrl(files[0], AVATAR_SIDE), photoCut: "" });
     } catch {
       setStatus("Could not read that picture");
     }

@@ -39,29 +39,21 @@ export function linkBadge(label: string, url: string) {
   return label.trim().slice(0, 2) || "Go";
 }
 
-export type ContactStyleId = "card" | "simple" | "play";
-export type PortraitId = "poster" | "duotone" | "plain" | "none";
-
-export const CONTACT_STYLES: { id: ContactStyleId; name: string }[] = [
-  { id: "card", name: "Portrait card" },
-  { id: "simple", name: "Simple row of links" },
-  { id: "play", name: "Playful bubbles" },
-];
+// The portrait on the contact card: the photo as it is, the photo with its background removed, or nothing.
+export type PortraitId = "plain" | "cut" | "none";
 
 export const PORTRAITS: { id: PortraitId; name: string }[] = [
-  { id: "poster", name: "Poster print in your colour" },
-  { id: "duotone", name: "Two-colour print" },
   { id: "plain", name: "Original photo" },
+  { id: "cut", name: "Background removed" },
   { id: "none", name: "No picture" },
 ];
 
-export type BuddyId = "robot" | "cat" | "ghost" | "none";
+// How a message typed into the contact form reaches the owner.
+export type SendId = "mailto" | "direct";
 
-export const BUDDIES: { id: BuddyId; name: string }[] = [
-  { id: "robot", name: "Robot" },
-  { id: "cat", name: "Cat" },
-  { id: "ghost", name: "Ghost" },
-  { id: "none", name: "No character" },
+export const SENDS: { id: SendId; name: string }[] = [
+  { id: "mailto", name: "Through the visitor's own email app" },
+  { id: "direct", name: "Straight to your inbox (FormSubmit service)" },
 ];
 
 // How photos are arranged in the photo panel.
@@ -181,13 +173,15 @@ export type Portfolio = {
   links: Link[];
   quote: string;
   quoteBy: string;
-  buddy: BuddyId;
-  // How the Contact section looks, and what its portrait card says.
-  contactStyle: ContactStyleId;
+  // What the Contact section says, and whether it has a message form.
   contactTitle: string;
   contactNote: string;
   contactStatus: string;
+  contactForm: boolean;
+  contactSend: SendId;
   portrait: PortraitId;
+  // The photo with its background removed, made once in the editor.
+  photoCut: string;
   skills: string[];
   sections: Section[];
   sample: boolean;
@@ -392,12 +386,13 @@ const CLOSING_DEFAULTS = {
   phone: "",
   quote: "",
   quoteBy: "",
-  buddy: "robot" as BuddyId,
-  contactStyle: "card" as ContactStyleId,
   contactTitle: "Let's work together.",
   contactNote: "",
   contactStatus: "",
-  portrait: "poster" as PortraitId,
+  contactForm: true,
+  contactSend: "mailto" as SendId,
+  portrait: "plain" as PortraitId,
+  photoCut: "",
 };
 
 // Fills in anything missing from a portfolio saved by an earlier version of the editor.
@@ -406,6 +401,8 @@ export function normalize(saved: Portfolio): Portfolio {
     ...LOOK_DEFAULTS,
     ...CLOSING_DEFAULTS,
     ...saved,
+    // Portrait looks from an earlier version become the plain photo.
+    portrait: saved.portrait === "cut" || saved.portrait === "none" ? saved.portrait : "plain",
     // Skills used to sit after every section, so that is where the section goes for older saves.
     sections: [
       ...saved.sections.map((section) => ({ ...section, style: section.style ?? "" })),

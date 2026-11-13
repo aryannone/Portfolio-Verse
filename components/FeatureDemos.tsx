@@ -17,6 +17,7 @@ const STYLES: { id: SectionStyle; name: string }[] = [
 
 // A piece of a portfolio page, with the portfolio script running on it.
 function Piece({ children, store, accent, className = "" }: { children: ReactNode; store?: RuntimeStore; accent: string; className?: string }) {
+  // data-demo tells the portfolio script that forms here are examples and must not send anything.
   const ref = useRef<HTMLDivElement | null>(null);
   const storeRef = useRef<RuntimeStore>(store ?? { items: {} });
 
@@ -28,6 +29,7 @@ function Piece({ children, store, accent, className = "" }: { children: ReactNod
   return (
     <div
       ref={ref}
+      data-demo=""
       className={`tp tp-custom tp-live tp-font-modern demo-piece ${className}`}
       style={{ "--tp-accent": accent, "--tp-on-accent": onColor(accent) } as CSSProperties}
     >
@@ -62,7 +64,7 @@ export default function FeatureDemos() {
 
   // A sample person for the contact demo, with a drawn portrait standing in for a photo.
   const contact = useMemo<Portfolio>(
-    () => ({ ...fromSample("professional-4"), photo: samplePortrait("#8c52ff"), portrait: "plain", contactStatus: "Open to internships" }),
+    () => ({ ...fromSample("professional-4"), photo: samplePortrait("#8c52ff"), portrait: "plain", contactStatus: "Open to internships", contactNote: "" }),
     [],
   );
 
@@ -149,8 +151,8 @@ export default function FeatureDemos() {
         <div className="demo-copy">
           <h3 className="display">A contact section with presence.</h3>
           <p>
-            Your headline, your email with one-tap copy, your links, and your portrait on a card that leans towards
-            the pointer. Your photo can be shown as it is, as a flat drawn-style poster, or as a two-colour print.
+            Visitors can write to you right on the page. Beside the form sits your portrait on a card that leans
+            towards the pointer, with your photo as it is or with its background removed.
           </p>
           <p className="demo-hint">Try it: move your pointer over the card.</p>
         </div>

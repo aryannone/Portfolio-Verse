@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
-import { BUDDIES, CARD_STYLES, CONTACT_STYLES, PORTRAITS, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type BuddyId, type ContactStyleId, type FontId, type PortraitId, type GalleryId, type Link, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
+import { useEffect, useState, type ReactNode } from "react";
+import { CARD_STYLES, PORTRAITS, SENDS, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type FontId, type PortraitId, type SendId, type GalleryId, type Link, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
 import type { PortfolioTools } from "@/lib/usePortfolio";
 
 // The form pieces shared by the details form (/start) and the editor.
@@ -108,8 +108,34 @@ export function LinkList({ label, links, onChange, namePlaceholder }: { label: s
   );
 }
 
-// The end of the page: the quote, and how the Contact section looks.
+// The end of the page: the quote, and what the Contact section says and shows.
 export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Partial<Portfolio>) => void }) {
+  const [note, setNote] = useState("");
+
+  // Make the cut-out the first time "Background removed" is chosen, and again whenever the photo changes.
+  useEffect(() => {
+    if (data.portrait !== "cut" || !data.photo || data.photoCut) return;
+    let stale = false;
+    setNote("Removing the background. This can take a few seconds the first time.");
+    import("@/lib/cutout")
+      .then(({ removeBackground }) => removeBackground(data.photo))
+      .then((photoCut) => {
+        if (stale) return;
+        set({ photoCut });
+        setNote("");
+      })
+      .catch(() => {
+        if (stale) return;
+        set({ portrait: "plain" });
+        setNote("Could not find a person to cut out in this photo, so the original is shown.");
+      });
+    return () => {
+      stale = true;
+    };
+    // "set" is recreated on every render and must not restart the work.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.portrait, data.photo, data.photoCut]);
+
   return (
     <>
       <Field label="Quote (shown above Contact)">
@@ -118,26 +144,39 @@ export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Par
       <Field label="Who said it">
         <input className="ed-input" value={data.quoteBy} placeholder="Leave empty if it is yours" onChange={(e) => set({ quoteBy: e.target.value })} />
       </Field>
-      <Choice<ContactStyleId> label="Contact style" value={data.contactStyle} options={CONTACT_STYLES} onChange={(contactStyle) => set({ contactStyle })} />
-      {data.contactStyle === "card" ? (
+      <Field label="Contact headline">
+        <input className="ed-input" value={data.contactTitle} placeholder="Let's work together." onChange={(e) => set({ contactTitle: e.target.value })} />
+      </Field>
+      <Field label="A line under it (optional)">
+        <textarea className="ed-input" rows={2} value={data.contactNote} placeholder="What you are looking for, and how fast you reply." onChange={(e) => set({ contactNote: e.target.value })} />
+      </Field>
+      <Field label="Status badge (optional)">
+        <input className="ed-input" value={data.contactStatus} placeholder="Open to internships" onChange={(e) => set({ contactStatus: e.target.value })} />
+      </Field>
+
+      <Choice<PortraitId> label="Your photo on the contact card" value={data.portrait} options={PORTRAITS} onChange={(portrait) => set({ portrait })} />
+      {data.portrait === "cut" && !data.photo ? <p className="ed-hint">Add your photo in About you first.</p> : null}
+      {note ? (
+        <p className="ed-hint" role="status">
+          {note}
+        </p>
+      ) : null}
+
+      <label className="ed-check">
+        <input type="checkbox" checked={data.contactForm} onChange={(e) => set({ contactForm: e.target.checked })} />
+        Let visitors write you a message
+      </label>
+      {data.contactForm ? (
         <>
-          <Field label="Contact headline">
-            <input className="ed-input" value={data.contactTitle} placeholder="Let's work together." onChange={(e) => set({ contactTitle: e.target.value })} />
-          </Field>
-          <Field label="A line under it (optional)">
-            <textarea className="ed-input" rows={2} value={data.contactNote} placeholder="What you are looking for, and how fast you reply." onChange={(e) => set({ contactNote: e.target.value })} />
-          </Field>
-          <Field label="Status badge (optional)">
-            <input className="ed-input" value={data.contactStatus} placeholder="Open to internships" onChange={(e) => set({ contactStatus: e.target.value })} />
-          </Field>
-          <Choice<PortraitId> label="Your portrait on the card" value={data.portrait} options={PORTRAITS} onChange={(portrait) => set({ portrait })} />
-          <p className="ed-hint">The portrait uses your photo from About you. Without one, it shows your initials.</p>
+          <Choice<SendId> label="How messages reach you" value={data.contactSend} options={SENDS} onChange={(contactSend) => set({ contactSend })} />
+          <p className="ed-hint">
+            {data.contactSend === "direct"
+              ? "Messages go through FormSubmit, a free outside service, to the email in About you. The first message makes it send you a confirmation email; after you confirm, messages arrive in your inbox. If it fails, the visitor's email app opens instead."
+              : "The visitor's email app opens with their message filled in, addressed to the email in About you. Nothing passes through any other service."}
+          </p>
         </>
       ) : null}
-      {data.contactStyle === "play" ? (
-        <Choice<BuddyId> label="Character in the playground" value={data.buddy} options={BUDDIES} onChange={(buddy) => set({ buddy })} />
-      ) : null}
-      <p className="ed-hint">Contact shows your email, phone and every link from About you.</p>
+      <p className="ed-hint">Contact also shows your email, phone and every link from About you.</p>
     </>
   );
 }
@@ -163,7 +202,7 @@ export function ProfileFields({ data, tools }: { data: Portfolio; tools: Tools }
           {data.photo ? (
             <div className="ed-photo ed-photo-me">
               <img src={data.photo} alt="Your photo" />
-              <button type="button" aria-label="Remove your photo" onClick={() => set({ photo: "" })}>
+              <button type="button" aria-label="Remove your photo" onClick={() => set({ photo: "", photoCut: "" })}>
                 ×
               </button>
             </div>

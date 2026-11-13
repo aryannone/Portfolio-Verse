@@ -14,10 +14,10 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 - Card sections arrange themselves by count: 2 or 3 side by side, 4 as two pairs, 5 and 7 with one tall card, 6 as two threes
 - Download: the editor builds one self-contained HTML file of the portfolio
 - Saved templates (`/saved`): named copies saved from the editor, each with download, open in editor and delete
-- Contact section in three styles: a portrait card (headline, email with copy, links, and the photo on a card that tilts to the pointer, optionally as a poster or two-colour print), a simple row, or playful bubbles
-- Entry links, a quote block above Contact, and a contact playground: links float as bubbles visitors can drag, throw and tap, watched by a character (robot, cat or ghost)
+- Contact section: a headline, a message form (through the visitor's email app, or straight to the inbox via FormSubmit if the owner chooses), the email with a copy button, links, and the photo on a card that tilts to the pointer
+- Background removal for the contact photo, done in the browser with MediaPipe's selfie segmenter (`lib/cutout.ts`). The model is in `public/vendor/mediapipe/`; the engine is copied there from `node_modules` by `scripts/copy-vendor.mjs` on every build
+- Entry links, and a quote block above Contact
 - Sample pictures are drawn mock-ups matched to each sample person (charts, drawings, app screens, posters)
-- The contact playground can be switched off for a plain row of round links; Professional templates start with it off
 - Per-section look: each section can have its own background, text colour, accent and font
 - Details panel: entries with photos or a full write-up show "See details", which opens the panel headed by the section name
 - Login is switched off for now. Every page is open to everyone, and each visitor's work is saved in their own browser (IndexedDB)

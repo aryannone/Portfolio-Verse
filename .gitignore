@@ -6,3 +6,6 @@ out
 .vercel
 *.tsbuildinfo
 .DS_Store
+
+# copied from node_modules by scripts/copy-vendor.mjs
+public/vendor/mediapipe/wasm

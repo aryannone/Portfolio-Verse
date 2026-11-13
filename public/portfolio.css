@@ -168,10 +168,7 @@
 .tp-quote footer { font-size: 15px; font-weight: 600; color: var(--tp-muted); }
 .tp-quote footer::before { content: "\2014\00a0"; }
 
-.tp-phone { font-size: 18px; font-weight: 500; }
-
-/* Contact, portrait-card style: words and links on one side, the person's portrait on a card that leans to the pointer. */
-.tp-defs { position: absolute; }
+/* Contact: words, a message form and links on one side, the person's portrait on a card that leans to the pointer. */
 .tp-ct { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); gap: 40px 64px; align-items: center; }
 .tp-ct.tp-ct-solo { grid-template-columns: minmax(0, 1fr); }
 .tp-ct-text { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; min-width: 0; }
@@ -180,6 +177,23 @@
 @keyframes tp-pulse { 70%, 100% { box-shadow: 0 0 0 9px rgba(22, 163, 74, 0); } }
 .tp-ct-title { font-family: var(--tp-display); font-weight: 600; font-size: clamp(32px, 5.2cqw, 60px); line-height: 1.04; letter-spacing: -0.025em; text-wrap: balance; }
 .tp-ct-note { font-size: 18px; color: var(--tp-muted); max-width: 30em; }
+/* Message form */
+.tp-form { width: 100%; max-width: 34em; display: flex; flex-direction: column; gap: 12px; }
+.tp-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.tp-form label { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tp-form label span { font-size: 13px; font-weight: 600; color: var(--tp-muted); }
+.tp-form input, .tp-form textarea { width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--tp-ink) 28%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--tp-ink) 4%, transparent); color: inherit; font: inherit; font-size: 16px; resize: vertical; transition: border-color 0.2s ease, background 0.2s ease; }
+.tp-form input:focus-visible, .tp-form textarea:focus-visible { outline: 2px solid var(--tp-ink); outline-offset: 1px; border-color: var(--tp-ink); }
+.tp-form-foot { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+.tp-send { min-height: 48px; padding: 0 24px; border: 0; border-radius: 999px; background: var(--tp-ink); color: var(--tp-bg); font: 600 15px var(--tp-body); cursor: pointer; transition: translate 0.2s ease, opacity 0.2s ease; }
+.tp-send:hover { translate: 0 -2px; }
+.tp-send:disabled { opacity: 0.6; cursor: default; translate: 0 0; }
+.tp-send:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.tp-form-status { font-size: 14px; color: var(--tp-muted); }
+@container (max-width: 520px) {
+  .tp-form-row { grid-template-columns: minmax(0, 1fr); }
+}
+
 .tp-ct-mail { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
 .tp .tp-ct-mail a { font-family: var(--tp-display); font-weight: 600; font-size: clamp(19px, 2.4cqw, 26px); text-decoration: underline; text-decoration-color: var(--tp-accent); text-decoration-thickness: 3px; text-underline-offset: 7px; }
 .tp-copy { min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); background: transparent; color: inherit; font: 600 13px var(--tp-body); cursor: pointer; transition: background 0.2s ease; }
@@ -198,11 +212,10 @@
 .tp-ct-back { position: absolute; inset: 0; border-radius: 28px; background: var(--tp-accent); transform: translate3d(20px, 20px, -50px) rotate(5deg); }
 .tp-ct-photo { position: absolute; inset: 0; border-radius: 28px; overflow: hidden; display: grid; place-items: center; background: color-mix(in srgb, var(--tp-ink) 8%, var(--tp-bg)); color: var(--tp-ink); font-family: var(--tp-display); font-weight: 700; font-size: 84px; letter-spacing: -0.03em; box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.55); transform: translateZ(10px); }
 .tp-ct-photo img { width: 100%; height: 100%; object-fit: cover; }
-.tp-pt-duotone { background: #ffffff; isolation: isolate; }
-.tp-pt-duotone img { filter: grayscale(1) contrast(1.25); }
-.tp-pt-duotone::before, .tp-pt-duotone::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-.tp-pt-duotone::before { background: var(--tp-accent); mix-blend-mode: multiply; }
-.tp-pt-duotone::after { background: #1a1033; mix-blend-mode: lighten; }
+/* Background removed: the person stands in front of a panel in the accent colour and rises a little above it. */
+.tp-ct-photo.tp-pt-cut { overflow: visible; background: linear-gradient(165deg, color-mix(in srgb, var(--tp-accent) 22%, var(--tp-bg)), color-mix(in srgb, var(--tp-accent) 70%, var(--tp-bg))); transform-style: preserve-3d; }
+.tp-ct-photo.tp-pt-cut img { position: absolute; left: 0; bottom: 0; width: 100%; height: 110%; object-fit: cover; object-position: 50% 100%; border-radius: 0 0 28px 28px; transform: translateZ(34px); filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.28)); }
+
 .tp-ct-tag { position: absolute; left: -18px; bottom: 26px; max-width: 86%; display: flex; flex-direction: column; padding: 10px 16px; border-radius: 14px; background: var(--tp-bg); color: var(--tp-ink); border: 1px solid color-mix(in srgb, var(--tp-ink) 16%, transparent); box-shadow: 0 18px 34px -18px rgba(0, 0, 0, 0.5); font-size: 13px; line-height: 1.35; transform: translateZ(60px); }
 .tp-ct-tag strong { font-size: 15px; }
 .tp-ct-tag span { color: var(--tp-muted); }
@@ -214,54 +227,8 @@
   .tp-ct-card { width: min(78%, 260px); margin: 8px 0 20px; justify-self: start; margin-left: 18px; }
 }
 
-/* Contact playground. Without scripts or motion it is a plain row of round links.
-   With them, the links float, can be dragged and thrown, and a character watches the pointer. */
-.tp-play, .tp-reach { position: relative; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
-.tp .tp-reach .tp-bub { width: 84px; height: 84px; transition: translate 0.25s ease, box-shadow 0.25s ease; }
-.tp .tp-reach .tp-bub:hover { translate: 0 -5px; }
-.tp-reach .tp-bub b { font-size: 22px; }
-.tp .tp-bub { width: 96px; height: 96px; flex: none; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px; background: var(--tp-accent); color: var(--tp-on-accent); text-align: center; text-decoration: none; overflow: hidden; box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.6); -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }
-.tp .tp-bub:nth-of-type(3n + 2) { background: var(--tp-ink); color: var(--tp-bg); }
-.tp .tp-bub:nth-of-type(3n) { background: var(--tp-bg); color: var(--tp-ink); box-shadow: inset 0 0 0 2px var(--tp-ink), 0 10px 24px -14px rgba(0, 0, 0, 0.6); }
-.tp .tp-bub:hover { text-decoration: none; }
-.tp-bub:focus-visible { outline: 3px solid var(--tp-ink); outline-offset: 3px; }
-.tp-bub b { font-family: var(--tp-display); font-size: 26px; font-weight: 700; line-height: 1; }
-.tp-bub span { max-width: 100%; font-size: 12px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tp-play-hint { display: none; font-size: 14px; color: var(--tp-muted); }
-
-.tp-play.tp-play-on { display: block; height: 280px; border: 1px dashed color-mix(in srgb, var(--tp-ink) 35%, transparent); border-radius: 24px; overflow: hidden; touch-action: pan-y; }
-.tp-play-on .tp-bub { position: absolute; left: 0; top: 0; z-index: 1; cursor: grab; touch-action: none; will-change: transform; }
-.tp-play-on .tp-bub.is-held { cursor: grabbing; box-shadow: 0 22px 40px -16px rgba(0, 0, 0, 0.7); }
-.tp-play-on .tp-buddy { position: absolute; left: 50%; bottom: 18px; margin-left: -48px; }
-.tp-play-on ~ .tp-play-hint { display: block; }
-
-/* The character. All three share the same eyes, which the script turns towards the pointer. */
-.tp-buddy { position: relative; width: 96px; height: 96px; flex: none; background: var(--tp-accent); border-radius: 26px; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; animation: tp-bob 3.2s ease-in-out infinite; }
-.tp-buddy-eye { width: 24px; height: 24px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; animation: tp-blink 5s infinite; }
-.tp-buddy-eye i { width: 11px; height: 11px; border-radius: 50%; background: #12141a; }
-.tp-buddy-mouth { position: absolute; left: 50%; bottom: 20px; width: 18px; height: 8px; margin-left: -9px; border-radius: 0 0 18px 18px; background: var(--tp-on-accent); transition: width 0.25s ease, height 0.25s ease, margin 0.25s ease; }
-.tp-buddy.is-happy .tp-buddy-mouth { width: 30px; height: 14px; margin-left: -15px; }
-.tp-buddy.is-hop { animation: tp-hop 0.6s cubic-bezier(0.3, 0.7, 0.4, 1); }
-.tp-buddy::before, .tp-buddy::after { content: ""; position: absolute; }
-.tp-buddy-robot::before { left: 50%; top: -16px; width: 4px; height: 16px; margin-left: -2px; background: var(--tp-accent); }
-.tp-buddy-robot::after { left: 50%; top: -26px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--tp-accent); }
-.tp-buddy-cat { border-radius: 40px 40px 34px 34px; }
-.tp-buddy-cat::before, .tp-buddy-cat::after { top: -14px; width: 0; height: 0; border-left: 16px solid transparent; border-right: 16px solid transparent; border-bottom: 30px solid var(--tp-accent); }
-.tp-buddy-cat::before { left: 4px; rotate: -18deg; }
-.tp-buddy-cat::after { right: 4px; rotate: 18deg; }
-.tp-buddy-ghost { height: 108px; border-radius: 48px 48px 0 0; align-items: flex-start; padding-top: 30px; }
-.tp-buddy-ghost::after { left: 0; right: 0; bottom: -1px; height: 14px; background: radial-gradient(circle at 12px 14px, var(--tp-bg) 11px, transparent 12px) 0 0 / 24px 14px repeat-x; }
-.tp-buddy-ghost .tp-buddy-mouth { bottom: 34px; }
-@keyframes tp-bob { 50% { translate: 0 -6px; } }
-@keyframes tp-blink { 0%, 46%, 50%, 100% { scale: 1 1; } 48% { scale: 1 0.1; } }
-@keyframes tp-hop { 30% { translate: 0 -46px; rotate: -8deg; } 60% { translate: 0 0; rotate: 4deg; } 80% { translate: 0 -10px; } }
-
-.tp-contact p { font-family: var(--tp-display); font-weight: 600; font-size: clamp(22px, 3.4cqw, 34px); letter-spacing: -0.01em; overflow-wrap: anywhere; }
 
 @container (max-width: 640px) {
-  .tp-play.tp-play-on { height: 300px; }
-  .tp .tp-bub { width: 84px; height: 84px; }
-  .tp-bub b { font-size: 22px; }
   .tp-in { padding: 40px 22px; gap: 40px; }
   .tp-bio { font-size: 18px; }
   .tp-row { grid-template-columns: minmax(0, 1fr); }
