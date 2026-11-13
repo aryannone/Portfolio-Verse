@@ -212,7 +212,8 @@ export function ClosingFields({ data, set }: { data: Portfolio; set: (patch: Par
             ) : null}
             <label className="ed-add">
               {data.contactPhoto ? "Change" : "Add photo"}
-              <input type="file" accept="image/*" onChange={async (e) => { const input = e.currentTarget; await pickContactPhoto(input.files); input.value = ""; }} />
+              <small className="ed-add-note">JPG or PNG</small>
+              <input type="file" accept="image/jpeg,image/png" onChange={async (e) => { const input = e.currentTarget; await pickContactPhoto(input.files); input.value = ""; }} />
             </label>
           </div>
         </div>
@@ -325,7 +326,8 @@ export function ProfileFields({ data, tools }: { data: Portfolio; tools: Tools }
           ) : null}
           <label className="ed-add">
             {data.photo ? "Change" : "Add photo"}
-            <input type="file" accept="image/*" onChange={async (e) => { const input = e.currentTarget; await setAvatar(input.files); input.value = ""; }} />
+            <small className="ed-add-note">JPG or PNG</small>
+            <input type="file" accept="image/jpeg,image/png" onChange={async (e) => { const input = e.currentTarget; await setAvatar(input.files); input.value = ""; }} />
           </label>
         </div>
       </div>
@@ -501,7 +503,8 @@ export function SectionFields({ data, section, tools, design }: { data: Portfoli
               ))}
               <label className="ed-add">
                 Add photos
-                <input type="file" accept="image/*" multiple onChange={async (e) => { const input = e.currentTarget; await addPhotos(section.id, item, input.files); input.value = ""; }} />
+              <small className="ed-add-note">JPG or PNG</small>
+                <input type="file" accept="image/jpeg,image/png" multiple onChange={async (e) => { const input = e.currentTarget; await addPhotos(section.id, item, input.files); input.value = ""; }} />
               </label>
             </div>
           </div>

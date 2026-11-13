@@ -192,82 +192,14 @@ export async function deleteSaved(id: string): Promise<boolean> {
 }
 
 // Shrinks a chosen photo so pages stay fast and downloads stay small.
-function readOnce(file: Blob): Promise<string> {
+// Photos must be JPG or PNG, which every browser can show. The chosen file is read exactly as it is.
+export function imageToDataUrl(file: File): Promise<string> {
+  const ok = /^image\/(jpeg|png)$/.test(file.type) || /\.(jpe?g|png)$/i.test(file.name);
+  if (!ok) return Promise.reject(new Error("Please add a JPG or PNG photo."));
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error ?? new Error("Read failed"));
+    reader.onerror = () => reject(new Error("Could not read that photo. Please add a JPG or PNG photo."));
     reader.readAsDataURL(file);
   });
-}
-
-async function bytesToDataUrl(file: Blob): Promise<string> {
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  let text = "";
-  for (let i = 0; i < bytes.length; i += 0x8000) text += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-  return `data:${file.type || "application/octet-stream"};base64,${btoa(text)}`;
-}
-
-// Phones sometimes hand over a photo before it is fully ready (Android can still be preparing a HEIC photo),
-// and the first read fails. It is tried a few ways, with short pauses, before giving up.
-async function readFile(file: Blob): Promise<string> {
-  let last: unknown;
-  for (const wait of [0, 400, 1200, 2500]) {
-    if (wait) await new Promise((r) => setTimeout(r, wait));
-    try {
-      return await readOnce(file);
-    } catch (error) {
-      last = error;
-    }
-    try {
-      return await bytesToDataUrl(file);
-    } catch (error) {
-      last = error;
-    }
-  }
-  const why = last instanceof Error ? `${last.name}: ${last.message}` : String(last);
-  const kind = file.type || "unknown type";
-  throw new Error(
-    `Could not read that picture (${kind}, ${(file.size / 1e6).toFixed(1)} MB; ${why}). ` +
-      "Open it in your gallery, save a copy as JPG (or take a screenshot of it), and upload that.",
-  );
-}
-
-// True when this browser can actually show the picture.
-function canShow(url: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(img.naturalWidth > 0);
-    img.onerror = () => resolve(false);
-    img.src = url;
-  });
-}
-
-function describe(file: File): string {
-  const kind = file.type || (file.name.includes(".") ? "." + file.name.split(".").pop() : "unknown type");
-  return `${kind}, ${(file.size / 1e6).toFixed(1)} MB`;
-}
-
-// Reads the picture the user chose exactly as it is: no resizing or cropping.
-// The one exception: a format the browser cannot show (such as HEIC from some phones) is turned into a JPG,
-// because it would otherwise appear as a broken image for every visitor.
-export async function imageToDataUrl(file: File): Promise<string> {
-  // A photo kept only in the cloud (for example in Google Photos) can arrive empty.
-  if (file.size === 0) {
-    throw new Error(
-      "This photo is empty: it may be stored only online. Download it to your device from your photos app first, then try again.",
-    );
-  }
-  const url = await readFile(file);
-  if (await canShow(url)) return url;
-  try {
-    const { heicTo } = await import("heic-to/next");
-    const jpg = await readFile(await heicTo({ blob: file, type: "image/jpeg", quality: 0.92 }));
-    if (await canShow(jpg)) return jpg;
-  } catch {
-    // Not a HEIC photo, or one the converter cannot read.
-  }
-  throw new Error(
-    `This browser can't show this picture (${describe(file)}). Choose a JPG or PNG, or take a screenshot of the photo and upload that.`,
-  );
 }
