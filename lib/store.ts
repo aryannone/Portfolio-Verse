@@ -192,12 +192,45 @@ export async function deleteSaved(id: string): Promise<boolean> {
 }
 
 // Shrinks a chosen photo so pages stay fast and downloads stay small.
-// Reads the picture the user chose exactly as it is: no resizing, cropping or converting.
-export function imageToDataUrl(file: File): Promise<string> {
+function readFile(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
     reader.onerror = () => reject(new Error("Could not read that picture."));
     reader.readAsDataURL(file);
   });
+}
+
+// True when this browser can actually show the picture.
+function canShow(url: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img.naturalWidth > 0);
+    img.onerror = () => resolve(false);
+    img.src = url;
+  });
+}
+
+function describe(file: File): string {
+  const kind = file.type || (file.name.includes(".") ? "." + file.name.split(".").pop() : "unknown type");
+  return `${kind}, ${(file.size / 1e6).toFixed(1)} MB`;
+}
+
+// Reads the picture the user chose exactly as it is: no resizing or cropping.
+// The one exception: a format the browser cannot show (such as HEIC from some phones) is turned into a JPG,
+// because it would otherwise appear as a broken image for every visitor.
+export async function imageToDataUrl(file: File): Promise<string> {
+  const url = await readFile(file);
+  if (await canShow(url)) return url;
+  try {
+    const { default: heic2any } = await import("heic2any");
+    const converted = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.92 });
+    const jpg = await readFile(Array.isArray(converted) ? converted[0] : converted);
+    if (await canShow(jpg)) return jpg;
+  } catch {
+    // Not a HEIC photo, or one the converter cannot read.
+  }
+  throw new Error(
+    `This browser can't show this picture (${describe(file)}). Choose a JPG or PNG, or take a screenshot of the photo and upload that.`,
+  );
 }
