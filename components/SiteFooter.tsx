@@ -4,11 +4,11 @@ export default function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="wrap site-footer-inner">
-        <div>PORTFOLIO-VERSE · Free during beta</div>
+        <div>PORTFOLIO-VERSE · Free, no sign-up</div>
         <div className="footer-links">
+          <Link href="/templates">Templates</Link>
+          <Link href="/saved">My portfolios</Link>
           <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
-          <Link href="/report">Report a site</Link>
         </div>
       </div>
     </footer>

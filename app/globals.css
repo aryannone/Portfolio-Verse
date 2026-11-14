@@ -424,7 +424,7 @@ a.btn { display: inline-flex; align-items: center; }
   .reveal-on [data-reveal] { opacity: 1; transform: none; transition: none; }
 }
 
-/* Simple pages: login, dashboard, legal */
+/* Simple pages: privacy */
 
 .simple {
   min-height: 60vh;
@@ -437,6 +437,9 @@ a.btn { display: inline-flex; align-items: center; }
   max-width: 720px;
 }
 .simple p { color: var(--muted); font-size: 17px; max-width: 34em; }
+.legal h2 { margin: 16px 0 0; font-family: var(--font-display-stack); font-size: 22px; }
+.legal ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; color: var(--ink-soft); max-width: 40em; }
+.legal .lead { color: var(--ink); }
 .notice { font-size: 15px; color: var(--ink); background: var(--surface); border-radius: var(--radius); padding: 14px 16px; }
 
 /* Editor */

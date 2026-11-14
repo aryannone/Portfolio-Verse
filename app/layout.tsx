@@ -34,11 +34,14 @@ export const metadata: Metadata = {
   description:
     "A free portfolio website builder for students and first-job seekers. Fill in your details, add photos, pick a template and download your site.",
   openGraph: {
-    title: "PORTFOLIO-VERSE",
+    title: "PORTFOLIO-VERSE: your portfolio, ready in ten minutes",
     description:
-      "Create and host your portfolio website for free. No code, no developer, no cost.",
+      "A free portfolio builder for students. Nine templates, résumé import, no sign-up. Download your site as one HTML file.",
     type: "website",
+    siteName: "PORTFOLIO-VERSE",
   },
+  // Shared links show the large preview picture (app/opengraph-image.tsx).
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
