@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import { LogoMark } from "@/components/Logo";
 
-// The opening animation, shown once per visit (browser tab session):
+// The opening animation, shown every time a page of the site is loaded or reloaded:
 // the legs step in, the head drops onto them, the cap is tossed and lands, then the name is written out.
 // It is drawn by the server and animated in CSS, so it plays before the page's scripts have loaded.
-// An inline script in the layout hides it at once when it has already been seen in this tab, and it is
-// never shown to people who ask for reduced motion. A tap or key press skips it.
+// It is never shown to people who ask for reduced motion. A tap or key press skips it.
 const NAME = "PORTFOLIO";
 const VERSE = "-VERSE";
 
@@ -16,10 +15,6 @@ export default function Intro() {
 
   useEffect(() => {
     const root = document.documentElement;
-    if (root.classList.contains("intro-seen")) {
-      setGone(true);
-      return;
-    }
     const skip = () => root.classList.add("intro-skip");
     const done = window.setTimeout(() => setGone(true), 4200);
     window.addEventListener("pointerdown", skip, { once: true });

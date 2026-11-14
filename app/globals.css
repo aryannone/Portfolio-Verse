@@ -941,7 +941,6 @@ label.rs-upload:focus-within { outline: 2px solid var(--ink); outline-offset: 3p
   background: var(--ground); color: var(--ink);
   animation: intro-out 0.5s cubic-bezier(0.7, 0, 0.84, 0) 3.3s forwards;
 }
-.intro-seen .intro { display: none; }
 .intro-skip .intro { animation: intro-out 0.3s ease forwards; }
 @media (prefers-reduced-motion: reduce) { .intro { display: none; } }
 @keyframes intro-out { to { opacity: 0; transform: translateY(-24px); visibility: hidden; pointer-events: none; } }
