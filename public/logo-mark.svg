@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 800" width="650" height="800">
   <g fill="none" stroke="#12141a" stroke-width="34" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M155 69 425 25 360 133C250 150 180 215 162 340L25 345Z"/>
-    <path d="M70 345V440"/>
     <path d="M240 482H325L198 770 25 768Z"/>
     <path d="M332 482H415L620 770H450Z"/>
   </g>
-  <path fill="#8c52ff" fill-rule="evenodd" d="M236 150C385 160 462 236 462 318C462 402 388 456 292 470H236ZM270 212V436H290C334 426 366 392 366 334C366 268 328 218 270 212Z"/>
+  <circle cx="330" cy="312" r="138" fill="#8c52ff"/>
+  <g fill="none" stroke="#12141a" stroke-width="34" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M155 69 425 25 360 133C250 150 180 215 162 340L25 345Z"/>
+    <path d="M70 345V440"/>
+  </g>
 </svg>

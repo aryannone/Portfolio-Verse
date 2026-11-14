@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Figtree, Fraunces, Playfair_Display, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import Intro from "@/components/Intro";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -42,12 +43,22 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${serif.variable} ${tech.variable} ${elegant.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${display.variable} ${body.variable} ${serif.variable} ${tech.variable} ${elegant.variable}`}>
       <head>
         {/* Template styles live in public/ so the editor can also copy them into downloaded portfolios. */}
         <link rel="stylesheet" href="/portfolio.css" precedence="default" />
+        {/* The opening animation plays once per browser tab: later pages skip it before anything is drawn. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(sessionStorage.getItem('pv-intro'))document.documentElement.classList.add('intro-seen');else sessionStorage.setItem('pv-intro','1')}catch(e){}",
+          }}
+        />
       </head>
-      <body>{children}</body>
+      <body>
+        <Intro />
+        {children}
+      </body>
     </html>
   );
 }
