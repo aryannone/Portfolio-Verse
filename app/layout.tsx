@@ -26,7 +26,13 @@ const serif = Fraunces({
   preload: false,
 });
 
+// The public address of the site. Shared-link previews (WhatsApp, LinkedIn...) need the preview image
+// as a full public link; without this, Vercel deployments can point it at a protected preview address.
+// Set NEXT_PUBLIC_SITE_URL in Vercel when the site moves to a new domain.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://portfolio-verse-tau.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "PORTFOLIO-VERSE: your portfolio, ready in ten minutes",
     template: "%s · PORTFOLIO-VERSE",
@@ -39,6 +45,7 @@ export const metadata: Metadata = {
       "A free portfolio builder for students. Nine templates, résumé import, no sign-up. Download your site as one HTML file.",
     type: "website",
     siteName: "PORTFOLIO-VERSE",
+    url: "/",
   },
   // Shared links show the large preview picture (app/opengraph-image.tsx).
   twitter: { card: "summary_large_image" },
