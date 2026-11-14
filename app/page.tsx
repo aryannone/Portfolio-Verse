@@ -6,6 +6,7 @@ import ScaledPreview from "@/components/ScaledPreview";
 import HeroShowcase from "@/components/HeroShowcase";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import FeatureDemos from "@/components/FeatureDemos";
+import StepsShowcase from "@/components/StepsShowcase";
 import { TemplateCard } from "@/components/TemplateCard";
 import { READY_TEMPLATES } from "@/lib/templates";
 
@@ -84,15 +85,7 @@ export default function LandingPage() {
         <section className="band-dark">
           <div className="wrap section">
             <h2 className="display h-section" data-reveal>Four steps. That is all.</h2>
-            <ol className="steps">
-              {STEPS.map((step, i) => (
-                <li key={step.title} className="step" data-reveal style={{ "--i": i } as React.CSSProperties}>
-                  <span className="step-num" aria-hidden="true">{i + 1}</span>
-                  <div className="step-title">{step.title}</div>
-                  <div className="step-text">{step.text}</div>
-                </li>
-              ))}
-            </ol>
+            <StepsShowcase steps={STEPS} />
           </div>
         </section>
 

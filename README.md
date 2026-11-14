@@ -36,6 +36,7 @@ Next.js (Vercel) + Supabase (Google login, Postgres, storage).
 
 - Accent colour: purple `#8c52ff`, set once as `--accent` in `app/globals.css`
 - Logo: `components/Logo.tsx` (used in the site; the cap, round head and legs are separate parts), `public/logo-mark.svg` (standalone file), `app/icon.svg` (browser tab)
+- Four steps band: `components/StepsShowcase.tsx` (styles under "How it works" in `app/globals.css`). A stage acts out each step, the logo graduate reacts beside it and follows the pointer, and the steps advance on their own while on screen.
 - Opening animation: `components/Intro.tsx` with styles at the end of `app/globals.css`. It plays once per browser tab, a tap or key press skips it, and it is never shown to people who ask for reduced motion.
 
 ## Folders
