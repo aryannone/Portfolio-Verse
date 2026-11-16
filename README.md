@@ -1,5 +1,7 @@
 # PORTFOLIO-VERSE
 
+[![CI](https://github.com/aryannone/Portfolio-Verse/actions/workflows/ci.yml/badge.svg?branch=app)](https://github.com/aryannone/Portfolio-Verse/actions/workflows/ci.yml)
+
 **A free portfolio website builder for students and first-job seekers.** Fill in your details (or import your résumé), pick one of nine templates, tweak the design, and download your whole site as a single HTML file. No sign-up, no code, no cost.
 
 **Live:** [portfolio-verse-tau.vercel.app](https://portfolio-verse-tau.vercel.app)
@@ -64,19 +66,36 @@ Most students need a portfolio site for internship and job applications, but web
 
 ## Lighthouse
 
-Landing page, Lighthouse 12 (mobile, simulated throttling):
+Landing page, Lighthouse 12 (mobile, simulated throttling), median of three runs:
 
 | Performance | Accessibility | Best practices | SEO |
 | :---: | :---: | :---: | :---: |
-| ~87 | 100 | 100 | 100 |
+| ~88 | 100 | 100 | 100 |
 
-Performance is measured with the opening animation playing. It covers the page for about 3.5 seconds on every load, which Lighthouse counts as slow visual progress. With reduced motion (no intro), Performance is about 95 and Speed Index drops from about 3.2 s to 1.3 s.
+Performance is measured with the opening animation playing. It covers the page for about 3.5 seconds on every load, which Lighthouse counts as slow visual progress. With reduced motion (no intro), Performance is about 92 and Speed Index drops from about 3 s to 1.2 s.
 
 Work done for these scores:
-- small accent text darkened to pass WCAG AA contrast
+- accent colour deepened wherever it is small text, or sits behind small white text, to pass WCAG AA contrast
+- correct heading order in the template gallery
 - template styles minified at build time
-- below-the-fold sections drawn only when near the screen (`content-visibility`)
+- below-the-fold landing sections drawn only when near the screen (`content-visibility`), which halved main-thread work
 - previews sized through `ResizeObserver` to avoid forced reflows
+
+## Tests
+
+Every push runs the [CI workflow](.github/workflows/ci.yml): type-check, unit tests, a production build and browser tests.
+
+- **Unit tests** (Vitest, `tests/unit`): link handling, file names, samples for every template, moving details between templates, and upgrading portfolios saved by older versions.
+- **Browser tests** (Playwright, `tests/e2e`):
+  - **Landing page:** the intro plays and can be skipped; every section appears on scroll; the four steps advance; the privacy page; the link preview image.
+  - **Editor:** typing shows in the preview and survives a reload; the downloaded HTML file works on its own; photo format checks; a résumé PDF made by the site imports back; "Save a copy" adds a second portfolio.
+
+```bash
+npm run typecheck
+npm test            # unit tests
+npm run build
+npm run test:e2e    # browser tests (starts the built site)
+```
 
 ## Project structure
 

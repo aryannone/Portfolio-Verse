@@ -12,3 +12,7 @@ public/vendor/mediapipe/wasm
 public/vendor/pdfjs
 # made from public/portfolio.css by scripts/copy-vendor.mjs
 public/portfolio.min.css
+
+# test output
+test-results
+playwright-report
