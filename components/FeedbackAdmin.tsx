@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 import { LIMITS, NOTE_FONTS, type Note } from "@/lib/feedback";
+import { PinnedHeart } from "@/components/FeedbackWall";
 
 type AdminNote = Note & { approved: boolean };
 type Action = "approve" | "hide" | "delete" | "pin" | "unpin";
@@ -155,10 +156,8 @@ export default function FeedbackAdmin() {
               className={`fw-note${n.pinned ? " is-pinned" : ""}`}
               style={{ "--note": n.color, "--tilt": "0deg", fontFamily: NOTE_FONTS.find((f) => f.id === n.font)?.css } as CSSProperties}
             >
-              <span className="fw-tags">
-                {n.pinned ? <span className="fw-pinned">Pinned</span> : null}
-                <span className="fw-topic">{n.topic}</span>
-              </span>
+              {n.pinned ? <PinnedHeart /> : null}
+              <span className="fw-topic">{n.topic}</span>
               <p className="fw-msg">{n.message}</p>
               <span className="fw-name">— {n.name}</span>
               {n.reply ? (

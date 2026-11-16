@@ -1217,8 +1217,9 @@ label.rs-upload:focus-within { outline: 2px solid var(--ink); outline-offset: 3p
 .fw-topic { align-self: center; padding: 1px 8px; border-radius: 4px; background: rgba(0, 0, 0, 0.08); font-family: var(--font-body-stack); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .fw-msg { flex: 1; margin: 0; font-size: 20px; line-height: 1.15; overflow-wrap: anywhere; }
 .fw-name { align-self: flex-end; font-size: 18px; }
-.fw-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
-.fw-pinned { padding: 1px 6px; border-radius: 4px; background: #1d1b16; color: #ffffff; font-family: var(--font-body-stack); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+/* A pinned note: a red heart in its top left corner and a gold pin. */
+.fw-pinned { position: absolute; top: 6px; left: 6px; display: block; line-height: 0; transform: rotate(-12deg); filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3)); }
+.fw-pinned svg { fill: #e11d48; }
 .fw-note.is-pinned .fw-pin { width: 20px; height: 20px; margin-left: -10px; top: -9px; background: radial-gradient(circle at 35% 35%, #ffe08a, #d4a017 60%, #7a5a05); }
 /* The owner's reply: a small white slip under the note's words. */
 .fw-reply { margin: 6px -4px 0; padding: 6px 8px; border-radius: 3px; background: rgba(255, 255, 255, 0.82); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); font-family: var(--font-body-stack); font-size: 12.5px; line-height: 1.35; overflow-wrap: anywhere; }

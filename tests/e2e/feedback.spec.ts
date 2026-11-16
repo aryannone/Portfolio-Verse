@@ -98,7 +98,7 @@ test.describe("feedback wall", () => {
     await page.goto("/");
     await page.locator("#feedback").scrollIntoViewIfNeeded();
     const note = page.locator(".fw-note.is-pinned");
-    await expect(note.locator(".fw-pinned")).toHaveText("Pinned");
+    await expect(note.getByRole("img", { name: "Pinned" })).toBeVisible();
     await expect(note.locator(".fw-reply")).toHaveText("Reply: Thank you, Priya!");
   });
 
@@ -132,7 +132,7 @@ test.describe("feedback wall", () => {
     await page.getByRole("button", { name: "On the wall" }).click();
     const priya = page.locator(".fa-item").filter({ hasText: "Priya" });
     await priya.getByRole("button", { name: "Pin" }).click();
-    await expect(priya.locator(".fw-pinned")).toHaveText("Pinned");
+    await expect(priya.getByRole("img", { name: "Pinned" })).toBeVisible();
     await priya.getByRole("button", { name: "Reply" }).click();
     await priya.getByLabel("Your reply (shown under the note)").fill("Thank you, Priya!");
     await priya.getByRole("button", { name: "Save reply" }).click();

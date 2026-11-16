@@ -51,6 +51,15 @@ function clientId() {
   }
 }
 
+// The mark on a note the owner has pinned to the top of the wall.
+export function PinnedHeart() {
+  return (
+    <span className="fw-pinned" role="img" aria-label="Pinned">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.2 0 3.7 1.3 5.2 3.1 1.5-1.8 3-3.1 5.2-3.1 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z" /></svg>
+    </span>
+  );
+}
+
 function StuckNote({ note, mine, hidden }: { note: Note; mine?: boolean; hidden?: boolean }) {
   return (
     <li
@@ -59,10 +68,8 @@ function StuckNote({ note, mine, hidden }: { note: Note; mine?: boolean; hidden?
       style={{ "--note": note.color, "--tilt": `${tiltOf(note.id)}deg`, fontFamily: fontCss(note.font), visibility: hidden ? "hidden" : undefined } as CSSProperties}
     >
       <span className="fw-pin" aria-hidden="true" />
-      <span className="fw-tags">
-        {note.pinned ? <span className="fw-pinned">Pinned</span> : null}
-        <span className="fw-topic">{note.topic}</span>
-      </span>
+      {note.pinned ? <PinnedHeart /> : null}
+      <span className="fw-topic">{note.topic}</span>
       <p className="fw-msg">{note.message}</p>
       <span className="fw-name">— {note.name}</span>
       {note.reply ? (
