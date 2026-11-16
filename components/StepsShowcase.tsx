@@ -58,6 +58,8 @@ export default function StepsShowcase({ steps }: { steps: Step[] }) {
     <div
       ref={band}
       className={`how${still ? " how-still" : playing ? "" : " is-paused"}`}
+      data-in-view={inView}
+      data-held={held}
       onMouseEnter={() => setHeld(true)}
       onMouseLeave={() => setHeld(false)}
       // Keyboard focus pauses it (so a step can be read); a mouse click on a step does not.

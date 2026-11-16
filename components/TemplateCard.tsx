@@ -11,7 +11,9 @@ const KIND: Record<string, string> = { professional: "Professional", creative: "
 // One template in a gallery: a live picture of it in a frame tinted with its own colour,
 // its name and what it is for. The whole card opens the full preview.
 // "compact" leaves out the "Use this template" button (for the home page).
+// On the home page the cards sit under a section heading (h3); in the gallery they come right under the page title (h2).
 export function TemplateCard({ template, data, compact = false }: { template: TemplateInfo; data?: Portfolio | null; compact?: boolean }) {
+  const Title = compact ? "h3" : "h2";
   return (
     <article className="tg-card" style={{ "--tg": template.accent } as CSSProperties}>
       <div className="tg-frame">
@@ -25,12 +27,12 @@ export function TemplateCard({ template, data, compact = false }: { template: Te
         </div>
       </div>
       <div className="tg-meta">
-        <h3 className="tg-title">
+        <Title className="tg-title">
           <Link href={`/templates/${template.id}`} className="tg-link">
             {template.name}
           </Link>
           {NEW.has(template.id) ? <span className="tg-new">New</span> : null}
-        </h3>
+        </Title>
         <span className="tg-tag">{KIND[template.category] ?? ""}</span>
       </div>
       <p className="tg-blurb">{template.blurb}</p>
@@ -73,7 +75,7 @@ export function BuildOwnCard() {
         </div>
       </div>
       <div className="tg-meta">
-        <h3 className="tg-title">Build your own</h3>
+        <h2 className="tg-title">Build your own</h2>
         <span className="tg-tag">Blank canvas</span>
       </div>
       <p className="tg-blurb">Add sections one by one and choose the colours, layouts and animation yourself.</p>

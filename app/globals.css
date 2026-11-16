@@ -10,7 +10,7 @@
   --surface: #f4f5f7;
   --ground: #ffffff;
   --accent: #8c52ff;
-  /* The accent for small text: a touch deeper so it passes WCAG AA contrast on white and grey. */
+  /* The accent for small text, and behind small white text: a touch deeper so it passes WCAG AA contrast. */
   --accent-text: #7a3fef;
   --on-accent: #ffffff;
   /* Lighter purples: one to sit behind dark text, one to read on dark backgrounds. */
@@ -426,9 +426,9 @@ a.btn { display: inline-flex; align-items: center; }
   .reveal-on [data-reveal] { opacity: 1; transform: none; transition: none; }
 }
 
-/* Landing sections below the first screen are not styled or drawn until they come near the screen,
-   which keeps the first load light. The size is a guess the browser uses until it draws them. */
-.offscreen { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+/* Landing sections below the first screen are only styled and drawn when they come near the screen,
+   which keeps the first load light. The size is the browser's guess until it draws them. */
+.lazy-draw { content-visibility: auto; contain-intrinsic-size: auto 900px; }
 
 /* Simple pages: privacy */
 
@@ -558,7 +558,7 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
 .sf-steps { display: flex; gap: 8px; padding-top: 20px; padding-bottom: 8px; overflow-x: auto; }
 .sf-step { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px 0 8px; border: 1px solid var(--line-strong); border-radius: 999px; background: #ffffff; color: var(--ink); font-size: 14px; font-weight: 600; white-space: nowrap; }
 .sf-step span { width: 28px; height: 28px; border-radius: 50%; background: var(--surface); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; }
-.sf-step.is-done span { background: var(--accent); color: var(--on-accent); }
+.sf-step.is-done span { background: var(--accent-text); color: var(--on-accent); }
 .sf-step.is-on { background: var(--ink); border-color: var(--ink); color: #ffffff; }
 .sf-step.is-on span { background: #ffffff; color: var(--ink); }
 .sf-main { max-width: 760px; padding-top: 28px; display: flex; flex-direction: column; gap: 18px; align-items: stretch; }
@@ -652,7 +652,7 @@ a.ed-link { display: inline; min-height: 0; padding: 0; }
 .browser.is-stopped .scaled-auto .scaled-scroll { animation-play-state: paused; }
 
 /* Closing call to action on the home page */
-.band-accent { background: var(--accent); color: var(--on-accent); }
+.band-accent { background: var(--accent-text); color: var(--on-accent); }
 .band-accent .btn-primary { background: #ffffff; border-color: #ffffff; color: var(--ink); }
 .band-accent .btn-primary:hover:not(:disabled) { background: var(--ink); border-color: var(--ink); color: #ffffff; }
 .closing { padding-top: 80px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
@@ -890,7 +890,7 @@ label.rs-upload:focus-within { outline: 2px solid var(--ink); outline-offset: 3p
 .tg-link::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 22px; }
 .tg-link:focus-visible { outline: none; }
 .tg-link:focus-visible::after { outline: 2px solid var(--ink); outline-offset: 6px; }
-.tg-new { padding: 2px 8px; border-radius: 999px; background: var(--accent); color: var(--on-accent, #ffffff); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.tg-new { padding: 2px 8px; border-radius: 999px; background: var(--accent-text); color: var(--on-accent, #ffffff); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .tg-tag { flex: none; padding: 3px 10px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--muted); }
 .tg-blurb { margin: 0; font-size: 15px; color: var(--muted); }
 .tg-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
