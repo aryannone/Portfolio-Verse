@@ -29,6 +29,7 @@ import {
 } from "@/lib/portfolio";
 import { usePortfolio } from "@/lib/usePortfolio";
 import { buildHtml, downloadHtml } from "@/lib/exportHtml";
+import { countEvent } from "@/components/SiteStats";
 import { addSaved, loadSaved, savePortfolio } from "@/lib/store";
 import { rememberDetails } from "@/lib/usePortfolio";
 import { useRouter } from "next/navigation";
@@ -82,6 +83,7 @@ export default function Editor() {
     setBusy(true);
     try {
       downloadHtml(await buildHtml(viewRef.current, data), data.name);
+      countEvent("download");
       setStatus("Downloaded your portfolio file");
     } catch {
       setStatus("Could not build the file. Please try again.");

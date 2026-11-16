@@ -159,6 +159,11 @@ a:focus-visible, button:focus-visible {
 
 .lead { font-size: 19px; color: var(--muted); max-width: 30em; }
 .small { font-size: 14px; color: var(--muted); }
+/* The home page's numbers: visitors, downloads, feedback notes. */
+.stats { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 6px 0 0; padding: 14px 0 0; list-style: none; border-top: 1px solid var(--line); }
+.stats li { display: flex; flex-direction: column; }
+.stats strong { font-family: var(--font-display-stack); font-size: 28px; line-height: 1.1; color: var(--ink); }
+.stats span { font-size: 13px; color: var(--muted); }
 
 /* Landing: hero */
 

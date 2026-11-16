@@ -8,6 +8,7 @@ import RevealOnScroll from "@/components/RevealOnScroll";
 import FeatureDemos from "@/components/FeatureDemos";
 import StepsShowcase from "@/components/StepsShowcase";
 import FeedbackWall from "@/components/FeedbackWall";
+import SiteStats from "@/components/SiteStats";
 import { TemplateCard } from "@/components/TemplateCard";
 import { READY_TEMPLATES } from "@/lib/templates";
 
@@ -65,6 +66,7 @@ export default function LandingPage() {
               </Link>
             </div>
             <p className="small">Free during beta. No sign-up. Download your HTML any time.</p>
+            <SiteStats />
           </div>
 
           <div className="hero-demo">
