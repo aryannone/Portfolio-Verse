@@ -62,6 +62,22 @@ Most students need a portfolio site for internship and job applications, but web
   - Older saved data is migrated on load (`normalize` in `lib/portfolio.ts`), including templates that were merged or retired.
 - **Résumé parsing without AI APIs.** `lib/resumeImport.ts` rebuilds lines from pdf.js text positions, finds section headings and pulls out names, links, dates and bullet points with patterns. The user always checks the result, and the UI says so.
 
+## Lighthouse
+
+Landing page, Lighthouse 12 (mobile, simulated throttling):
+
+| Performance | Accessibility | Best practices | SEO |
+| :---: | :---: | :---: | :---: |
+| ~87 | 100 | 100 | 100 |
+
+Performance is measured with the opening animation playing. It covers the page for about 3.5 seconds on every load, which Lighthouse counts as slow visual progress. With reduced motion (no intro), Performance is about 95 and Speed Index drops from about 3.2 s to 1.3 s.
+
+Work done for these scores:
+- small accent text darkened to pass WCAG AA contrast
+- template styles minified at build time
+- below-the-fold sections drawn only when near the screen (`content-visibility`)
+- previews sized through `ResizeObserver` to avoid forced reflows
+
 ## Project structure
 
 ```
