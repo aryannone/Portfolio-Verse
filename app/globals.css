@@ -1217,7 +1217,6 @@ label.rs-upload:focus-within { outline: 2px solid var(--ink); outline-offset: 3p
 .fw-topic { align-self: center; padding: 1px 8px; border-radius: 4px; background: rgba(0, 0, 0, 0.08); font-family: var(--font-body-stack); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .fw-msg { flex: 1; margin: 0; font-size: 20px; line-height: 1.15; overflow-wrap: anywhere; }
 .fw-name { align-self: flex-end; font-size: 18px; }
-.fw-pending { margin-top: 4px; padding: 3px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.7); font-family: var(--font-body-stack); font-size: 11px; font-weight: 600; text-align: center; }
 .fw-note.is-mine { outline: 2px dashed rgba(0, 0, 0, 0.35); outline-offset: 3px; }
 
 /* The pad. */
@@ -1271,6 +1270,7 @@ label.rs-upload:focus-within { outline: 2px solid var(--ink); outline-offset: 3p
 .fw-thanks { display: flex; flex-direction: column; gap: 6px; padding: 28px 24px; border-radius: 16px; background: #ffffff; border: 1px solid var(--line); box-shadow: 0 18px 40px -26px rgba(18, 20, 26, 0.4); }
 .fw-thanks strong { font-family: var(--font-note-caveat), cursive; font-size: 34px; color: var(--accent-text); }
 .fw-thanks p { margin: 0; color: var(--ink-soft); }
+.fw-edit { align-self: flex-start; margin-top: 10px; }
 
 @media (max-width: 860px) {
   .fw { grid-template-columns: 1fr; }

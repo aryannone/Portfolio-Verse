@@ -6,12 +6,14 @@ const approved = [
   { id: "00000001-aaaa-bbbb-cccc-dddddddddddd", name: "Priya", topic: "Templates", message: "The Aurora template is gorgeous!", color: "#a8d8ff", font: "caveat", created_at: "2026-11-01T10:00:00Z" },
 ];
 
-async function openWall(page: Page, onPost?: (body: Record<string, unknown>) => void) {
+async function openWall(page: Page, onPost?: (body: Record<string, unknown>, method: string) => void) {
   await page.route("**/api/feedback", async (route) => {
-    if (route.request().method() === "GET") return route.fulfill({ json: { notes: approved, ready: true } });
+    const method = route.request().method();
+    if (method === "GET") return route.fulfill({ json: { notes: approved, ready: true } });
     const body = route.request().postDataJSON();
-    onPost?.(body);
-    return route.fulfill({ status: 201, json: { note: { ...body, id: "ffffffff-1111-2222-3333-444444444444", created_at: new Date().toISOString() } } });
+    onPost?.(body, method);
+    const note = { ...body, id: "ffffffff-1111-2222-3333-444444444444", created_at: new Date().toISOString() };
+    return route.fulfill({ status: method === "POST" ? 201 : 200, json: { note } });
   });
   await page.goto("/");
   await page.locator("#feedback").scrollIntoViewIfNeeded();
@@ -34,7 +36,7 @@ test.describe("feedback wall", () => {
     await page.getByRole("button", { name: "Stick it on the wall" }).click();
 
     await expect(page.locator(".fw-note.is-mine")).toContainText("Click to edit in the preview");
-    await expect(page.locator(".fw-note.is-mine")).toContainText("Only you can see this until it is approved");
+    await expect(page.locator(".fw-note.is-mine")).not.toContainText("approved");
     await expect(page.locator(".fw-thanks")).toBeVisible();
     expect(posts).toHaveLength(1);
     expect(posts[0]).toMatchObject({ name: "Aryan", topic: "Editor", font: "indie" });
@@ -44,6 +46,34 @@ test.describe("feedback wall", () => {
     await page.locator("#feedback").scrollIntoViewIfNeeded();
     await expect(page.locator(".fw-note.is-mine")).toBeVisible();
     await expect(page.locator(".fw-form")).toHaveCount(0);
+  });
+
+  test("the visitor can change the words and the style of their note", async ({ page }) => {
+    const sent: { body: Record<string, unknown>; method: string }[] = [];
+    await openWall(page, (body, method) => sent.push({ body, method }));
+    await page.getByLabel("Your feedback").fill("First thoughts on the editor.");
+    await page.getByLabel("Your name (required)").fill("Aryan");
+    await page.getByRole("button", { name: "Stick it on the wall" }).click();
+    await expect(page.locator(".fw-note.is-mine")).toContainText("First thoughts");
+
+    await page.getByRole("button", { name: "Edit your note" }).click();
+    await expect(page.getByLabel("Your feedback")).toHaveValue("First thoughts on the editor.");
+    await page.getByLabel("Your feedback").fill("Changed my mind: the editor is great!");
+    await page.getByRole("radio", { name: "Note colour 3" }).click();
+    await page.getByRole("radio", { name: "Neat" }).click();
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    const mineNote = page.locator(".fw-note.is-mine");
+    await expect(mineNote).toContainText("Changed my mind");
+    await expect(page.locator(".fw-note")).toHaveCount(2);
+    expect(sent.map((s) => s.method)).toEqual(["POST", "PATCH"]);
+    expect(sent[1].body).toMatchObject({ message: "Changed my mind: the editor is great!", color: "#a5f3c4", font: "patrick" });
+
+    // The change is kept after a reload, and the note can still be edited.
+    await page.reload();
+    await page.locator("#feedback").scrollIntoViewIfNeeded();
+    await expect(page.locator(".fw-note.is-mine")).toContainText("Changed my mind");
+    await expect(page.getByRole("button", { name: "Edit your note" })).toBeVisible();
   });
 
   test("a note can be dragged onto the wall by its tape", async ({ page }) => {
@@ -65,6 +95,7 @@ test.describe("feedback wall", () => {
     const list = await request.get("/api/feedback");
     expect(await list.json()).toEqual({ notes: [], ready: false });
     expect((await request.post("/api/feedback", { data: {} })).status()).toBe(503);
+    expect((await request.patch("/api/feedback", { data: {} })).status()).toBe(503);
     expect((await request.get("/api/feedback/admin")).status()).toBe(401);
   });
 });

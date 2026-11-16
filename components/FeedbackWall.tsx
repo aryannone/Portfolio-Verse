@@ -19,6 +19,7 @@ import {
 // A note is stuck on by dragging it onto the board or with the button. It waits for the owner's approval
 // before others see it, but the visitor who wrote it sees it on the wall straight away (kept in this browser).
 // Each browser can add one note: the browser remembers it, and the server refuses a second one.
+// The visitor can change their note's words and style at any time; a changed note is approved again.
 
 const MINE_KEY = "pv_feedback_note";
 const CLIENT_KEY = "pv_feedback_client";
@@ -50,10 +51,10 @@ function clientId() {
   }
 }
 
-function StuckNote({ note, pending, hidden }: { note: Note; pending?: boolean; hidden?: boolean }) {
+function StuckNote({ note, mine, hidden }: { note: Note; mine?: boolean; hidden?: boolean }) {
   return (
     <li
-      className={`fw-note${pending ? " is-mine" : ""}`}
+      className={`fw-note${mine ? " is-mine" : ""}`}
       data-id={note.id}
       style={{ "--note": note.color, "--tilt": `${tiltOf(note.id)}deg`, fontFamily: fontCss(note.font), visibility: hidden ? "hidden" : undefined } as CSSProperties}
     >
@@ -61,7 +62,6 @@ function StuckNote({ note, pending, hidden }: { note: Note; pending?: boolean; h
       <span className="fw-topic">{note.topic}</span>
       <p className="fw-msg">{note.message}</p>
       <span className="fw-name">— {note.name}</span>
-      {pending ? <span className="fw-pending">Only you can see this until it is approved</span> : null}
     </li>
   );
 }
@@ -71,6 +71,7 @@ export default function FeedbackWall() {
   const [loaded, setLoaded] = useState(false);
   const [mine, setMine] = useState<Mine | "posted" | null>(null);
   const [flying, setFlying] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   const [color, setColor] = useState<NoteColor>(NOTE_COLORS[0]);
   const [font, setFont] = useState<NoteFont>("caveat");
@@ -98,7 +99,6 @@ export default function FeedbackWall() {
   }, []);
 
   const mineNote = mine && mine !== "posted" ? mine : null;
-  const mineApproved = mineNote ? notes.some((n) => n.id === mineNote.id) : false;
   const posted = Boolean(mine);
 
   // After a note is posted, it flies from the pad to its place on the board.
@@ -136,6 +136,28 @@ export default function FeedbackWall() {
     return () => ghost.remove();
   }, [flying, mineNote]);
 
+  function remember(value: Mine | "posted") {
+    try {
+      window.localStorage.setItem(MINE_KEY, typeof value === "string" ? value : JSON.stringify(value));
+    } catch {
+      // Without storage the note is still on the server; it just will not be shown back after a reload.
+    }
+    setMine(value);
+  }
+
+  // Opens the pad again with the visitor's note on it, to change its words or its style.
+  function startEdit() {
+    if (!mineNote) return;
+    setColor(mineNote.color);
+    setFont(mineNote.font);
+    setTopic(mineNote.topic);
+    setMessage(mineNote.message);
+    setName(mineNote.name);
+    setError("");
+    setEditing(true);
+  }
+
+  // Sticks a new note on the wall, or saves the changes to the visitor's note.
   async function stick(from: DOMRect | null) {
     setError("");
     const checked = checkNote({ name, message, topic, color, font });
@@ -146,28 +168,23 @@ export default function FeedbackWall() {
     setBusy(true);
     try {
       const res = await fetch("/api/feedback", {
-        method: "POST",
+        method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...checked.note, clientId: clientId(), website: trap }),
       });
       const data = (await res.json().catch(() => ({}))) as { note?: Note; error?: string };
       if (res.status === 409) {
-        window.localStorage.setItem(MINE_KEY, "posted");
-        setMine("posted");
+        // This browser already has a note on the server: show that one, so it can be edited.
+        remember(data.note ? { ...data.note, approved: false } : "posted");
         return true;
       }
       if (!res.ok || !data.note) {
         setError(data.error ?? "Could not save your note. Please try again later.");
         return false;
       }
-      const note: Mine = { ...data.note, approved: false };
-      try {
-        window.localStorage.setItem(MINE_KEY, JSON.stringify(note));
-      } catch {
-        // Without storage the note is still on the server; it just will not be shown back after a reload.
-      }
       flyFrom.current = from ?? draft.current?.getBoundingClientRect() ?? null;
-      setMine(note);
+      remember({ ...data.note, approved: false });
+      setEditing(false);
       setFlying(true);
       return true;
     } catch {
@@ -208,6 +225,7 @@ export default function FeedbackWall() {
   // An old error goes away as soon as the note is changed.
   useEffect(() => setError(""), [message, name, topic]);
 
+  // The visitor's own note is drawn from this browser's copy, so their latest changes show straight away.
   const others = notes.filter((n) => n.id !== mineNote?.id);
 
   return (
@@ -223,25 +241,24 @@ export default function FeedbackWall() {
         <div className="fw">
           <div className={`fw-board${overBoard ? " is-target" : ""}`} ref={board} role="region" aria-label="Notes from visitors" tabIndex={-1}>
             <ul className="fw-notes">
-              {mineNote && !mineApproved ? <StuckNote note={mineNote} pending hidden={flying} /> : null}
+              {mineNote ? <StuckNote note={mineNote} mine hidden={flying} /> : null}
               {others.map((n) => (
-                <StuckNote key={n.id} note={n} hidden={flying && n.id === mineNote?.id} />
+                <StuckNote key={n.id} note={n} />
               ))}
             </ul>
             {loaded && !others.length && !mineNote ? <p className="fw-empty">The wall is empty. Be the first to stick a note here!</p> : null}
           </div>
 
           <div className="fw-pad">
-            {posted ? (
+            {posted && !editing ? (
               <div className="fw-thanks" role="status">
                 <strong>Thank you!</strong>
-                <p>
-                  {mineNote
-                    ? mineApproved
-                      ? "Your note is on the wall for everyone to see."
-                      : "Your note is on the wall. Others will see it once it has been approved."
-                    : "This browser has already added a note. Thank you for your feedback!"}
-                </p>
+                <p>{mineNote ? "Your note is on the wall. You can change it whenever you like." : "This browser has already added a note. Thank you for your feedback!"}</p>
+                {mineNote ? (
+                  <button type="button" className="btn btn-outline fw-edit" onClick={startEdit}>
+                    Edit your note
+                  </button>
+                ) : null}
               </div>
             ) : (
               <form
@@ -333,9 +350,15 @@ export default function FeedbackWall() {
                 ) : null}
                 <div className="fw-actions">
                   <button type="submit" className="btn btn-primary" disabled={busy}>
-                    {busy ? "Sticking…" : "Stick it on the wall"}
+                    {editing ? (busy ? "Saving…" : "Save changes") : busy ? "Sticking…" : "Stick it on the wall"}
                   </button>
-                  <span className="fw-hint">or drag the note by its tape onto the wall</span>
+                  {editing ? (
+                    <button type="button" className="btn btn-outline" disabled={busy} onClick={() => setEditing(false)}>
+                      Cancel
+                    </button>
+                  ) : (
+                    <span className="fw-hint">or drag the note by its tape onto the wall</span>
+                  )}
                 </div>
               </form>
             )}
