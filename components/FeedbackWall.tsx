@@ -84,6 +84,7 @@ export default function FeedbackWall() {
 
   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
   const [overBoard, setOverBoard] = useState(false);
+  const [more, setMore] = useState(false);
   const board = useRef<HTMLDivElement>(null);
   const draft = useRef<HTMLDivElement>(null);
   const dragStart = useRef<{ x: number; y: number } | null>(null);
@@ -225,6 +226,17 @@ export default function FeedbackWall() {
   // An old error goes away as soon as the note is changed.
   useEffect(() => setError(""), [message, name, topic]);
 
+  // When the board holds more notes than fit, a hint at its bottom edge says there are more below.
+  const checkMore = () => {
+    const b = board.current;
+    setMore(Boolean(b && b.scrollHeight - b.clientHeight - b.scrollTop > 8));
+  };
+  useEffect(() => {
+    checkMore();
+    window.addEventListener("resize", checkMore);
+    return () => window.removeEventListener("resize", checkMore);
+  }, [notes, mine]);
+
   // The visitor's own note is drawn from this browser's copy, so their latest changes show straight away.
   const others = notes.filter((n) => n.id !== mineNote?.id);
 
@@ -239,14 +251,21 @@ export default function FeedbackWall() {
         </div>
 
         <div className="fw">
-          <div className={`fw-board${overBoard ? " is-target" : ""}`} ref={board} role="region" aria-label="Notes from visitors" tabIndex={-1}>
-            <ul className="fw-notes">
-              {mineNote ? <StuckNote note={mineNote} mine hidden={flying} /> : null}
-              {others.map((n) => (
-                <StuckNote key={n.id} note={n} />
-              ))}
-            </ul>
-            {loaded && !others.length && !mineNote ? <p className="fw-empty">The wall is empty. Be the first to stick a note here!</p> : null}
+          <div className="fw-frame">
+            <div className={`fw-board${overBoard ? " is-target" : ""}`} ref={board} onScroll={checkMore} role="region" aria-label="Notes from visitors" tabIndex={-1}>
+              <ul className="fw-notes">
+                {mineNote ? <StuckNote note={mineNote} mine hidden={flying} /> : null}
+                {others.map((n) => (
+                  <StuckNote key={n.id} note={n} />
+                ))}
+              </ul>
+              {loaded && !others.length && !mineNote ? <p className="fw-empty">The wall is empty. Be the first to stick a note here!</p> : null}
+            </div>
+            {more ? (
+              <button type="button" className="fw-more" onClick={() => board.current?.scrollBy({ top: board.current.clientHeight * 0.8, behavior: "smooth" })}>
+                <span>Scroll for more notes ↓</span>
+              </button>
+            ) : null}
           </div>
 
           <div className="fw-pad">
