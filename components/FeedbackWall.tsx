@@ -54,14 +54,22 @@ function clientId() {
 function StuckNote({ note, mine, hidden }: { note: Note; mine?: boolean; hidden?: boolean }) {
   return (
     <li
-      className={`fw-note${mine ? " is-mine" : ""}`}
+      className={`fw-note${mine ? " is-mine" : ""}${note.pinned ? " is-pinned" : ""}`}
       data-id={note.id}
       style={{ "--note": note.color, "--tilt": `${tiltOf(note.id)}deg`, fontFamily: fontCss(note.font), visibility: hidden ? "hidden" : undefined } as CSSProperties}
     >
       <span className="fw-pin" aria-hidden="true" />
-      <span className="fw-topic">{note.topic}</span>
+      <span className="fw-tags">
+        {note.pinned ? <span className="fw-pinned">Pinned</span> : null}
+        <span className="fw-topic">{note.topic}</span>
+      </span>
       <p className="fw-msg">{note.message}</p>
       <span className="fw-name">— {note.name}</span>
+      {note.reply ? (
+        <p className="fw-reply">
+          <strong>Reply:</strong> {note.reply}
+        </p>
+      ) : null}
     </li>
   );
 }
@@ -99,13 +107,16 @@ export default function FeedbackWall() {
       .finally(() => setLoaded(true));
   }, []);
 
-  const mineNote = mine && mine !== "posted" ? mine : null;
+  // The visitor's note comes from this browser's copy, with the owner's pin and reply taken from the wall.
+  const mineLocal = mine && mine !== "posted" ? mine : null;
+  const mineOnWall = mineLocal ? notes.find((n) => n.id === mineLocal.id) : undefined;
+  const mineNote: Mine | null = mineLocal ? { ...mineLocal, pinned: mineOnWall?.pinned, reply: mineOnWall?.reply } : null;
   const posted = Boolean(mine);
 
   // After a note is posted, it flies from the pad to its place on the board.
   useEffect(() => {
-    if (!flying || !mineNote || !board.current) return;
-    const target = board.current.querySelector<HTMLElement>(`[data-id="${mineNote.id}"]`);
+    if (!flying || !mineLocal || !board.current) return;
+    const target = board.current.querySelector<HTMLElement>(`[data-id="${mineLocal.id}"]`);
     const from = flyFrom.current;
     const done = () => {
       setFlying(false);
@@ -126,7 +137,7 @@ export default function FeedbackWall() {
       [
         { transform: `translate(${dx}px, ${dy}px) scale(${s}) rotate(0deg)`, boxShadow: "0 30px 40px rgba(0,0,0,0.35)" },
         { transform: `translate(${dx * 0.45}px, ${dy * 0.45 - 60}px) scale(${(s + 1) / 2 + 0.08}) rotate(-8deg)`, offset: 0.55 },
-        { transform: `translate(0, 0) scale(1) rotate(${tiltOf(mineNote.id)}deg)`, boxShadow: "0 6px 10px rgba(0,0,0,0.25)" },
+        { transform: `translate(0, 0) scale(1) rotate(${tiltOf(mineLocal.id)}deg)`, boxShadow: "0 6px 10px rgba(0,0,0,0.25)" },
       ],
       { duration: 900, easing: "cubic-bezier(0.3, 0.7, 0.2, 1)" },
     );
@@ -135,7 +146,7 @@ export default function FeedbackWall() {
       done();
     };
     return () => ghost.remove();
-  }, [flying, mineNote]);
+  }, [flying, mineLocal]);
 
   function remember(value: Mine | "posted") {
     try {

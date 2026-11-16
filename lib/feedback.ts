@@ -16,7 +16,7 @@ export const NOTE_FONTS = [
 ] as const;
 export type NoteFont = (typeof NOTE_FONTS)[number]["id"];
 
-export const LIMITS = { name: 30, message: 220, minMessage: 8 };
+export const LIMITS = { name: 30, message: 220, minMessage: 8, reply: 160 };
 
 export type Note = {
   id: string;
@@ -26,9 +26,12 @@ export type Note = {
   color: NoteColor;
   font: NoteFont;
   created_at: string;
+  // Set by the owner only: a pinned note sits at the top of the wall, and a reply is shown under the note.
+  pinned?: boolean;
+  reply?: string | null;
 };
 
-export type NoteInput = Omit<Note, "id" | "created_at">;
+export type NoteInput = Omit<Note, "id" | "created_at" | "pinned" | "reply">;
 
 // A few words that never belong on a public wall. Approval is the real filter; this catches the obvious.
 const BLOCKED = /\b(fuck|shit|bitch|cunt|asshole|bastard|madarchod|bhenchod|chutiya|gandu|randi)\w*/i;

@@ -3,16 +3,16 @@ import { checkNote, type Note } from "@/lib/feedback";
 import { feedbackReady, rest } from "@/lib/supabaseRest";
 
 // The feedback wall's public API.
-// GET: the approved notes, newest first. POST: a new note, stored unapproved until the owner approves it.
+// GET: the approved notes, pinned ones first, then newest first. POST: a new note, stored unapproved until the owner approves it.
 // PATCH: the visitor changes their own note (found by the random id their browser keeps). A changed note
 // goes back to waiting for approval, so an approved note cannot be swapped for something else.
 export const dynamic = "force-dynamic";
 
-const FIELDS = "id,name,topic,message,color,font,created_at";
+const FIELDS = "id,name,topic,message,color,font,created_at,pinned,reply";
 
 export async function GET() {
   if (!feedbackReady) return NextResponse.json({ notes: [], ready: false });
-  const res = await rest(`feedback?select=${FIELDS}&approved=eq.true&order=created_at.desc&limit=60`);
+  const res = await rest(`feedback?select=${FIELDS}&approved=eq.true&order=pinned.desc,created_at.desc&limit=60`);
   if (!res.ok) return NextResponse.json({ notes: [], ready: true, error: "Could not load notes" }, { status: 502 });
   const notes = (await res.json()) as Note[];
   // A short shared cache: the wall does not need to be live to the second.

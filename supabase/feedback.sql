@@ -11,6 +11,9 @@ create table if not exists public.feedback (
   -- A random id kept in the visitor's browser: one note per browser.
   client_id text not null unique check (char_length(client_id) between 16 and 64),
   approved boolean not null default false,
+  -- Set by the owner from the admin page: pinned notes sit at the top of the wall; a reply shows under the note.
+  pinned boolean not null default false,
+  reply text check (reply is null or char_length(reply) between 1 and 160),
   created_at timestamptz not null default now()
 );
 
@@ -18,3 +21,7 @@ create index if not exists feedback_approved_created on public.feedback (approve
 
 -- Row level security on, with no policies: the public keys can do nothing; only the server's service role can.
 alter table public.feedback enable row level security;
+
+-- Added later: run these on a table made before pinned notes and replies existed (safe to run again).
+alter table public.feedback add column if not exists pinned boolean not null default false;
+alter table public.feedback add column if not exists reply text check (reply is null or char_length(reply) between 1 and 160);

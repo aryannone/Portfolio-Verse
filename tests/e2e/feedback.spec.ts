@@ -91,6 +91,67 @@ test.describe("feedback wall", () => {
     await expect(page.locator(".fw-note.is-mine")).toContainText("Dragging notes is fun!");
   });
 
+  test("a pinned note shows its badge and the owner's reply", async ({ page }) => {
+    await page.route("**/api/feedback", (route) =>
+      route.fulfill({ json: { notes: [{ ...approved[0], pinned: true, reply: "Thank you, Priya!" }], ready: true } }),
+    );
+    await page.goto("/");
+    await page.locator("#feedback").scrollIntoViewIfNeeded();
+    const note = page.locator(".fw-note.is-pinned");
+    await expect(note.locator(".fw-pinned")).toHaveText("Pinned");
+    await expect(note.locator(".fw-reply")).toHaveText("Reply: Thank you, Priya!");
+  });
+
+  test("admin: search, sort, pin, reply and approve all", async ({ page }) => {
+    const notes = [
+      { id: "00000001-aaaa-bbbb-cccc-dddddddddddd", name: "Priya", topic: "Templates", message: "Lovely templates here.", color: "#a8d8ff", font: "caveat", created_at: "2026-11-01T10:00:00Z", approved: true, pinned: false, reply: null },
+      { id: "00000002-aaaa-bbbb-cccc-dddddddddddd", name: "Rahul", topic: "Editor", message: "The editor is quick.", color: "#ffe66d", font: "kalam", created_at: "2026-11-02T10:00:00Z", approved: false, pinned: false, reply: null },
+      { id: "00000003-aaaa-bbbb-cccc-dddddddddddd", name: "Meera", topic: "Overall", message: "No sign-up is great.", color: "#ffb3c7", font: "indie", created_at: "2026-11-03T10:00:00Z", approved: false, pinned: false, reply: null },
+    ];
+    const actions: Record<string, unknown>[] = [];
+    await page.route("**/api/feedback/admin", async (route) => {
+      if (route.request().headers()["x-admin-key"] !== "test-admin-key-123") return route.fulfill({ status: 401, json: { error: "Wrong key." } });
+      if (route.request().method() === "GET") return route.fulfill({ json: { notes } });
+      actions.push(route.request().postDataJSON());
+      return route.fulfill({ json: { ok: true } });
+    });
+    await page.goto("/admin/feedback");
+    await page.getByLabel("Admin key").fill("test-admin-key-123");
+    await page.getByRole("button", { name: "Open" }).click();
+
+    // Waiting notes, newest first; then oldest first; then search.
+    const names = page.locator(".fa-item .fw-name");
+    await expect(names).toHaveText(["— Meera", "— Rahul"]);
+    await page.getByLabel("Sort").selectOption("oldest");
+    await expect(names).toHaveText(["— Rahul", "— Meera"]);
+    await page.getByLabel("Search").fill("sign-up");
+    await expect(names).toHaveText(["— Meera"]);
+    await page.getByLabel("Search").fill("");
+
+    // Pin and reply on the note already on the wall.
+    await page.getByRole("button", { name: "On the wall" }).click();
+    const priya = page.locator(".fa-item").filter({ hasText: "Priya" });
+    await priya.getByRole("button", { name: "Pin" }).click();
+    await expect(priya.locator(".fw-pinned")).toHaveText("Pinned");
+    await priya.getByRole("button", { name: "Reply" }).click();
+    await priya.getByLabel("Your reply (shown under the note)").fill("Thank you, Priya!");
+    await priya.getByRole("button", { name: "Save reply" }).click();
+    await expect(priya.locator(".fw-reply")).toHaveText("Reply: Thank you, Priya!");
+
+    // Approve every waiting note at once.
+    await page.getByRole("button", { name: /Waiting/ }).click();
+    page.once("dialog", (d) => d.accept());
+    await page.getByRole("button", { name: "Approve all waiting (2)" }).click();
+    await expect(page.locator(".fa-empty")).toHaveText("Nothing here.");
+    await expect(page.getByRole("button", { name: "Waiting (0)" })).toBeVisible();
+
+    expect(actions).toEqual([
+      { id: notes[0].id, action: "pin" },
+      { id: notes[0].id, action: "reply", reply: "Thank you, Priya!" },
+      { action: "approve_all" },
+    ]);
+  });
+
   test("without Supabase the real API says the wall is not open, and admin needs the key", async ({ request }) => {
     const list = await request.get("/api/feedback");
     expect(await list.json()).toEqual({ notes: [], ready: false });
