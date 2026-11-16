@@ -35,12 +35,15 @@ export default function ScaledPreview({
   useEffect(() => {
     const box = boxRef.current;
     if (!box) return;
-    const update = () => {
-      const scale = box.clientWidth / width;
-      setSize({ scale, viewHeight: box.clientHeight / scale });
-    };
-    update();
-    const observer = new ResizeObserver(update);
+    // The size comes from the ResizeObserver, which reports it once on start and after every change.
+    // Reading clientWidth here instead would force the browser to lay out the page early (a forced reflow),
+    // once for every preview on the page.
+    const observer = new ResizeObserver(([entry]) => {
+      const { width: w, height: h } = entry.contentRect;
+      if (!w) return;
+      const scale = w / width;
+      setSize({ scale, viewHeight: h / scale });
+    });
     observer.observe(box);
     return () => observer.disconnect();
   }, [width]);

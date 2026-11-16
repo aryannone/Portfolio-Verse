@@ -7,7 +7,7 @@ const escapeHtml = (text: string) =>
 // Builds one self-contained HTML file from the page shown in the editor:
 // the same markup, the same stylesheet and the same photo-panel code.
 export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<string> {
-  const css = await fetch("/portfolio.css").then((r) => {
+  const css = await fetch("/portfolio.min.css").then((r) => {
     if (!r.ok) throw new Error("Could not load the template styles");
     return r.text();
   });

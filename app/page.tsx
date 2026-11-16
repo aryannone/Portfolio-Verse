@@ -82,14 +82,14 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <section className="band-dark">
+        <section className="band-dark offscreen">
           <div className="wrap section">
             <h2 className="display h-section" data-reveal>Four steps. That is all.</h2>
             <StepsShowcase steps={STEPS} />
           </div>
         </section>
 
-        <section className="wrap section" id="templates">
+        <section className="wrap section offscreen" id="templates">
           <div className="section-head">
             <h2 className="display h-section" data-reveal>Nine templates. Switch whenever you like.</h2>
             <p>
@@ -107,7 +107,7 @@ export default function LandingPage() {
           </p>
         </section>
 
-        <section className="band" id="features">
+        <section className="band offscreen" id="features">
           <div className="wrap section">
             <div className="section-head">
               <h2 className="display h-section" data-reveal>Three things you can try right here.</h2>
@@ -125,7 +125,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="band-accent">
+        <section className="band-accent offscreen">
           <div className="wrap closing" data-reveal>
             <h2 className="display h-section">Ten minutes from now, you could have a portfolio.</h2>
             <p>No sign-up and nothing to install. Your work stays in your browser until you download it.</p>

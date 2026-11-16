@@ -56,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${display.variable} ${body.variable} ${serif.variable} ${tech.variable} ${elegant.variable}`}>
       <head>
         {/* Template styles live in public/ so the editor can also copy them into downloaded portfolios. */}
-        <link rel="stylesheet" href="/portfolio.css" precedence="default" />
+        <link rel="stylesheet" href="/portfolio.min.css" precedence="default" />
       </head>
       <body>
         <Intro />
