@@ -26,6 +26,7 @@ Most students need a portfolio site for internship and job applications, but web
 - **Résumé PDF export:** generates a clean résumé from the same details.
 - **Photo background removal:** a person-segmentation model running in the browser cuts you out of your photo for the contact card.
 - **Photos fit their frames:** every photo fills its frame in every template, whatever its shape, and you choose which part of your own photo stays in view.
+- **Feedback wall:** visitors pick a sticky note, choose a topic and a handwriting style, sign it, and drag it onto a cork board on the home page. One note per browser; notes appear for everyone once the owner approves them, and the writer sees theirs straight away.
 - **Interactive contact section:** a 3D character that follows the pointer, watches visitors type and cheers when a message is sent; or your photo, a design, or nothing. The message form works through the visitor's email app or straight to your inbox.
 - **Details panel:** visitors tap a project or job to open a side panel (a bottom sheet on phones) with the full story and photos.
 - **Section navigation:** a sticky section bar, reading progress and back-to-top in every portfolio.
@@ -44,16 +45,18 @@ Most students need a portfolio site for internship and job applications, but web
 ## Tech stack
 
 - **Next.js 15 (App Router), React 19, TypeScript**, deployed on **Vercel**
-- **IndexedDB** for storage, so there's no database or backend
+- **IndexedDB** for everyone's portfolios, kept in their own browser
+- **Supabase** (Postgres, through Next.js route handlers) only for the public feedback wall
 - **MediaPipe Selfie Segmenter** (WebAssembly) for background removal
 - **pdf.js** to read résumés, **jsPDF** to write them
 - Hand-written CSS with custom properties and container queries; no UI library
 
 ## Engineering highlights
 
-- **No backend at all.**
-  - Every feature, including machine-learning background removal and PDF parsing, runs on the user's device.
-  - Running costs stay at zero, and the privacy story is simple: we never receive anyone's data.
+- **Portfolios never leave the device.**
+  - Every builder feature, including machine-learning background removal and PDF parsing, runs on the user's device.
+  - Running costs stay at zero, and the privacy story is simple: we never receive anyone's portfolio.
+  - The only server code is the feedback wall: two small route handlers (`app/api/feedback`). They validate notes with the same rules as the browser (`lib/feedback.ts`), store them in Supabase with row-level security on and no public policies, and enforce one note per browser with a unique key. A private admin page approves notes.
   - The ML model and PDF engine are served by the site itself and loaded only when used (`scripts/copy-vendor.mjs`).
 - **One renderer, three places.**
   - `components/PortfolioView.tsx` renders every template from one markup tree.
@@ -85,9 +88,10 @@ Work done for these scores:
 
 Every push runs the [CI workflow](.github/workflows/ci.yml): type-check, unit tests, a production build and browser tests.
 
-- **Unit tests** (Vitest, `tests/unit`): link handling, file names, samples for every template, moving details between templates, and upgrading portfolios saved by older versions.
+- **Unit tests** (Vitest, `tests/unit`): link handling, file names, samples for every template, moving details between templates, upgrading portfolios saved by older versions, and the feedback note rules.
 - **Browser tests** (Playwright, `tests/e2e`):
   - **Landing page:** the intro plays and can be skipped; every section appears on scroll; the four steps advance; the privacy page; the link preview image.
+  - **Feedback wall:** a note needs a name; it sticks by button or by dragging; one per browser, even after a reload; the API without Supabase and the admin key check.
   - **Editor:** typing shows in the preview and survives a reload; the downloaded HTML file works on its own; photo format checks; a résumé PDF made by the site imports back; "Save a copy" adds a second portfolio.
 
 ```bash
@@ -100,17 +104,27 @@ npm run test:e2e    # browser tests (starts the built site)
 ## Project structure
 
 ```
-app/          pages: landing, /start (details form), /templates, /editor, /saved, /privacy
-components/   UI: PortfolioView (templates), Editor, Fields, StartForm, ContactBlock, StepsShowcase, Intro...
-lib/          portfolio.ts (data model), store.ts (IndexedDB), runtime.ts (portfolio interactions),
+app/          pages: landing, /start (details form), /templates, /editor, /saved, /privacy, /admin/feedback
+              api/feedback: the feedback wall's routes
+components/   UI: PortfolioView (templates), Editor, Fields, StartForm, ContactBlock, StepsShowcase, FeedbackWall, Intro...
+lib/          portfolio.ts (data model), store.ts (IndexedDB), runtime.ts (portfolio interactions), feedback.ts,
               exportHtml.ts, resumeImport.ts, resumePdf.ts, cutout.ts, templates.ts, samples.ts
 public/       portfolio.css (all template styles, also copied into exports), logo
+supabase/     feedback.sql (the feedback wall's table)
 docs/         README screenshots
 ```
 
 ## Run it locally
 
-Requires Node.js 18.18 or newer. No environment variables are needed.
+Requires Node.js 18.18 or newer. The builder needs no settings. The feedback wall needs three environment variables; without them the wall shows as empty and closed:
+
+| Variable | What it is |
+| --- | --- |
+| `SUPABASE_URL` | Supabase project URL (Project Settings, API) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key: server only, never exposed to the browser |
+| `FEEDBACK_ADMIN_KEY` | Any long secret you choose, at least 12 characters; opens `/admin/feedback` |
+
+Create the table once by running `supabase/feedback.sql` in Supabase's SQL editor.
 
 ```bash
 npm install
@@ -121,4 +135,4 @@ Open http://localhost:3000. `npm run build` makes a production build.
 
 ## Privacy
 
-Portfolios are stored only in the user's browser. There is no account, analytics or tracking. See [/privacy](https://portfolio-verse-tau.vercel.app/privacy).
+Portfolios are stored only in the user's browser. There is no account, analytics or tracking. Feedback notes (name, topic, message and a random browser id) are stored in Supabase, and shown publicly only after approval. See [/privacy](https://portfolio-verse-tau.vercel.app/privacy).

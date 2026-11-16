@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Figtree, Fraunces, Playfair_Display, Space_Grotesk } from "next/font/google";
+import { Bricolage_Grotesque, Caveat, Figtree, Fraunces, Indie_Flower, Kalam, Patrick_Hand, Playfair_Display, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Intro from "@/components/Intro";
 
@@ -18,6 +18,13 @@ const body = Figtree({
 // The fonts below are only used when someone picks them in the editor, so they are not preloaded.
 const tech = Space_Grotesk({ subsets: ["latin"], variable: "--font-tech", display: "swap", preload: false });
 const elegant = Playfair_Display({ subsets: ["latin"], variable: "--font-elegant", display: "swap", preload: false });
+
+// Handwriting for the feedback wall's sticky notes. Not preloaded: they download only when a note uses them.
+const noteCaveat = Caveat({ subsets: ["latin"], variable: "--font-note-caveat", display: "swap", preload: false });
+const noteKalam = Kalam({ subsets: ["latin"], weight: "400", variable: "--font-note-kalam", display: "swap", preload: false });
+const notePatrick = Patrick_Hand({ subsets: ["latin"], weight: "400", variable: "--font-note-patrick", display: "swap", preload: false });
+const noteIndie = Indie_Flower({ subsets: ["latin"], weight: "400", variable: "--font-note-indie", display: "swap", preload: false });
+const noteFonts = [noteCaveat, noteKalam, notePatrick, noteIndie].map((f) => f.variable).join(" ");
 
 const serif = Fraunces({
   subsets: ["latin"],
@@ -53,7 +60,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${serif.variable} ${tech.variable} ${elegant.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${serif.variable} ${tech.variable} ${elegant.variable} ${noteFonts}`}>
       <head>
         {/* Template styles live in public/ so the editor can also copy them into downloaded portfolios. */}
         <link rel="stylesheet" href="/portfolio.min.css" precedence="default" />

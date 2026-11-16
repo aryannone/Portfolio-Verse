@@ -20,7 +20,7 @@ export default function PrivacyPage() {
         <h2>What stays on your device</h2>
         <ul>
           <li>
-            Everything you type, every photo you add and every portfolio you save is kept in your own browser (IndexedDB and
+            Everything you type into the builder, every photo you add and every portfolio you save is kept in your own browser (IndexedDB and
             local storage). It is not sent to us, and we have no copy of it.
           </li>
           <li>
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
         <ul>
           <li>No sign-up, login or account.</li>
           <li>No analytics, advertising or tracking cookies.</li>
-          <li>We never sell or share anything, because we never receive your portfolio.</li>
+          <li>We never sell or share anything. We never receive your portfolio, only feedback notes you choose to send.</li>
         </ul>
 
         <h2>Outside services</h2>
@@ -52,6 +52,16 @@ export default function PrivacyPage() {
             they are sent through FormSubmit, an outside service. Otherwise the form simply opens the visitor&apos;s own email
             app.
           </li>
+        </ul>
+
+        <h2>The feedback wall</h2>
+        <ul>
+          <li>
+            If you add a note to the feedback wall on the home page, its name, topic and message are stored on our database
+            (Supabase), with a random code from your browser that allows one note per browser.
+          </li>
+          <li>Notes are checked by us before anyone else can see them. Once approved, a note is public on the home page.</li>
+          <li>Only add a name you are happy to show publicly; a first name is enough. To have a note removed, ask us.</li>
         </ul>
 
         <h2>Your portfolio is public once you publish it</h2>
