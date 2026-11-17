@@ -52,7 +52,7 @@ export default function PrivacyPage() {
             number is linked to your account, so you count once on all your devices. Downloads are a single count with
             nothing about you stored with it.
           </li>
-          <li>We never sell or share anything. We never receive your portfolio, only feedback notes you choose to send.</li>
+          <li>We never sell or share anything. We only receive your portfolio if you publish it, and feedback notes you choose to send.</li>
         </ul>
 
         <h2>Outside services</h2>
