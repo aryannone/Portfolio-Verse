@@ -15,7 +15,7 @@ export default function PrivacyPage() {
       <SiteHeader />
       <main className="wrap simple legal">
         <h1 className="display h-page">Privacy</h1>
-        <p className="lead">Short version: your portfolio stays in your browser. There is no account, and we do not track you.</p>
+        <p className="lead">Short version: your portfolio stays in your browser. Your account holds only your name, email and Google photo, and we do not track you.</p>
 
         <h2>What stays on your device</h2>
         <ul>
@@ -30,10 +30,23 @@ export default function PrivacyPage() {
           <li>Clearing your browser&apos;s site data deletes your portfolios, so download the ones you want to keep.</li>
         </ul>
 
+        <h2>Your account</h2>
+        <ul>
+          <li>
+            You sign in with Google before you start building. We receive your name, email address and Google photo, and keep
+            them, with the name and username you choose on your profile, in our database (Supabase). Nothing else from your
+            Google account is shared with us.
+          </li>
+          <li>A sign-in cookie keeps you signed in on this site. Signing out removes it.</li>
+          <li>Your portfolios are not in your account: they still stay in your browser.</li>
+        </ul>
+
         <h2>What we do not do</h2>
         <ul>
-          <li>No sign-up, login or account.</li>
-          <li>No analytics, advertising or tracking cookies.</li>
+          <li>
+            No analytics, advertising or tracking cookies. The home page shows how many people have visited and downloaded:
+            each browser adds one to a single anonymous count once a day, and nothing about you is stored with it.
+          </li>
           <li>We never sell or share anything. We never receive your portfolio, only feedback notes you choose to send.</li>
         </ul>
 

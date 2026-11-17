@@ -11,7 +11,7 @@ type Props = {
   template?: string;
 };
 
-// The way into the product. No account is needed for now.
+// The way into the product. When sign-in is set up, the building pages ask people to sign in first (middleware.ts).
 //
 // Without a template ("Start building"): new visitors fill in their details; returning ones go to the
 // templates, which show their details.

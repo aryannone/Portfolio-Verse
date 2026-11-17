@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import UserMenu from "@/components/UserMenu";
 
 export default function SiteHeader({ current }: { current?: "templates" | "saved" }) {
   return (
@@ -22,6 +23,7 @@ export default function SiteHeader({ current }: { current?: "templates" | "saved
         >
           My portfolios
         </Link>
+        <UserMenu />
       </nav>
     </header>
   );
