@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties, type Ref } from "react";
-import { initialsOf, onColor, toHref, type Item, type Link, type Portfolio, type Section } from "@/lib/portfolio";
+import { PHOTO_FOCUS, initialsOf, onColor, toHref, type Item, type Link, type Portfolio, type Section } from "@/lib/portfolio";
 import { mountPortfolio, type RuntimeStore } from "@/lib/runtime";
 import ContactBlock from "@/components/ContactBlock";
 import { resumeFileName } from "@/lib/resumePdf";
@@ -47,6 +47,19 @@ function photoLabel(count: number) {
 
 // A whole portfolio page in the look of its template.
 // The markup is the same for every template; public/portfolio.css gives each its own layout.
+// An entry's first photo in its frame. By default the whole photo shows, with a blurred copy of it filling
+// the rest of the frame; "Fill the frame" crops it instead (the frame gets the class is-fill).
+// The copy costs nothing in a downloaded file: each photo is stored there once.
+function FramedPhoto({ item }: { item: Item }) {
+  return (
+    <>
+      {item.photoFit === "fill" ? null : <img className="tp-photo-bg" src={item.photos[0]} alt="" aria-hidden="true" />}
+      <img className="tp-photo" src={item.photos[0]} alt="" />
+    </>
+  );
+}
+const focusStyle = (item: Item) => (item.photoFit === "fill" && item.photoFocus ? ({ "--tp-fy": PHOTO_FOCUS[item.photoFocus] } as CSSProperties) : undefined);
+
 export default function PortfolioView({ data, animate, interactive, reveal, semantic, rootRef }: Props) {
   const localRef = useRef<HTMLDivElement | null>(null);
   const store = useRef<RuntimeStore>({ items: {} });
@@ -78,8 +91,8 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   };
 
   // Skills are a section like any other, placed wherever the user moved them.
-  // Professional 2 is the exception: its design keeps them in the side panel.
-  const inSide = data.template === "professional-2";
+  // Professional 2 (Résumé) is the exception: its design shows them right below About.
+  const skillsFirst = data.template === "professional-2";
   const skills = (section: Section, place: "side" | "main") => (
     <div key={section.id} id={place === "main" ? anchor(section.id) : undefined} className={`tp-sec tp-skills tp-skills-${place}${look(section).extra}`} style={look(section).style}>
       <Heading className="tp-h">{section.title}</Heading>
@@ -97,8 +110,9 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
   const hasContact = Boolean(data.email || data.phone.trim() || data.links.some((l) => l.url.trim()));
   const navLinks = [
     ...(data.about ? [{ href: "#tp-about", label: "About" }] : []),
+    ...(skillsFirst && skillsSection ? [skillsSection] : []).map((section) => ({ href: `#${anchor(section.id)}`, label: section.title || "Skills" })),
     ...sections
-      .filter((section) => !(section.layout === "skills" && data.template === "professional-2"))
+      .filter((section) => !(section.layout === "skills" && skillsFirst))
       .map((section) => ({ href: `#${anchor(section.id)}`, label: section.title || "Section" })),
     ...(hasContact ? [{ href: "#tp-contact", label: "Contact" }] : []),
   ];
@@ -184,8 +198,8 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
           return (
             <article key={item.id} className="tp-chapter">
               {item.photos.length ? (
-                <button type="button" className="tp-ch-media tp-item has-more" data-item={key} aria-label={photosLabel} tabIndex={interactive ? 0 : -1}>
-                  <img src={item.photos[0]} alt="" />
+                <button type="button" className={`tp-ch-media tp-item has-more${item.photoFit === "fill" ? " is-fill" : ""}`} style={focusStyle(item)} data-item={key} aria-label={photosLabel} tabIndex={interactive ? 0 : -1}>
+                  <FramedPhoto item={item} />
                   {item.photos.length > 1 ? <span className="tp-count">{photoLabel(item.photos.length)}</span> : null}
                 </button>
               ) : (
@@ -322,7 +336,6 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
             </div>
           </div>
 
-          {skillsSection && inSide ? skills(skillsSection, "side") : null}
         </div>
 
         <div className="tp-main">
@@ -332,10 +345,11 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
               <p>{data.about}</p>
             </div>
           ) : null}
+          {skillsSection && skillsFirst ? skills(skillsSection, "main") : null}
 
           {sections.map((section) =>
             section.layout === "skills" ? (
-              inSide ? null : skills(section, "main")
+              skillsFirst ? null : skills(section, "main")
             ) : section.layout === "cards" && data.template === "case" ? (
               chapters(section)
             ) : section.layout === "cards" ? (
@@ -345,8 +359,8 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                   {section.items.map((item) => (
                     <div key={item.id} {...itemProps(section, item, "tp-card")}>
                       {item.photos.length ? (
-                        <div className="tp-shot">
-                          <img src={item.photos[0]} alt="" />
+                        <div className={`tp-shot${item.photoFit === "fill" ? " is-fill" : ""}`} style={focusStyle(item)}>
+                          <FramedPhoto item={item} />
                           <span className="tp-count">{photoLabel(item.photos.length)}</span>
                         </div>
                       ) : null}

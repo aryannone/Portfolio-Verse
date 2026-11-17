@@ -17,7 +17,7 @@ Most students need a portfolio site for internship and job applications, but web
 
 ## Features
 
-- **9 templates, one data model:** Classic, Résumé, Timeline, Case study, Split screen, Bold, Aurora, Editorial and Bento, plus "Build your own". Your details appear in every template, so you can switch at any time without retyping.
+- **9 templates, one data model, every screen size:** Classic, Résumé, Timeline, Case study, Split screen, Bold, Aurora, Editorial and Bento, plus "Build your own". Your details appear in every template, so you can switch at any time without retyping.
 - **Live editor:**
   - colours, fonts, backgrounds, header layouts, photo frames and scroll animations, set for the whole page or per section
   - reorder sections and entries
@@ -28,7 +28,7 @@ Most students need a portfolio site for internship and job applications, but web
 - **Résumé import:** reads a résumé PDF in the browser and fills in the details.
 - **Résumé PDF export:** generates a clean résumé from the same details.
 - **Photo background removal:** a person-segmentation model running in the browser cuts you out of your photo for the contact card.
-- **Photos fit their frames:** every photo fills its frame in every template, whatever its shape, and you choose which part of your own photo stays in view.
+- **Photos fit their frames:** an entry's photo shows whole, with a blurred copy of it filling the rest of the frame, or is cropped to fill the frame keeping the top, middle or bottom in view. Profile photos let you choose which part stays in view. Large photos are scaled down in the downloaded or published file, so sites stay small and publish fast.
 - **Feedback wall:** signed-in visitors pick a sticky note, choose a topic and a handwriting style, sign it, and drag it onto a cork board on the home page. One note per Google account, editable from any device; notes appear for everyone once the owner approves them (an edited note is approved again). The owner can pin notes (a heart in the corner) and reply to them.
 - **Admin page** (`/admin/feedback`, behind a secret key): approve, hide, pin, reply to or delete notes, approve all at once, search and sort.
 - **Home page numbers:** unique visitors, portfolios downloaded and feedback notes, all counted for real. A browser counts once; a signed-in person counts once across all their devices.

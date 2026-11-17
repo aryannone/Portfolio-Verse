@@ -11,7 +11,7 @@ export type TemplateInfo = {
 
 export const TEMPLATES: TemplateInfo[] = [
   { id: "professional-1", name: "Classic", category: "professional", blurb: "One calm column, lots of white space.", accent: "#f5a300" },
-  { id: "professional-2", name: "Résumé", category: "professional", blurb: "A side panel with your name and skills, like a résumé.", accent: "#1f3a34" },
+  { id: "professional-2", name: "Résumé", category: "professional", blurb: "A side panel with your name and links, like a résumé, and your skills right below About.", accent: "#1f3a34" },
   { id: "professional-4", name: "Timeline", category: "professional", blurb: "Jobs and degrees along a dated line.", accent: "#2643e9" },
   { id: "case", name: "Case study", category: "professional", blurb: "Each project as a full-screen chapter: the problem, what you did, the result.", accent: "#0ea5e9" },
   { id: "split", name: "Split screen", category: "professional", blurb: "Your photo fills one half and stays put while your work scrolls.", accent: "#ea580c" },

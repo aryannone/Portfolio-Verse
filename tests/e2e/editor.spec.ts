@@ -71,6 +71,48 @@ test.describe("editor", () => {
     await expect(page.locator(".tp-avatar img")).toHaveJSProperty("complete", true);
   });
 
+  test("entry photos show whole with a blurred fill, or cropped to fill the frame", async ({ page }) => {
+    await openEditor(page);
+    const shot = page.locator(".tp .tp-shot").first();
+    await expect(shot.locator("img.tp-photo-bg")).toHaveCount(1);
+    await expect(shot.locator("img.tp-photo")).toHaveCSS("object-fit", "contain");
+
+    const fit = page.getByLabel("First photo on the page").first();
+    await fit.selectOption("fill");
+    await expect(shot).toHaveClass(/is-fill/);
+    await expect(shot.locator("img.tp-photo-bg")).toHaveCount(0);
+    await expect(shot.locator("img.tp-photo")).toHaveCSS("object-fit", "cover");
+    await page.getByLabel("Part of the photo to keep").first().selectOption("top");
+    await expect(shot.locator("img.tp-photo")).toHaveCSS("object-position", "50% 0%");
+  });
+
+  test("large photos are made smaller in the downloaded file", async ({ page }, info) => {
+    await openEditor(page);
+    // A 3000 x 2000 photo full of noise, which stays large as a JPG (several MB).
+    const big = await page.evaluate(() => {
+      const c = document.createElement("canvas");
+      c.width = 3000;
+      c.height = 2000;
+      const ctx = c.getContext("2d")!;
+      const data = ctx.createImageData(3000, 2000);
+      for (let i = 0; i < data.data.length; i++) data.data[i] = (i * 2654435761) % 251;
+      ctx.putImageData(data, 0, 0);
+      return c.toDataURL("image/jpeg", 0.95).split(",")[1];
+    });
+    const bigPath = info.outputPath("big.jpg");
+    writeFileSync(bigPath, Buffer.from(big, "base64"));
+    const about = page.locator(".ed-group", { hasText: "About you" }).first();
+    await about.locator(".ed-photos input[type=file]").first().setInputFiles(bigPath);
+    await expect(page.locator(".tp-avatar img")).toHaveCount(1);
+
+    const [download] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: "Download HTML" }).click()]);
+    const path = info.outputPath("portfolio.html");
+    await download.saveAs(path);
+    const html = readFileSync(path, "utf8");
+    expect(html.length).toBeLessThan(big.length / 2);
+    expect(html).toContain("data:image/webp");
+  });
+
   // The title is plain ASCII on purpose: Playwright cannot hand the page a file from an output folder
   // whose path has accented letters, and the folder is named after the test.
   test("resume round trip: the resume PDF it makes can be imported back", async ({ page }, info) => {

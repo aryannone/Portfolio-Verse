@@ -192,8 +192,8 @@ export async function deleteSaved(id: string): Promise<boolean> {
   }
 }
 
-// Shrinks a chosen photo so pages stay fast and downloads stay small.
-// Photos must be JPG or PNG, which every browser can show. The chosen file is read exactly as it is.
+// Reads a chosen photo. Photos must be JPG or PNG, which every browser can show. The file is kept exactly
+// as it is here; large photos are made smaller only in the downloaded or published file (lib/exportHtml.ts).
 export function imageToDataUrl(file: File): Promise<string> {
   const ok = /^image\/(jpeg|png)$/.test(file.type) || /\.(jpe?g|png)$/i.test(file.name);
   if (!ok) return Promise.reject(new Error("Please add a JPG or PNG photo."));

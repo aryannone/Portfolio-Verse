@@ -14,7 +14,15 @@ export type Item = {
   links?: Link[]; // a project site, a repository, a certificate
   photos: string[]; // image data, shown in the details panel
   gallery?: GalleryId | ""; // this entry's own photo layout; empty means the portfolio's
+  // How the first photo sits in its frame on the page. "fit" (the default) shows the whole photo with a
+  // blurred copy filling the space around it; "fill" crops it to fill the frame, keeping photoFocus in view.
+  photoFit?: PhotoFit;
+  photoFocus?: PhotoFocus;
 };
+
+export type PhotoFit = "fit" | "fill";
+export type PhotoFocus = "top" | "center" | "bottom";
+export const PHOTO_FOCUS: Record<PhotoFocus, string> = { top: "0%", center: "50%", bottom: "100%" };
 
 export type Link = { id: string; label: string; url: string };
 

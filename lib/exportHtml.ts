@@ -7,6 +7,30 @@ export const SITE_URL = "https://portfolio-verse-tau.vercel.app";
 const escapeHtml = (text: string) =>
   text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+// Photos straight from a phone are often 3 to 8 MB. In the downloaded or published file each one is scaled
+// down to at most 1600 pixels on its longest side and saved as WebP (which keeps transparency, for cut-out
+// photos), so sites stay small and publish quickly. The portfolio saved in the browser keeps the originals.
+const MAX_SIDE = 1600;
+async function shrinkPhoto(src: string): Promise<string> {
+  if (!/^data:image\/(jpeg|png|webp)/.test(src) || src.length < 200_000) return src;
+  try {
+    const img = new Image();
+    img.src = src;
+    await img.decode();
+    const scale = Math.min(1, MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.naturalWidth * scale);
+    canvas.height = Math.round(img.naturalHeight * scale);
+    canvas.getContext("2d")?.drawImage(img, 0, 0, canvas.width, canvas.height);
+    let out = canvas.toDataURL("image/webp", 0.82);
+    // A browser that cannot write WebP gives PNG back; a JPEG photo is then better kept as JPEG.
+    if (!out.startsWith("data:image/webp")) out = src.startsWith("data:image/jpeg") ? canvas.toDataURL("image/jpeg", 0.85) : src;
+    return out.length < src.length ? out : src;
+  } catch {
+    return src;
+  }
+}
+
 // Builds one self-contained HTML file from the page shown in the editor:
 // the same markup, the same stylesheet and the same photo-panel code.
 export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<string> {
@@ -97,6 +121,8 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
     (used.has("tech") ? "&family=Space+Grotesk:wght@400..700" : "") +
     (used.has("elegant") ? "&family=Playfair+Display:wght@400..700" : "");
   const title = [data.name, data.role].filter(Boolean).join(" · ");
+  // Every photo has its number now; make the large ones small before they are written into the file.
+  store.photos = await Promise.all(photos.map(shrinkPhoto));
   const json = JSON.stringify(store).replace(/</g, "\\u003c");
 
   return `<!doctype html>

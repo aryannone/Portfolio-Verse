@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { CARD_STYLES, CONTACT_DESIGNS, CONTACT_VISUALS, PORTRAITS, SENDS, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type ContactDesignId, type ContactVisualId, type FontId, type PortraitId, type SendId, type GalleryId, type Link, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
+import { CARD_STYLES, CONTACT_DESIGNS, CONTACT_VISUALS, PORTRAITS, SENDS, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type ContactDesignId, type ContactVisualId, type FontId, type PortraitId, type SendId, type GalleryId, type Link, type PhotoFit, type PhotoFocus, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
 import type { PortfolioTools } from "@/lib/usePortfolio";
 
 // The form pieces shared by the details form (/start) and the editor.
@@ -508,6 +508,31 @@ export function SectionFields({ data, section, tools, design }: { data: Portfoli
               </label>
             </div>
           </div>
+          {item.photos.length ? (
+            <>
+              <Choice<PhotoFit>
+                label="First photo on the page"
+                value={item.photoFit ?? "fit"}
+                options={[
+                  { id: "fit", name: "Show the whole photo (blurred edges fill the frame)" },
+                  { id: "fill", name: "Crop to fill the frame" },
+                ]}
+                onChange={(photoFit) => setItem(section.id, item.id, { photoFit })}
+              />
+              {item.photoFit === "fill" ? (
+                <Choice<PhotoFocus>
+                  label="Part of the photo to keep"
+                  value={item.photoFocus ?? "center"}
+                  options={[
+                    { id: "top", name: "Top" },
+                    { id: "center", name: "Middle" },
+                    { id: "bottom", name: "Bottom" },
+                  ]}
+                  onChange={(photoFocus) => setItem(section.id, item.id, { photoFocus })}
+                />
+              ) : null}
+            </>
+          ) : null}
           {item.photos.length ? (
             <Choice<GalleryId | "">
               label="How these photos open"
