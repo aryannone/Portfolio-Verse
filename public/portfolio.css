@@ -551,14 +551,17 @@
 .tp.tp-bento .tp-hero:has(> .tp-avatar img)::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(10, 11, 16, 0.94) 0%, rgba(10, 11, 16, 0.72) 32%, rgba(10, 11, 16, 0.12) 68%, transparent 100%); }
 /* On a published or downloaded page, the hero tile is never taller than the screen and stays in view while
    the tiles beside it scroll past, so the photo and name are always seen together (like Split screen). */
-@container tp (min-width: 761px) {
+@container tp (min-width: 861px) {
   .tp.tp-live.tp-bento .tp-hero.tp-hero { --tp-room: calc(var(--tp-view, 100vh) - var(--tp-top, 0px) - 32px); position: sticky; top: calc(var(--tp-top, 0px) + 16px); flex: 0 0 auto; height: min(100%, var(--tp-room)); max-height: var(--tp-room); min-height: min(440px, var(--tp-room)); }
   .tp.tp-live.tp-bento.tp-has-nav .tp-hero.tp-hero { --tp-room: calc(var(--tp-view, 100vh) - var(--tp-top, 0px) - 88px); top: calc(var(--tp-top, 0px) + 72px); }
 }
 .tp.tp-bento .tp-hero .tp-tags { color: inherit; opacity: 0.72; }
 .tp.tp-bento .tp-hero .tp-links .tp-cta { background: var(--tp-accent); color: var(--tp-on-accent); }
 .tp.tp-bento .tp-name { font-size: clamp(40px, calc(5.4 * var(--tp-w)), 72px); }
-.tp.tp-bento .tp-cards, .tp.tp-bento .tp-contact { grid-column: 1 / -1; }
+/* Tiles that can grow long (entries, lists, the quote) take the whole row, so a tall tile never sits beside
+   a short one that would be stretched into a big empty box. Short tiles (About, Skills) pair up, and the
+   grid fills gaps (dense), so Skills usually lands in the free space beside the hero. */
+.tp.tp-bento .tp-cards, .tp.tp-bento .tp-list, .tp.tp-bento .tp-quote, .tp.tp-bento .tp-contact { grid-column: 1 / -1; }
 .tp.tp-bento .tp-cards .tp-card { border: 0; background: var(--tp-bg); }
 .tp.tp-bento .tp-quote { display: flex; align-items: center; background: var(--tp-accent); color: var(--tp-on-accent); }
 .tp.tp-bento .tp-quote blockquote { border-left-color: currentColor; }
@@ -568,7 +571,9 @@
 @container tp (max-width: 860px) {
   .tp.tp-bento .tp-in { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 16px; gap: 12px; }
   .tp.tp-bento .tp-side, .tp.tp-bento .tp-hero, .tp.tp-bento .tp-sec { grid-column: 1 / -1; grid-row: auto; }
-  .tp.tp-bento .tp-about, .tp.tp-bento .tp-skills-main, .tp.tp-bento .tp-quote { grid-column: span 1; }
+  /* Two columns: About is usually long, so it takes the row; Skills and the quote, both short, pair up. */
+  .tp.tp-bento .tp-skills-main, .tp.tp-bento .tp-quote { grid-column: span 1; }
+  .tp.tp-bento:not(:has(.tp-quote)) .tp-skills-main, .tp.tp-bento:not(:has(.tp-skills-main)) .tp-quote { grid-column: 1 / -1; }
 }
 @container tp (max-width: 560px) {
   .tp.tp-bento .tp-about, .tp.tp-bento .tp-skills-main, .tp.tp-bento .tp-quote { grid-column: 1 / -1; }
