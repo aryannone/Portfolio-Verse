@@ -44,8 +44,10 @@ export default function PrivacyPage() {
         <h2>What we do not do</h2>
         <ul>
           <li>
-            No analytics, advertising or tracking cookies. The home page shows how many people have visited and downloaded:
-            each browser adds one to a single anonymous count once a day, and nothing about you is stored with it.
+            No analytics services, advertising or tracking across other sites. To show how many people have visited, your
+            browser gets a random number in a cookie (it says nothing about you) and is counted once. If you sign in, that
+            number is linked to your account, so you count once on all your devices. Downloads are a single count with
+            nothing about you stored with it.
           </li>
           <li>We never sell or share anything. We never receive your portfolio, only feedback notes you choose to send.</li>
         </ul>
