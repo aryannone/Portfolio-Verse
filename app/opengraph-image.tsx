@@ -48,7 +48,7 @@ export default function OpenGraphImage() {
             Your portfolio website, ready in ten minutes.
           </div>
           <div style={{ display: "flex", gap: 14 }}>
-            {["Free", "No code", "9 templates", "Download as HTML"].map((tag) => (
+            {["Free", "No code", "9 templates", "Publish or download"].map((tag) => (
               <div
                 key={tag}
                 style={{

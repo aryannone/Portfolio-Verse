@@ -54,7 +54,7 @@ test.describe("site pages", () => {
     await expect(active).toHaveText("Start building");
     await expect(active).toHaveText("Fill in your details", { timeout: 6_000 });
     await page.locator(".how-pick").nth(3).click();
-    await expect(active).toHaveText("Download");
+    await expect(active).toHaveText("Publish or download");
     await context.close();
   });
 

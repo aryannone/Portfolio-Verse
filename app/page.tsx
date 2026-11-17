@@ -16,13 +16,13 @@ const STEPS = [
   { title: "Start building", text: "One click to sign in with Google. No password to remember." },
   { title: "Fill in your details", text: "A short form, one step at a time. Leave and come back whenever you like." },
   { title: "Pick a template", text: "See your own details in every template, or build your own from blank." },
-  { title: "Download", text: "Get your whole portfolio as one HTML file and host it anywhere." },
+  { title: "Publish or download", text: "Put it live at your own link in one click, or get one HTML file to host anywhere." },
 ];
 
 const EXTRAS = [
   { title: "Looks right on every screen", text: "Recruiters open links on phones. Your site adapts on its own." },
   { title: "Saves as you type", text: "Your work is kept in this browser, so you can come back to it." },
-  { title: "Download the HTML", text: "The site is yours. Take the file and host it wherever you like." },
+  { title: "Your own link", text: "Publish in one click and share a link like /u/your-name. Or download the file: it is yours." },
 ];
 
 // Who the builder is for. Shown as a moving strip under the hero.
@@ -56,8 +56,8 @@ export default function LandingPage() {
               Your portfolio, ready in <span className="mark">ten minutes.</span>
             </h1>
             <p className="lead">
-              Fill in your details, add your photos, pick a template and download your site. No
-              code, no cost.
+              Fill in your details, add your photos, pick a template, then publish your site with its own link or
+              download it. No code, no cost.
             </p>
             <div className="hero-actions">
               <StartButton />
@@ -131,7 +131,7 @@ export default function LandingPage() {
         <section className="band-accent lazy-draw">
           <div className="wrap closing" data-reveal>
             <h2 className="display h-section">Ten minutes from now, you could have a portfolio.</h2>
-            <p>Nothing to install. Your work stays in your browser until you download it.</p>
+            <p>Nothing to install. Your work stays in your browser until you publish or download it.</p>
             <div className="hero-actions">
               <StartButton />
               <Link href="/templates" className="btn btn-outline">

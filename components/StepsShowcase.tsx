@@ -212,7 +212,7 @@ function Scene({ index }: { index: number }) {
       </div>
     );
   }
-  // 4. Download: the file flies into the tray, a tick, then "ready to host".
+  // 4. Publish (or download): the file flies up, a tick, then the site is live at its own link.
   return (
     <div className="hs hs-4">
       <Window>
@@ -221,7 +221,7 @@ function Scene({ index }: { index: number }) {
           <i style={{ width: "76%" }} />
           <i style={{ width: "64%" }} />
         </div>
-        <div className="hs-dl">Download HTML</div>
+        <div className="hs-dl">Publish</div>
       </Window>
       <div className="hs-file">
         <span>&lt;/&gt;</span>
@@ -237,7 +237,7 @@ function Scene({ index }: { index: number }) {
       </div>
       <div className="hs-live">
         <i />
-        Ready to host anywhere
+        Live at /u/priya-nair
       </div>
     </div>
   );
