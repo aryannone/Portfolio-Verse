@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Caveat, Figtree, Fraunces, Indie_Flower, Kalam, Patrick_Hand, Playfair_Display, Space_Grotesk } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Intro from "@/components/Intro";
 
@@ -68,6 +69,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Intro />
         {children}
+        {/* Vercel Web Analytics: counts visitors without cookies (Vercel serves this script itself). */}
+        <Script id="vercel-analytics-queue" strategy="afterInteractive">
+          {"window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };"}
+        </Script>
+        <Script src="/_vercel/insights/script.js" strategy="afterInteractive" />
       </body>
     </html>
   );
