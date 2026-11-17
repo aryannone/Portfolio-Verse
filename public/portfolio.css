@@ -537,9 +537,24 @@
 /* Bento: the whole portfolio as one grid of tiles of different sizes. */
 .tp-bento { --tp-bg: #eeebe5; --tp-ink: #16171d; --tp-muted: #5d5f6a; --tp-line: #dedad2; --tp-accent: #e11d48; --tp-on-accent: #ffffff; --tp-card: #ffffff; }
 .tp.tp-bento .tp-in { max-width: 1180px; padding: 32px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-flow: row dense; gap: 16px; }
-.tp.tp-bento .tp-side, .tp.tp-bento .tp-main { display: contents; }
+.tp.tp-bento .tp-main { display: contents; }
+/* The side holds only the hero tile here. It is a real box two tiles wide and two tall, so a pinned hero
+   (below) stops at the end of its own rows instead of sliding over the tiles that follow. */
+.tp.tp-bento .tp-side { grid-column: span 2; grid-row: span 2; display: flex; flex-direction: column; min-width: 0; }
 .tp.tp-bento .tp-hero, .tp.tp-bento .tp-sec { grid-column: span 2; min-width: 0; padding: 30px; border-radius: 28px; background: var(--tp-card); transition: translate 0.3s ease, box-shadow 0.3s ease; }
-.tp.tp-bento .tp-hero { grid-row: span 2; justify-content: flex-end; background: var(--tp-ink); color: var(--tp-bg); }
+.tp.tp-bento .tp-hero { flex: 1 1 auto; justify-content: center; background: var(--tp-ink); color: var(--tp-bg); }
+/* The hero tile is as tall as the two tiles beside it, which can be very tall with a long About. With a
+   profile photo, the photo fills the whole tile and the name sits over a dark fade at the bottom, so a tall
+   tile shows more photo instead of an empty dark block. Without one, the words sit in the middle. */
+.tp.tp-bento .tp-hero:has(> .tp-avatar img) { position: relative; overflow: hidden; isolation: isolate; justify-content: flex-end; min-height: 440px; }
+.tp.tp-bento .tp-hero > .tp-avatar:has(img) { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; margin: 0; border-radius: 0; rotate: 0deg; box-shadow: none; outline: 0; clip-path: none; animation: none; }
+.tp.tp-bento .tp-hero:has(> .tp-avatar img)::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(10, 11, 16, 0.94) 0%, rgba(10, 11, 16, 0.72) 32%, rgba(10, 11, 16, 0.12) 68%, transparent 100%); }
+/* On a published or downloaded page, the hero tile is never taller than the screen and stays in view while
+   the tiles beside it scroll past, so the photo and name are always seen together (like Split screen). */
+@container tp (min-width: 761px) {
+  .tp.tp-live.tp-bento .tp-hero.tp-hero { --tp-room: calc(var(--tp-view, 100vh) - var(--tp-top, 0px) - 32px); position: sticky; top: calc(var(--tp-top, 0px) + 16px); flex: 0 0 auto; height: min(100%, var(--tp-room)); max-height: var(--tp-room); min-height: min(440px, var(--tp-room)); }
+  .tp.tp-live.tp-bento.tp-has-nav .tp-hero.tp-hero { --tp-room: calc(var(--tp-view, 100vh) - var(--tp-top, 0px) - 88px); top: calc(var(--tp-top, 0px) + 72px); }
+}
 .tp.tp-bento .tp-hero .tp-tags { color: inherit; opacity: 0.72; }
 .tp.tp-bento .tp-hero .tp-links .tp-cta { background: var(--tp-accent); color: var(--tp-on-accent); }
 .tp.tp-bento .tp-name { font-size: clamp(40px, calc(5.4 * var(--tp-w)), 72px); }
@@ -552,7 +567,7 @@
 .tp.tp-bento .tp-sec.tp-sec-bg { padding: 30px; }
 @container tp (max-width: 860px) {
   .tp.tp-bento .tp-in { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 16px; gap: 12px; }
-  .tp.tp-bento .tp-hero, .tp.tp-bento .tp-sec { grid-column: 1 / -1; grid-row: auto; }
+  .tp.tp-bento .tp-side, .tp.tp-bento .tp-hero, .tp.tp-bento .tp-sec { grid-column: 1 / -1; grid-row: auto; }
   .tp.tp-bento .tp-about, .tp.tp-bento .tp-skills-main, .tp.tp-bento .tp-quote { grid-column: span 1; }
 }
 @container tp (max-width: 560px) {
