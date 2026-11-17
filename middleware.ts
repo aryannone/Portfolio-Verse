@@ -33,6 +33,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Every page, but not the API, Next's own files or static files.
-  matcher: ["/((?!api/|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?)$).*)"],
+  // Every page, but not the API, published sites (/u/...), Next's own files or static files.
+  matcher: ["/((?!api/|u/|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?)$).*)"],
 };

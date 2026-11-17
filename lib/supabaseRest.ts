@@ -19,3 +19,13 @@ export async function rest(path: string, init: RequestInit = {}) {
     },
   });
 }
+
+// Supabase Storage with the service role key (server only): reads and removes published site files.
+export async function storageFetch(path: string, init: RequestInit = {}) {
+  if (!url || !key) throw new Error("Storage is not set up");
+  return fetch(`${url}/storage/v1/${path}`, {
+    ...init,
+    cache: "no-store",
+    headers: { apikey: key, Authorization: `Bearer ${key}`, ...(init.headers ?? {}) },
+  });
+}

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import ProfileForm from "@/components/ProfileForm";
+import MySite from "@/components/MySite";
 import { serverSupabase } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Your profile", robots: { index: false, follow: false } };
@@ -39,6 +40,8 @@ export default async function ProfilePage() {
         </div>
 
         <ProfileForm initialName={name} initialUsername={profile?.username ?? ""} userId={user.id} />
+
+        <MySite />
 
         <div className="profile-links">
           <a className="btn btn-outline" href="/saved">

@@ -30,6 +30,7 @@ import {
 import { usePortfolio } from "@/lib/usePortfolio";
 import { buildHtml, downloadHtml } from "@/lib/exportHtml";
 import { countEvent } from "@/components/SiteStats";
+import PublishButton from "@/components/PublishButton";
 import { addSaved, loadSaved, savePortfolio } from "@/lib/store";
 import { rememberDetails } from "@/lib/usePortfolio";
 import { useRouter } from "next/navigation";
@@ -221,9 +222,10 @@ export default function Editor() {
           <button type="button" className="btn btn-outline" onClick={downloadResume}>
             Résumé PDF
           </button>
-          <button type="button" className="btn btn-primary" onClick={download} disabled={busy}>
+          <button type="button" className="btn btn-outline" onClick={download} disabled={busy}>
             {busy ? "Building…" : "Download HTML"}
           </button>
+          <PublishButton sample={Boolean(data.sample)} build={async () => buildHtml(viewRef.current!, data)} />
         </div>
       </header>
 
