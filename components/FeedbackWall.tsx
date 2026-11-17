@@ -13,43 +13,19 @@ import {
   type NoteFont,
   type Topic,
 } from "@/lib/feedback";
+import GoogleSignIn from "@/components/GoogleSignIn";
 
 // The feedback wall at the bottom of the home page.
 // Left: a cork board with the approved notes. Right: a pad of sticky notes to write on.
+// Anyone can read the wall; writing a note needs Google sign-in, and each Google account has one note.
 // A note is stuck on by dragging it onto the board or with the button. It waits for the owner's approval
-// before others see it, but the visitor who wrote it sees it on the wall straight away (kept in this browser).
-// Each browser can add one note: the browser remembers it, and the server refuses a second one.
-// The visitor can change their note's words and style at any time; a changed note is approved again.
-
-const MINE_KEY = "pv_feedback_note";
-const CLIENT_KEY = "pv_feedback_client";
+// before others see it, but its writer sees it on the wall straight away, on any device they sign in on.
+// The writer can change their note's words and style at any time; a changed note is approved again.
 
 type Mine = Note & { approved?: boolean };
+type Me = { signedIn: boolean; name?: string };
 
 const fontCss = (id: NoteFont) => NOTE_FONTS.find((f) => f.id === id)?.css ?? NOTE_FONTS[0].css;
-
-function readMine(): Mine | "posted" | null {
-  try {
-    const raw = window.localStorage.getItem(MINE_KEY);
-    if (!raw) return null;
-    return raw === "posted" ? "posted" : (JSON.parse(raw) as Mine);
-  } catch {
-    return null;
-  }
-}
-
-function clientId() {
-  try {
-    let id = window.localStorage.getItem(CLIENT_KEY);
-    if (!id) {
-      id = (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`).replace(/[^a-z0-9-]/gi, "");
-      window.localStorage.setItem(CLIENT_KEY, id);
-    }
-    return id;
-  } catch {
-    return `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
-  }
-}
 
 // The mark on a note the owner has pinned to the top of the wall.
 export function PinnedHeart() {
@@ -84,7 +60,8 @@ function StuckNote({ note, mine, hidden }: { note: Note; mine?: boolean; hidden?
 export default function FeedbackWall() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [mine, setMine] = useState<Mine | "posted" | null>(null);
+  const [me, setMe] = useState<Me | null>(null);
+  const [mine, setMine] = useState<Mine | null>(null);
   const [flying, setFlying] = useState(false);
   const [editing, setEditing] = useState(false);
 
@@ -106,24 +83,28 @@ export default function FeedbackWall() {
   const flyFrom = useRef<DOMRect | null>(null);
 
   useEffect(() => {
-    setMine(readMine());
     fetch("/api/feedback")
       .then((r) => r.json())
       .then((d: { notes?: Note[] }) => setNotes(d.notes ?? []))
       .catch(() => {})
       .finally(() => setLoaded(true));
+    // Who is looking: signed in or not, their first name for the note, and the note they already wrote.
+    fetch("/api/feedback/mine")
+      .then((r) => r.json())
+      .then((d: Me & { note?: Mine | null }) => {
+        setMe({ signedIn: Boolean(d.signedIn), name: d.name });
+        if (d.note) setMine(d.note);
+        if (d.name) setName((n) => n || d.name || "");
+      })
+      .catch(() => setMe({ signedIn: false }));
   }, []);
 
-  // The visitor's note comes from this browser's copy, with the owner's pin and reply taken from the wall.
-  const mineLocal = mine && mine !== "posted" ? mine : null;
-  const mineOnWall = mineLocal ? notes.find((n) => n.id === mineLocal.id) : undefined;
-  const mineNote: Mine | null = mineLocal ? { ...mineLocal, pinned: mineOnWall?.pinned, reply: mineOnWall?.reply } : null;
   const posted = Boolean(mine);
 
   // After a note is posted, it flies from the pad to its place on the board.
   useEffect(() => {
-    if (!flying || !mineLocal || !board.current) return;
-    const target = board.current.querySelector<HTMLElement>(`[data-id="${mineLocal.id}"]`);
+    if (!flying || !mine || !board.current) return;
+    const target = board.current.querySelector<HTMLElement>(`[data-id="${mine.id}"]`);
     const from = flyFrom.current;
     const done = () => {
       setFlying(false);
@@ -144,7 +125,7 @@ export default function FeedbackWall() {
       [
         { transform: `translate(${dx}px, ${dy}px) scale(${s}) rotate(0deg)`, boxShadow: "0 30px 40px rgba(0,0,0,0.35)" },
         { transform: `translate(${dx * 0.45}px, ${dy * 0.45 - 60}px) scale(${(s + 1) / 2 + 0.08}) rotate(-8deg)`, offset: 0.55 },
-        { transform: `translate(0, 0) scale(1) rotate(${tiltOf(mineLocal.id)}deg)`, boxShadow: "0 6px 10px rgba(0,0,0,0.25)" },
+        { transform: `translate(0, 0) scale(1) rotate(${tiltOf(mine.id)}deg)`, boxShadow: "0 6px 10px rgba(0,0,0,0.25)" },
       ],
       { duration: 900, easing: "cubic-bezier(0.3, 0.7, 0.2, 1)" },
     );
@@ -153,25 +134,21 @@ export default function FeedbackWall() {
       done();
     };
     return () => ghost.remove();
-  }, [flying, mineLocal]);
+  }, [flying, mine]);
 
-  function remember(value: Mine | "posted") {
-    try {
-      window.localStorage.setItem(MINE_KEY, typeof value === "string" ? value : JSON.stringify(value));
-    } catch {
-      // Without storage the note is still on the server; it just will not be shown back after a reload.
-    }
-    setMine(value);
+  // Keeps the writer's latest version, with the owner's pin and reply.
+  function remember(note: Note) {
+    setMine((old) => ({ ...note, approved: false, pinned: note.pinned ?? old?.pinned, reply: note.reply ?? old?.reply }));
   }
 
   // Opens the pad again with the visitor's note on it, to change its words or its style.
   function startEdit() {
-    if (!mineNote) return;
-    setColor(mineNote.color);
-    setFont(mineNote.font);
-    setTopic(mineNote.topic);
-    setMessage(mineNote.message);
-    setName(mineNote.name);
+    if (!mine) return;
+    setColor(mine.color);
+    setFont(mine.font);
+    setTopic(mine.topic);
+    setMessage(mine.message);
+    setName(mine.name);
     setError("");
     setEditing(true);
   }
@@ -189,20 +166,21 @@ export default function FeedbackWall() {
       const res = await fetch("/api/feedback", {
         method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...checked.note, clientId: clientId(), website: trap }),
+        body: JSON.stringify({ ...checked.note, website: trap }),
       });
       const data = (await res.json().catch(() => ({}))) as { note?: Note; error?: string };
-      if (res.status === 409) {
-        // This browser already has a note on the server: show that one, so it can be edited.
-        remember(data.note ? { ...data.note, approved: false } : "posted");
+      if (res.status === 409 && data.note) {
+        // This account already has a note (written on another device): show that one, so it can be edited.
+        remember(data.note);
         return true;
       }
+      if (res.status === 401) setMe({ signedIn: false });
       if (!res.ok || !data.note) {
         setError(data.error ?? "Could not save your note. Please try again later.");
         return false;
       }
       flyFrom.current = from ?? draft.current?.getBoundingClientRect() ?? null;
-      remember({ ...data.note, approved: false });
+      remember(data.note);
       setEditing(false);
       setFlying(true);
       return true;
@@ -255,8 +233,8 @@ export default function FeedbackWall() {
     return () => window.removeEventListener("resize", checkMore);
   }, [notes, mine]);
 
-  // The visitor's own note is drawn from this browser's copy, so their latest changes show straight away.
-  const others = notes.filter((n) => n.id !== mineNote?.id);
+  // The writer's own note comes from their account, so their latest changes show straight away.
+  const others = notes.filter((n) => n.id !== mine?.id);
 
   return (
     <section className="fw-band" id="feedback" aria-labelledby="fw-title">
@@ -265,19 +243,19 @@ export default function FeedbackWall() {
           <h2 className="display h-section" id="fw-title">
             The feedback wall
           </h2>
-          <p>Pick a sticky note, tell us what you think, and stick it on the wall. One note per visitor.</p>
+          <p>Pick a sticky note, tell us what you think, and stick it on the wall. Sign in with Google to add yours: one note each.</p>
         </div>
 
         <div className="fw">
           <div className="fw-frame">
             <div className={`fw-board${overBoard ? " is-target" : ""}`} ref={board} onScroll={checkMore} role="region" aria-label="Notes from visitors" tabIndex={-1}>
               <ul className="fw-notes">
-                {mineNote ? <StuckNote note={mineNote} mine hidden={flying} /> : null}
+                {mine ? <StuckNote note={mine} mine hidden={flying} /> : null}
                 {others.map((n) => (
                   <StuckNote key={n.id} note={n} />
                 ))}
               </ul>
-              {loaded && !others.length && !mineNote ? <p className="fw-empty">The wall is empty. Be the first to stick a note here!</p> : null}
+              {loaded && !others.length && !mine ? <p className="fw-empty">The wall is empty. Be the first to stick a note here!</p> : null}
             </div>
             {more ? (
               <button type="button" className="fw-more" onClick={() => board.current?.scrollBy({ top: board.current.clientHeight * 0.8, behavior: "smooth" })}>
@@ -287,15 +265,19 @@ export default function FeedbackWall() {
           </div>
 
           <div className="fw-pad">
-            {posted && !editing ? (
+            {!me ? null : !me.signedIn ? (
+              <div className="fw-thanks fw-signin">
+                <strong>Add your note</strong>
+                <p>Sign in with Google to stick a note on the wall. You can change it later from any device.</p>
+                <GoogleSignIn next="/#feedback" />
+              </div>
+            ) : posted && !editing ? (
               <div className="fw-thanks" role="status">
                 <strong>Thank you!</strong>
-                <p>{mineNote ? "Your note is on the wall. You can change it whenever you like." : "This browser has already added a note. Thank you for your feedback!"}</p>
-                {mineNote ? (
-                  <button type="button" className="btn btn-outline fw-edit" onClick={startEdit}>
-                    Edit your note
-                  </button>
-                ) : null}
+                <p>Your note is on the wall. You can change it whenever you like.</p>
+                <button type="button" className="btn btn-outline fw-edit" onClick={startEdit}>
+                  Edit your note
+                </button>
               </div>
             ) : (
               <form

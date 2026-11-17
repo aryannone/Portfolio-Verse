@@ -6,13 +6,21 @@ const approved = [
   { id: "00000001-aaaa-bbbb-cccc-dddddddddddd", name: "Priya", topic: "Templates", message: "The Aurora template is gorgeous!", color: "#a8d8ff", font: "caveat", created_at: "2026-11-01T10:00:00Z" },
 ];
 
-async function openWall(page: Page, onPost?: (body: Record<string, unknown>, method: string) => void) {
+// The person looking at the wall: signed in with Google (as "Aryan"), with no note yet, unless told otherwise.
+async function openWall(
+  page: Page,
+  onPost?: (body: Record<string, unknown>, method: string) => void,
+  me: Record<string, unknown> = { signedIn: true, name: "Aryan", note: null },
+) {
+  let mine: unknown = me.note ?? null;
+  await page.route("**/api/feedback/mine", (route) => route.fulfill({ json: { ...me, note: mine } }));
   await page.route("**/api/feedback", async (route) => {
     const method = route.request().method();
     if (method === "GET") return route.fulfill({ json: { notes: approved, ready: true } });
     const body = route.request().postDataJSON();
     onPost?.(body, method);
     const note = { ...body, id: "ffffffff-1111-2222-3333-444444444444", created_at: new Date().toISOString() };
+    mine = note;
     return route.fulfill({ status: method === "POST" ? 201 : 200, json: { note } });
   });
   await page.goto("/");
@@ -21,10 +29,13 @@ async function openWall(page: Page, onPost?: (body: Record<string, unknown>, met
 }
 
 test.describe("feedback wall", () => {
-  test("a note needs a name, then sticks to the wall, and only one per browser", async ({ page }) => {
+  test("a signed-in person's note needs a name, then sticks to the wall, and only one per account", async ({ page }) => {
     const posts: Record<string, unknown>[] = [];
     await openWall(page, (b) => posts.push(b));
 
+    // The name starts as the person's Google first name.
+    await expect(page.getByLabel("Your name (required)")).toHaveValue("Aryan");
+    await page.getByLabel("Your name (required)").fill("");
     await page.getByLabel("Your feedback").fill("Click to edit in the preview, please!");
     await page.getByRole("button", { name: "Stick it on the wall" }).click();
     await expect(page.locator(".fw-error")).toHaveText("Please add your name at the bottom of the note.");
@@ -41,7 +52,7 @@ test.describe("feedback wall", () => {
     expect(posts).toHaveLength(1);
     expect(posts[0]).toMatchObject({ name: "Aryan", topic: "Editor", font: "indie" });
 
-    // After a reload this browser still sees its note, and cannot add another.
+    // After a reload the account's note is still there, and another cannot be added.
     await page.reload();
     await page.locator("#feedback").scrollIntoViewIfNeeded();
     await expect(page.locator(".fw-note.is-mine")).toBeVisible();
@@ -74,6 +85,13 @@ test.describe("feedback wall", () => {
     await page.locator("#feedback").scrollIntoViewIfNeeded();
     await expect(page.locator(".fw-note.is-mine")).toContainText("Changed my mind");
     await expect(page.getByRole("button", { name: "Edit your note" })).toBeVisible();
+  });
+
+  test("signed out, the wall can be read but adding a note asks for Google sign-in", async ({ page }) => {
+    await openWall(page, undefined, { signedIn: false });
+    await expect(page.locator(".fw-signin")).toContainText("Sign in with Google to stick a note on the wall.");
+    await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();
+    await expect(page.locator(".fw-form")).toHaveCount(0);
   });
 
   test("a note can be dragged onto the wall by its tape", async ({ page }) => {
@@ -152,11 +170,12 @@ test.describe("feedback wall", () => {
     ]);
   });
 
-  test("without Supabase the real API says the wall is not open, and admin needs the key", async ({ request }) => {
+  test("without Supabase the real API says the wall is not open, nobody is signed in, and admin needs the key", async ({ request }) => {
     const list = await request.get("/api/feedback");
     expect(await list.json()).toEqual({ notes: [], ready: false });
     expect((await request.post("/api/feedback", { data: {} })).status()).toBe(503);
     expect((await request.patch("/api/feedback", { data: {} })).status()).toBe(503);
+    expect(await (await request.get("/api/feedback/mine")).json()).toEqual({ signedIn: false });
     expect((await request.get("/api/feedback/admin")).status()).toBe(401);
   });
 });

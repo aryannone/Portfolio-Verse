@@ -25,3 +25,7 @@ alter table public.feedback enable row level security;
 -- Added later: run these on a table made before pinned notes and replies existed (safe to run again).
 alter table public.feedback add column if not exists pinned boolean not null default false;
 alter table public.feedback add column if not exists reply text check (reply is null or char_length(reply) between 1 and 160);
+
+-- Added later: notes belong to a Google account (one note each); the browser id is no longer used for new notes.
+alter table public.feedback add column if not exists user_id uuid unique references auth.users (id) on delete cascade;
+alter table public.feedback alter column client_id drop not null;

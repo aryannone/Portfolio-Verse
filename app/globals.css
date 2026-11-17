@@ -1298,6 +1298,7 @@ label.rs-upload:focus-within { outline: 2px solid var(--ink); outline-offset: 3p
 .fw-thanks strong { font-family: var(--font-note-caveat), cursive; font-size: 34px; color: var(--accent-text); }
 .fw-thanks p { margin: 0; color: var(--ink-soft); }
 .fw-edit { align-self: flex-start; margin-top: 10px; }
+.fw-signin .btn-google { align-self: flex-start; margin-top: 10px; }
 
 @media (max-width: 860px) {
   .fw { grid-template-columns: 1fr; }

@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { checkNote, type Note } from "@/lib/feedback";
 import { feedbackReady, rest } from "@/lib/supabaseRest";
+import { serverSupabase } from "@/lib/supabase/server";
 
 // The feedback wall's public API.
-// GET: the approved notes, pinned ones first, then newest first. POST: a new note, stored unapproved until the owner approves it.
-// PATCH: the visitor changes their own note (found by the random id their browser keeps). A changed note
-// goes back to waiting for approval, so an approved note cannot be swapped for something else.
+// GET: the approved notes, pinned ones first, then newest first (open to everyone).
+// POST: a new note from a signed-in person, stored unapproved until the owner approves it. One note per Google account.
+// PATCH: the signed-in person changes their own note. A changed note goes back to waiting for approval,
+// so an approved note cannot be swapped for something else.
+// The signed-in person's own note is read from /api/feedback/mine.
 export const dynamic = "force-dynamic";
 
 const FIELDS = "id,name,topic,message,color,font,created_at,pinned,reply";
@@ -19,8 +22,16 @@ export async function GET() {
   return NextResponse.json({ notes, ready: true }, { headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120" } });
 }
 
-// Reads and checks the body shared by POST and PATCH: the bot trap, the browser's id and the note itself.
+// The signed-in person (from their session cookie), or null.
+async function signedInUser() {
+  const supabase = await serverSupabase();
+  return supabase ? (await supabase.auth.getUser()).data.user : null;
+}
+
+// Checks what POST and PATCH share: a signed-in person, the bot trap and the note itself.
 async function readNote(request: Request) {
+  const user = await signedInUser();
+  if (!user) return { error: NextResponse.json({ error: "Please sign in with Google to leave a note." }, { status: 401 }) };
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -30,12 +41,9 @@ async function readNote(request: Request) {
   // A field people never see: forms filled in by bots usually fill it.
   if (typeof body.website === "string" && body.website) return { error: NextResponse.json({ error: "Please try again." }, { status: 400 }) };
 
-  const clientId = typeof body.clientId === "string" ? body.clientId : "";
-  if (!/^[a-z0-9-]{16,64}$/i.test(clientId)) return { error: NextResponse.json({ error: "Please reload the page and try again." }, { status: 400 }) };
-
   const checked = checkNote(body);
   if ("error" in checked) return { error: NextResponse.json({ error: checked.error }, { status: 400 }) };
-  return { clientId, note: checked.note };
+  return { userId: user.id, note: checked.note };
 }
 
 export async function POST(request: Request) {
@@ -46,13 +54,13 @@ export async function POST(request: Request) {
   const res = await rest(`feedback?select=${FIELDS}`, {
     method: "POST",
     headers: { Prefer: "return=representation" },
-    body: JSON.stringify({ ...read.note, client_id: read.clientId, approved: false }),
+    body: JSON.stringify({ ...read.note, user_id: read.userId, approved: false }),
   });
   if (res.status === 409) {
-    // This browser already has a note: hand it back so the visitor can see and edit it.
-    const mine = await rest(`feedback?select=${FIELDS}&client_id=eq.${read.clientId}&limit=1`);
+    // This account already has a note: hand it back so it can be seen and edited.
+    const mine = await rest(`feedback?select=${FIELDS}&user_id=eq.${read.userId}&limit=1`);
     const [note] = mine.ok ? ((await mine.json()) as Note[]) : [];
-    return NextResponse.json({ error: "This browser has already added a note.", note }, { status: 409 });
+    return NextResponse.json({ error: "You have already added a note.", note }, { status: 409 });
   }
   if (!res.ok) return NextResponse.json({ error: "Could not save your note. Please try again later." }, { status: 502 });
   const [note] = (await res.json()) as Note[];
@@ -64,7 +72,7 @@ export async function PATCH(request: Request) {
   const read = await readNote(request);
   if ("error" in read) return read.error;
 
-  const res = await rest(`feedback?select=${FIELDS}&client_id=eq.${read.clientId}`, {
+  const res = await rest(`feedback?select=${FIELDS}&user_id=eq.${read.userId}`, {
     method: "PATCH",
     headers: { Prefer: "return=representation" },
     body: JSON.stringify({ ...read.note, approved: false }),
