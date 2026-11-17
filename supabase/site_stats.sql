@@ -1,4 +1,4 @@
--- The home page's numbers (visitors and HTML downloads). Run once in Supabase: SQL Editor -> New query -> paste -> Run.
+-- The home page's download count (the 'visitors' row is no longer used: unique visitors are in visitors.sql). Run once in Supabase: SQL Editor -> New query -> paste -> Run.
 -- Only the site's server (with the service role key) reads it and calls increment_stat; visitors never reach it directly.
 
 create table if not exists public.site_stats (

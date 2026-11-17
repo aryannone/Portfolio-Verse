@@ -1,7 +1,8 @@
 import type { Portfolio } from "@/lib/portfolio";
 import { getTemplate } from "@/lib/templates";
 
-// Everything is kept in this browser (IndexedDB), because there are no accounts yet.
+// Everything is kept in this browser (IndexedDB). Accounts (Google sign-in) do not hold portfolios; only a
+// published site is stored on the server (see lib/publish.ts).
 // IndexedDB is used and not localStorage, so that photos fit.
 //
 // A browser can hold many portfolios. Three things are stored:

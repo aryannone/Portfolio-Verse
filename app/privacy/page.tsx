@@ -4,7 +4,7 @@ import SiteFooter from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Privacy",
-  description: "PORTFOLIO-VERSE keeps your portfolio in your own browser. No account, no tracking.",
+  description: "PORTFOLIO-VERSE keeps your portfolio in your own browser until you publish it. Google sign-in, no tracking.",
 };
 
 // What the site does with people's information, in plain words. Keep it true to the code:
@@ -15,13 +15,16 @@ export default function PrivacyPage() {
       <SiteHeader />
       <main className="wrap simple legal">
         <h1 className="display h-page">Privacy</h1>
-        <p className="lead">Short version: your portfolio stays in your browser. Your account holds only your name, email and Google photo, and we do not track you.</p>
+        <p className="lead">
+          Short version: your portfolio stays in your browser until you choose to publish it. Your account holds only your name, email and Google
+          photo, and we do not track you.
+        </p>
 
         <h2>What stays on your device</h2>
         <ul>
           <li>
             Everything you type into the builder, every photo you add and every portfolio you save is kept in your own browser (IndexedDB and
-            local storage). It is not sent to us, and we have no copy of it.
+            local storage). It is not sent to us, and we have no copy of it, unless you press Publish (see below).
           </li>
           <li>
             Reading a résumé PDF and removing a photo&apos;s background both happen inside your browser. The files never leave
@@ -72,17 +75,27 @@ export default function PrivacyPage() {
         <h2>The feedback wall</h2>
         <ul>
           <li>
-            If you add a note to the feedback wall on the home page, its name, topic and message are stored on our database
-            (Supabase), with a random code from your browser that allows one note per browser.
+            You need to sign in with Google to add a note to the feedback wall. Its name, topic and message are stored on our
+            database (Supabase) with your account, which allows one note per person and lets you edit it from any device.
           </li>
           <li>Notes are checked by us before anyone else can see them. Once approved, a note is public on the home page.</li>
           <li>Only add a name you are happy to show publicly; a first name is enough. To have a note removed, ask us.</li>
         </ul>
 
+        <h2>Publishing your site</h2>
+        <ul>
+          <li>
+            When you press Publish, the portfolio open in the editor is turned into one HTML file and stored on our storage
+            (Supabase), linked to your account. Anyone with your link (/u/your-username) can see it.
+          </li>
+          <li>You can publish one site at a time. Publishing again replaces it; Take down deletes the file and the link stops working.</li>
+          <li>Downloaded and published portfolios end with a small &quot;Made in • PORTFOLIO-VERSE&quot; link back to this site.</li>
+        </ul>
+
         <h2>Your portfolio is public once you publish it</h2>
         <p>
-          When you put your downloaded portfolio online, everything in it, including your email, phone number and any
-          résumé file you added, can be seen by anyone. Only include what you are happy to share.
+          Whether you publish here or put your downloaded file online yourself, everything in it, including your email, phone
+          number and any résumé file you added, can be seen by anyone. Only include what you are happy to share.
         </p>
       </main>
       <SiteFooter />
