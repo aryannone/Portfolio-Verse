@@ -953,6 +953,23 @@ label.rs-upload:focus-within { outline: 2px solid var(--ink); outline-offset: 3p
 }
 
 /* Choosing the part of your photo to keep in view */
+/* The crop tool for an entry's first photo: the same blurred fill as the page, in a 16:10 frame. */
+.ed-crop-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.ed-crop-actions { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.ed-crop-frame { position: relative; display: block; width: 160px; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 10px; background: var(--surface); isolation: isolate; }
+.ed-crop-frame.is-big { width: 100%; max-width: 420px; border-radius: 12px; }
+.ed-crop-frame img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; -webkit-user-drag: none; }
+.ed-crop-bg { object-fit: cover; filter: blur(22px) saturate(1.2); transform: scale(1.25); opacity: 0.9; }
+.ed-crop-img { object-fit: contain; }
+.ed-crop { gap: 12px; }
+.ed-crop-stage { display: block; max-width: 420px; border-radius: 12px; cursor: grab; touch-action: none; outline: 2px dashed var(--line-strong); outline-offset: 4px; }
+.ed-crop-stage:active { cursor: grabbing; }
+.ed-crop-stage:focus-visible { outline: 3px solid var(--accent-text); }
+.ed-crop-zoom { display: flex; align-items: center; gap: 10px; max-width: 420px; }
+.ed-crop-zoom input { flex: 1; accent-color: var(--accent); }
+.ed-crop-zoom output { min-width: 44px; font-size: 13px; font-weight: 600; color: var(--muted); text-align: right; }
+.ed-crop-step { width: 36px; height: 36px; flex: none; border: 1px solid var(--line-strong); border-radius: 50%; background: #ffffff; font-size: 18px; line-height: 1; cursor: pointer; }
+.ed-crop-step:hover { border-color: var(--ink); }
 .ed-focus-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
 .ed-focus { padding: 0; border: 0; background: none; cursor: crosshair; border-radius: 10px; }
 .ed-focus:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }

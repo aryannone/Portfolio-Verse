@@ -14,11 +14,17 @@ export type Item = {
   links?: Link[]; // a project site, a repository, a certificate
   photos: string[]; // image data, shown in the details panel
   gallery?: GalleryId | ""; // this entry's own photo layout; empty means the portfolio's
-  // How the first photo sits in its frame on the page. "fit" (the default) shows the whole photo with a
-  // blurred copy filling the space around it; "fill" crops it to fill the frame, keeping photoFocus in view.
+  // How the first photo sits in its frame on the page. With no crop, the whole photo shows and a blurred
+  // copy of it fills any space around it. photoCrop zooms (below 1 zooms out, leaving more blurred space)
+  // and moves it (x and y as a share of the frame, -100 to 100). photoFit "fill" and photoFocus are the
+  // older top/middle/bottom crop, still drawn for portfolios saved with it.
+  photoCrop?: PhotoCrop;
   photoFit?: PhotoFit;
   photoFocus?: PhotoFocus;
 };
+
+export type PhotoCrop = { x: number; y: number; zoom: number };
+export const CROP_ZOOM = { min: 0.5, max: 4 };
 
 export type PhotoFit = "fit" | "fill";
 export type PhotoFocus = "top" | "center" | "bottom";

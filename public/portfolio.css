@@ -971,7 +971,7 @@
    instead, keeping the chosen part (--tp-fy: top, centre or bottom) in view. */
 .tp .tp-shot, .tp .tp-ch-media { isolation: isolate; }
 .tp .tp-shot img.tp-photo-bg, .tp .tp-ch-media img.tp-photo-bg { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(22px) saturate(1.2); transform: scale(1.25); opacity: 0.9; pointer-events: none; }
-.tp .tp-shot img.tp-photo, .tp .tp-ch-media img.tp-photo { position: relative; z-index: 1; object-fit: contain; }
-.tp .is-fill img.tp-photo { object-fit: cover; object-position: 50% var(--tp-fy, 50%); }
+.tp .tp-shot img.tp-photo, .tp .tp-ch-media img.tp-photo { position: relative; z-index: 1; object-fit: contain; transform: translate(var(--tp-tx, 0%), var(--tp-ty, 0%)) scale(var(--tp-z, 1)); }
+.tp .is-fill img.tp-photo { object-fit: cover; object-position: 50% var(--tp-fy, 50%); transform: none; }
 .tp .tp-shot .tp-count { z-index: 2; }
 .tp .tp-ch-media .tp-count { z-index: 2; }

@@ -71,19 +71,38 @@ test.describe("editor", () => {
     await expect(page.locator(".tp-avatar img")).toHaveJSProperty("complete", true);
   });
 
-  test("entry photos show whole with a blurred fill, or cropped to fill the frame", async ({ page }) => {
+  test("entry photos show whole with a blurred fill, and can be zoomed in, out and moved", async ({ page }) => {
     await openEditor(page);
     const shot = page.locator(".tp .tp-shot").first();
+    const photo = shot.locator("img.tp-photo");
     await expect(shot.locator("img.tp-photo-bg")).toHaveCount(1);
-    await expect(shot.locator("img.tp-photo")).toHaveCSS("object-fit", "contain");
+    await expect(photo).toHaveCSS("object-fit", "contain");
 
-    const fit = page.getByLabel("First photo on the page").first();
-    await fit.selectOption("fill");
-    await expect(shot).toHaveClass(/is-fill/);
-    await expect(shot.locator("img.tp-photo-bg")).toHaveCount(0);
-    await expect(shot.locator("img.tp-photo")).toHaveCSS("object-fit", "cover");
-    await page.getByLabel("Part of the photo to keep").first().selectOption("top");
-    await expect(shot.locator("img.tp-photo")).toHaveCSS("object-position", "50% 0%");
+    await page.getByRole("button", { name: "Crop and zoom" }).first().click();
+    const stage = page.getByRole("application", { name: /Photo crop/ });
+    await expect(stage).toBeVisible();
+    // Zoom in twice with the button, then move the photo with the keyboard.
+    await page.getByRole("button", { name: "Zoom in" }).click();
+    await page.getByRole("button", { name: "Zoom in" }).click();
+    await stage.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(shot).toHaveAttribute("style", /--tp-z: 1.2/);
+    await expect(shot).toHaveAttribute("style", /--tp-tx: 2%/);
+    // Zoom out below the frame: the blurred copy still fills the space around the photo.
+    await page.getByLabel("Zoom", { exact: true }).fill("0.6");
+    await expect(shot).toHaveAttribute("style", /--tp-z: 0.6/);
+    await expect(shot.locator("img.tp-photo-bg")).toHaveCount(1);
+    // Dragging moves it too.
+    const box = (await stage.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2 - box.width / 4, box.y + box.height / 2, { steps: 5 });
+    await page.mouse.up();
+    await expect(shot).toHaveAttribute("style", /--tp-tx: -2[0-9.]*%/);
+
+    await page.getByRole("button", { name: "Done" }).click();
+    await page.getByRole("button", { name: "Show the whole photo again" }).first().click();
+    await expect(shot).not.toHaveAttribute("style", /--tp-z/);
   });
 
   test("large photos are made smaller in the downloaded file", async ({ page }, info) => {

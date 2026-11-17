@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
-import { CARD_STYLES, CONTACT_DESIGNS, CONTACT_VISUALS, PORTRAITS, SENDS, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type ContactDesignId, type ContactVisualId, type FontId, type PortraitId, type SendId, type GalleryId, type Link, type PhotoFit, type PhotoFocus, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { CROP_ZOOM, CARD_STYLES, CONTACT_DESIGNS, CONTACT_VISUALS, PORTRAITS, SENDS, FONTS, GALLERIES, LIST_STYLES, newItem, uid, type ContactDesignId, type ContactVisualId, type FontId, type PortraitId, type SendId, type GalleryId, type Link, type PhotoCrop, type Portfolio, type Section, type SectionStyle } from "@/lib/portfolio";
 import type { PortfolioTools } from "@/lib/usePortfolio";
 
 // The form pieces shared by the details form (/start) and the editor.
@@ -257,6 +257,109 @@ export function move<T>(list: T[], index: number, by: number) {
 
 type Tools = Pick<PortfolioTools, "set" | "setSection" | "setItem" | "addPhotos" | "setAvatar">;
 
+// The crop tool for an entry's first photo. Drag the photo to move it, zoom in or out with the slider or the
+// buttons (arrow keys move it too). Space the photo does not cover is filled with a blurred copy of it, as on
+// the page. The frame here is 16:10, the shape most templates use; a few use slightly different shapes.
+function PhotoCropper({ photo, crop, onChange }: { photo: string; crop: PhotoCrop | undefined; onChange: (crop: PhotoCrop | undefined) => void }) {
+  const [open, setOpen] = useState(false);
+  const drag = useRef<{ x: number; y: number; start: PhotoCrop } | null>(null);
+  const c = crop ?? { x: 0, y: 0, zoom: 1 };
+  const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+  const update = (next: Partial<PhotoCrop>) =>
+    onChange({
+      x: Math.round(clamp(next.x ?? c.x, -100, 100) * 10) / 10,
+      y: Math.round(clamp(next.y ?? c.y, -100, 100) * 10) / 10,
+      zoom: Math.round(clamp(next.zoom ?? c.zoom, CROP_ZOOM.min, CROP_ZOOM.max) * 100) / 100,
+    });
+  const frame = (big: boolean) => (
+    <span className={`ed-crop-frame${big ? " is-big" : ""}`}>
+      <img className="ed-crop-bg" src={photo} alt="" />
+      <img className="ed-crop-img" src={photo} alt="" draggable={false} style={{ transform: `translate(${c.x}%, ${c.y}%) scale(${c.zoom})` }} />
+    </span>
+  );
+
+  if (!open) {
+    return (
+      <div className="ed-field">
+        <span>First photo on the page</span>
+        <div className="ed-crop-row">
+          {frame(false)}
+          <div className="ed-crop-actions">
+            <button type="button" className="btn btn-outline" onClick={() => setOpen(true)}>
+              Crop and zoom
+            </button>
+            {crop ? (
+              <button type="button" className="ed-link" onClick={() => onChange(undefined)}>
+                Show the whole photo again
+              </button>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="ed-field ed-crop">
+      <span>Drag the photo to move it. Zoom in or out; any empty space is filled with a blurred copy.</span>
+      <div
+        className="ed-crop-stage"
+        role="application"
+        tabIndex={0}
+        aria-label={`Photo crop: zoom ${Math.round(c.zoom * 100)}%. Drag or use the arrow keys to move the photo.`}
+        onPointerDown={(e) => {
+          e.preventDefault();
+          (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+          drag.current = { x: e.clientX, y: e.clientY, start: c };
+        }}
+        onPointerMove={(e) => {
+          const d = drag.current;
+          if (!d) return;
+          const box = e.currentTarget.getBoundingClientRect();
+          update({ x: d.start.x + ((e.clientX - d.x) / box.width) * 100, y: d.start.y + ((e.clientY - d.y) / box.height) * 100 });
+        }}
+        onPointerUp={() => (drag.current = null)}
+        onPointerCancel={() => (drag.current = null)}
+        onKeyDown={(e) => {
+          const step = e.shiftKey ? 10 : 2;
+          const moves: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+          const m = moves[e.key];
+          if (!m) return;
+          e.preventDefault();
+          update({ x: c.x + m[0], y: c.y + m[1] });
+        }}
+      >
+        {frame(true)}
+      </div>
+      <div className="ed-crop-zoom">
+        <button type="button" className="ed-crop-step" aria-label="Zoom out" onClick={() => update({ zoom: c.zoom - 0.1 })}>
+          −
+        </button>
+        <input
+          type="range"
+          aria-label="Zoom"
+          min={CROP_ZOOM.min}
+          max={CROP_ZOOM.max}
+          step={0.01}
+          value={c.zoom}
+          onChange={(e) => update({ zoom: Number(e.target.value) })}
+        />
+        <button type="button" className="ed-crop-step" aria-label="Zoom in" onClick={() => update({ zoom: c.zoom + 0.1 })}>
+          +
+        </button>
+        <output>{Math.round(c.zoom * 100)}%</output>
+      </div>
+      <div className="ed-crop-actions">
+        <button type="button" className="btn btn-primary" onClick={() => setOpen(false)}>
+          Done
+        </button>
+        <button type="button" className="ed-link" onClick={() => onChange(undefined)}>
+          Reset
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // "Tap the part of your photo that should stay in view." Frames that crop the photo keep that point visible.
 // Arrow keys move the point too.
 function PhotoFocus({ photo, focus, onChange }: { photo: string; focus: string; onChange: (focus: string) => void }) {
@@ -510,27 +613,11 @@ export function SectionFields({ data, section, tools, design }: { data: Portfoli
           </div>
           {item.photos.length ? (
             <>
-              <Choice<PhotoFit>
-                label="First photo on the page"
-                value={item.photoFit ?? "fit"}
-                options={[
-                  { id: "fit", name: "Show the whole photo (blurred edges fill the frame)" },
-                  { id: "fill", name: "Crop to fill the frame" },
-                ]}
-                onChange={(photoFit) => setItem(section.id, item.id, { photoFit })}
+              <PhotoCropper
+                photo={item.photos[0]}
+                crop={item.photoCrop}
+                onChange={(photoCrop) => setItem(section.id, item.id, { photoCrop, photoFit: undefined, photoFocus: undefined })}
               />
-              {item.photoFit === "fill" ? (
-                <Choice<PhotoFocus>
-                  label="Part of the photo to keep"
-                  value={item.photoFocus ?? "center"}
-                  options={[
-                    { id: "top", name: "Top" },
-                    { id: "center", name: "Middle" },
-                    { id: "bottom", name: "Bottom" },
-                  ]}
-                  onChange={(photoFocus) => setItem(section.id, item.id, { photoFocus })}
-                />
-              ) : null}
             </>
           ) : null}
           {item.photos.length ? (

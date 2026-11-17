@@ -47,18 +47,23 @@ function photoLabel(count: number) {
 
 // A whole portfolio page in the look of its template.
 // The markup is the same for every template; public/portfolio.css gives each its own layout.
-// An entry's first photo in its frame. By default the whole photo shows, with a blurred copy of it filling
-// the rest of the frame; "Fill the frame" crops it instead (the frame gets the class is-fill).
+// An entry's first photo in its frame. The whole photo shows, with a blurred copy of it filling the rest of
+// the frame; the editor's crop tool can zoom and move it (photoCrop). The older "fill" crop gives is-fill.
 // The copy costs nothing in a downloaded file: each photo is stored there once.
 function FramedPhoto({ item }: { item: Item }) {
   return (
     <>
-      {item.photoFit === "fill" ? null : <img className="tp-photo-bg" src={item.photos[0]} alt="" aria-hidden="true" />}
+      {isFill(item) ? null : <img className="tp-photo-bg" src={item.photos[0]} alt="" aria-hidden="true" />}
       <img className="tp-photo" src={item.photos[0]} alt="" />
     </>
   );
 }
-const focusStyle = (item: Item) => (item.photoFit === "fill" && item.photoFocus ? ({ "--tp-fy": PHOTO_FOCUS[item.photoFocus] } as CSSProperties) : undefined);
+const focusStyle = (item: Item) => {
+  const c = item.photoCrop;
+  if (c) return { "--tp-tx": `${c.x}%`, "--tp-ty": `${c.y}%`, "--tp-z": c.zoom } as CSSProperties;
+  return item.photoFit === "fill" && item.photoFocus ? ({ "--tp-fy": PHOTO_FOCUS[item.photoFocus] } as CSSProperties) : undefined;
+};
+const isFill = (item: Item) => item.photoFit === "fill" && !item.photoCrop;
 
 export default function PortfolioView({ data, animate, interactive, reveal, semantic, rootRef }: Props) {
   const localRef = useRef<HTMLDivElement | null>(null);
@@ -198,7 +203,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
           return (
             <article key={item.id} className="tp-chapter">
               {item.photos.length ? (
-                <button type="button" className={`tp-ch-media tp-item has-more${item.photoFit === "fill" ? " is-fill" : ""}`} style={focusStyle(item)} data-item={key} aria-label={photosLabel} tabIndex={interactive ? 0 : -1}>
+                <button type="button" className={`tp-ch-media tp-item has-more${isFill(item) ? " is-fill" : ""}`} style={focusStyle(item)} data-item={key} aria-label={photosLabel} tabIndex={interactive ? 0 : -1}>
                   <FramedPhoto item={item} />
                   {item.photos.length > 1 ? <span className="tp-count">{photoLabel(item.photos.length)}</span> : null}
                 </button>
@@ -359,7 +364,7 @@ export default function PortfolioView({ data, animate, interactive, reveal, sema
                   {section.items.map((item) => (
                     <div key={item.id} {...itemProps(section, item, "tp-card")}>
                       {item.photos.length ? (
-                        <div className={`tp-shot${item.photoFit === "fill" ? " is-fill" : ""}`} style={focusStyle(item)}>
+                        <div className={`tp-shot${isFill(item) ? " is-fill" : ""}`} style={focusStyle(item)}>
                           <FramedPhoto item={item} />
                           <span className="tp-count">{photoLabel(item.photos.length)}</span>
                         </div>
