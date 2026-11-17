@@ -5,7 +5,7 @@ import { serverSupabase } from "@/lib/supabase/server";
 import { VISITOR_COOKIE, VISITOR_COOKIE_OPTIONS, VISITOR_ID, recordVisit, visitorCount } from "@/lib/visitors";
 
 // The numbers shown on the home page: unique visitors, HTML downloads and approved feedback notes.
-// GET: the current numbers (cached for a minute).
+// GET: the current numbers (cached for at most a minute, so a refresh is never more than a minute behind).
 // POST { event: "visit" }: records this browser (once, ever) and links it to the signed-in account, if any;
 //   answers with the up-to-date visitor number. POST { event: "download" }: counts one more download.
 export const dynamic = "force-dynamic";
@@ -23,7 +23,7 @@ export async function GET() {
   const [downloads] = (await stats.json()) as { value: number }[];
   return NextResponse.json(
     { ready: true, visitors, downloads: Number(downloads?.value ?? 0), notes },
-    { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } },
+    { headers: { "Cache-Control": "public, s-maxage=60" } },
   );
 }
 
