@@ -1,6 +1,9 @@
 import { slugOf, toHref, type Portfolio } from "@/lib/portfolio";
 import { mountPortfolio, type RuntimeStore } from "@/lib/runtime";
 
+// Every downloaded or published portfolio ends with a small credit line linking here.
+export const SITE_URL = "https://portfolio-verse-tau.vercel.app";
+
 const escapeHtml = (text: string) =>
   text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -26,6 +29,14 @@ export async function buildHtml(root: HTMLElement, data: Portfolio): Promise<str
 
   const clone = root.cloneNode(true) as HTMLElement;
   clone.classList.remove("tp-anim", "tp-live-motion", "tp-pointer", "tp-scrolled");
+  // The credit goes inside the portfolio, at the very end, so it takes the template's colours.
+  const credit = document.createElement("a");
+  credit.className = "pv-credit";
+  credit.href = SITE_URL;
+  credit.target = "_blank";
+  credit.rel = "noopener";
+  credit.innerHTML = 'Made in <span aria-hidden="true">•</span> <b>PORTFOLIO-VERSE</b>';
+  clone.appendChild(credit);
   clone.style.removeProperty("--mx");
   clone.style.removeProperty("--my");
   clone.querySelectorAll(".tp-shot img, .tp-ch-media img").forEach((el) => (el as HTMLElement).style.removeProperty("--par"));
@@ -112,6 +123,9 @@ html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; }
 .tp { min-height: 100vh; }
 ${css}
+.pv-credit { display: block; padding: 20px 16px 24px; text-align: center; font: 500 12px/1.4 var(--font-body-stack); letter-spacing: 0.04em; color: inherit; opacity: 0.65; text-decoration: none; }
+.pv-credit b { font-weight: 800; letter-spacing: 0.08em; }
+.pv-credit:hover, .pv-credit:focus-visible { opacity: 1; text-decoration: underline; }
 </style>
 </head>
 <body>

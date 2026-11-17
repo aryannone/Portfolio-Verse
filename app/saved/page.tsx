@@ -13,6 +13,7 @@ export default function SavedPage() {
         <section className="wrap page-head">
           <h1 className="display h-page">My portfolios.</h1>
           <p>Every portfolio you have made in this browser. Each one saves by itself as you edit, and none replaces another.</p>
+          <p className="small one-site">You can publish one portfolio at a time. Publishing another one replaces your live site.</p>
         </section>
         <SavedList />
       </main>

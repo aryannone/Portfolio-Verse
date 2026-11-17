@@ -38,6 +38,11 @@ test.describe("editor", () => {
     await page.setContent(html);
     await expect(page.locator(".tp").getByText(NAME).first()).toBeVisible();
     await expect(page.locator(".tp-nav")).toBeVisible();
+    // It ends with a small credit line linking to PORTFOLIO-VERSE.
+    const credit = page.locator(".tp > .pv-credit");
+    await expect(credit).toHaveText("Made in • PORTFOLIO-VERSE");
+    await expect(credit).toHaveAttribute("href", "https://portfolio-verse-tau.vercel.app");
+    expect(await page.locator(".tp > *").last().getAttribute("class")).toBe("pv-credit");
     expect(errors).toEqual([]);
   });
 

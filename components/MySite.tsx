@@ -29,6 +29,7 @@ export default function MySite() {
   return (
     <section className="my-site">
       <h2>Your published site</h2>
+      <p className="small one-site">You can publish one portfolio at a time. Publishing another one replaces your live site.</p>
       {status.live && status.path ? (
         <>
           <p>
